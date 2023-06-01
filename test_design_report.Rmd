@@ -1,0 +1,34 @@
+---
+title: "Test Design report"
+date: "`r Sys.Date()`"
+output: html_document
+params:
+  est_prev_plot: NA
+  est_icc_plot: NA
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+require(tidyverse)
+
+set.seed(10)
+```
+
+## *This is just a test document for now *
+
+#### Estimated prevalence plot
+```{r}
+params$est_prev_plot
+```
+
+
+#### Estimated ICC plot
+```{r}
+params$est_icc_plot
+```
+
+```{r}
+
+```
+
