@@ -10,7 +10,8 @@
 library(shiny)
 library(tidyverse)
 library(shiny.fluent)
-library(DRpower)
+# devtools::install_github(repo = "mrc-ide/DRpower@develop")
+# library(DRpower)
 
 load("dummy_data.RData")
 
@@ -156,26 +157,26 @@ function(input, output, session) {
                                             "prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims))
     
     # ATM this is hard-coded but will be flexible eventually
-    power_output <- DRpower::get_power_threshold(N = c(rep(100, 10)),
-                                                 prevalence = 0.06,
-                                                 ICC = 0.1,
-                                                 reps = 100
-                                                )
-    
-    output$est_power_plot <- renderPlot({
-      ggplot(power_output) +
-        geom_segment(aes(x = " ", xend = " ",y = lower, yend = upper), color = "black", linewidth = 1) +
-        geom_point(aes(x = " ", y = power),
-                   size = 4,
-                   shape = 21,
-                   fill = "skyblue3") +
-        scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
-        labs(x = "",
-             y = "Estimated power",
-             caption = paste0("Parameters: prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims)) +
-        theme_light() +
-        theme(text = element_text(size = 16))
-    })
+    # power_output <- DRpower::get_power_threshold(N = c(rep(100, 10)),
+    #                                              prevalence = 0.06,
+    #                                              ICC = 0.1,
+    #                                              reps = 100
+    #                                             )
+    # 
+    # output$est_power_plot <- renderPlot({
+    #   ggplot(power_output) +
+    #     geom_segment(aes(x = " ", xend = " ",y = lower, yend = upper), color = "black", linewidth = 1) +
+    #     geom_point(aes(x = " ", y = power),
+    #                size = 4,
+    #                shape = 21,
+    #                fill = "skyblue3") +
+    #     scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
+    #     labs(x = "",
+    #          y = "Estimated power",
+    #          caption = paste0("Parameters: prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims)) +
+    #     theme_light() +
+    #     theme(text = element_text(size = 16))
+    # })
   })
   
   # ----------------------------------
@@ -251,41 +252,41 @@ function(input, output, session) {
     output$text_prevbox <- renderText("The table and plot show the mean and lower and upper credible interval")
     
     # ATM this is hard-coded but will be flexible eventually
-    prev_output <- DRpower::get_prevalence(n = c(rep(5, 10)), N = c(rep(100, 10)))
-    
-    output$est_prev_table <- renderDT({
-      datatable(prev_output, 
-                rownames = FALSE, 
-                colnames = c("Mean prevalence", "Lower CrI", "Upper CrI", "Probability above threshold"),
-                options = list(autoWidth = TRUE, 
-                               fixedHeader = TRUE,
-                               columnDefs = list(list(className = "dt-center", 
-                                                      targets = "_all")),
-                               dom = 't'))
-    })
+    # prev_output <- DRpower::get_prevalence(n = c(rep(5, 10)), N = c(rep(100, 10)))
+    # 
+    # output$est_prev_table <- renderDT({
+    #   datatable(prev_output, 
+    #             rownames = FALSE, 
+    #             colnames = c("Mean prevalence", "Lower CrI", "Upper CrI", "Probability above threshold"),
+    #             options = list(autoWidth = TRUE, 
+    #                            fixedHeader = TRUE,
+    #                            columnDefs = list(list(className = "dt-center", 
+    #                                                   targets = "_all")),
+    #                            dom = 't'))
+    # })
     
     # NOTE need to divide by 100 to convert to proportion
     
-    est_prev_plot <- reactive({
-      ggplot(prev_output) +
-        geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100), 
-                     color = "black", linewidth = 1) +
-        geom_point(aes(x = " ", y = MAP/100),
-                   size = 3,
-                   shape = 21,
-                   fill = "skyblue3") +
-        # geom_hline(aes(y=0.06),
-        #            color = "darkgrey",
-        #            linetype = "dashed") +
-        scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
-        labs(x = "",
-             y = "Estimated prevalence") +
-        # coord_flip() +
-        theme_light() +
-        theme(text = element_text(size = 16))
-    })
-    
-    output$est_prev_plot <- renderPlot(est_prev_plot())
+    # est_prev_plot <- reactive({
+    #   ggplot(prev_output) +
+    #     geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100), 
+    #                  color = "black", linewidth = 1) +
+    #     geom_point(aes(x = " ", y = MAP/100),
+    #                size = 3,
+    #                shape = 21,
+    #                fill = "skyblue3") +
+    #     # geom_hline(aes(y=0.06),
+    #     #            color = "darkgrey",
+    #     #            linetype = "dashed") +
+    #     scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
+    #     labs(x = "",
+    #          y = "Estimated prevalence") +
+    #     # coord_flip() +
+    #     theme_light() +
+    #     theme(text = element_text(size = 16))
+    # })
+    # 
+    # output$est_prev_plot <- renderPlot(est_prev_plot())
     
   })
   
