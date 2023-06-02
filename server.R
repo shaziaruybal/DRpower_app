@@ -134,8 +134,14 @@ function(input, output, session) {
    observeEvent(input$calc_sizes, {
     print("Calculate final sample sizes values button clicked")
     
+     output$title_finalsizesbox <- renderText("The final sample sizes are below: ")
+     output$text_finalsizesbox <- renderText("Based on the values you entered for sample size and taking into account the proportion drop-out, 
+                                             the final adjusted sample sizes are calculated using the formula: Nadj=n/(1-d) where Nadj is the adjusted sample size, 
+                                             n is the target sample size, and d is the expected drop-out proportion")
+     
      n_rows <- input$user_nclust
      
+     # TODO: This needs to be updated to ideal numbers based on final simulations
      final_df <- data.frame(
        cluster = c(rep(1:n_rows)),
        final_sample_size = c(rep(150, n_rows))
