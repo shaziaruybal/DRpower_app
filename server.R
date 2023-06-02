@@ -117,8 +117,9 @@ function(input, output, session) {
                     )
                   ),
                 rownames = FALSE,
-                options = list(dom = 'rtip',
-                               autoWidth = TRUE))
+                options = list(dom = 'rti',
+                               autoWidth = TRUE,
+                               pageLength=20))
     })
     
     # output$output_text <- renderText(paste0("Number of clusters: ", input$user_nclust))
