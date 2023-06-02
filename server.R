@@ -10,7 +10,6 @@
 library(shiny)
 library(tidyverse)
 library(shiny.fluent)
-# devtools::install_github(repo = "mrc-ide/DRpower@develop", force=T)
 library(DRpower)
 
 load("dummy_data.RData")
@@ -18,8 +17,6 @@ load("dummy_data.RData")
 set.seed(10)
 
 function(input, output, session) {
-    # bs_themer()
-  
   
   ##################################################
   # TESTING
@@ -43,10 +40,13 @@ function(input, output, session) {
   shiny::observeEvent(input$test_button, {
     plot_data <- rnorm(100)
     print("Test button clicked")
-
+    
     output$test_plot <- renderPlot({
       hist(plot_data, main = "Histogram of Random Data")
     })
+    
+    session$sendCustomMessage(type = "testmessage",
+                              message = "Thanks for clicking")
   })
 
   ##################################################
@@ -57,32 +57,38 @@ function(input, output, session) {
   # Sample size table
   # ----------------------------------
   
-  # TODO: make sure this shows the table representing the correct power selected by the user
+  # TODO: make sure this shows the table representing the correct power selected by the user - when Bob sends final sample size estimates
   
-  observeEvent(input$user_pow, {
+  observeEvent(input$user_pow, ignoreNULL = T, ignoreInit = F, {
     print("Target power selected")
     
-    if(input$user_pow==0.8)
-      
-      output$sample_size_table <- renderDT(datatable(df_samp_size2, 
-                                                     colnames = c("Number of clusters", "6%", "7%", "8%", "9%", "10%"),
-                                                     rownames = FALSE,
-                                                     extensions = c("Buttons", "FixedHeader"), 
-                                                     options = list(autoWidth = T, 
-                                                                    pageLength = 12,
-                                                                    fixedHeader = TRUE,
-                                                                    columnDefs = list(list(className = "dt-center", 
-                                                                                           targets = "_all")),
-                                                                    searchHighlight = TRUE,
-                                                                    language = list(search = 'Filter:'),
-                                                                    dom = 'rtB',
-                                                                    buttons = c('copy', 'csv', 'excel')))
-      )
-      
-    else
-      output$table_NA <- renderText("There is no table for that target power yet")
+    output$sample_size_table <- renderDT({
+      if(input$user_pow==0.8){
+        datatable(df_samp_size2, 
+                  colnames = c("Number of clusters", "6%", "7%", "8%", "9%", "10%"),
+                  rownames = FALSE,
+                  extensions = c("Buttons", "FixedHeader"), 
+                  options = list(autoWidth = T, 
+                                 pageLength = 12,
+                                 fixedHeader = TRUE,
+                                 columnDefs = list(list(className = "dt-center", 
+                                                        targets = "_all")),
+                                 searchHighlight = TRUE,
+                                 language = list(search = 'Filter:'),
+                                 dom = 'rtB',
+                                 buttons = c('copy', 'csv', 'excel')
+                  ))
+      }
+    })
     
-  })
+    output$table_NA <- renderText({
+      if(input$user_pow !=0.8){
+        "There is no table for that target power yet"
+      }
+    })
+  })     
+  
+  
   
   # ----------------------------------
   #  User-input table: sample size and proportion drop-out
@@ -151,17 +157,17 @@ function(input, output, session) {
   # Display results once estimate power is clicked
   observeEvent(input$est_pow, {
     
-    
     output$title_powbox <- renderText("The estimated power is below: ")
     output$text_powbox <- renderText(paste0("The plot shows the mean and lower and upper credible interval based on the parameters: ",
                                             "prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims))
-    
+
     # ATM this is hard-coded but will be flexible eventually
     power_output <- DRpower::get_power_threshold(N = c(rep(100, 10)),
                                                  prevalence = 0.06,
                                                  ICC = 0.1,
                                                  reps = 100
-                                                )
+    )
+    
 
     output$est_power_plot <- renderPlot({
       ggplot(power_output) +
