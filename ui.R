@@ -68,7 +68,7 @@ dashboardPage(#theme = "flatly",
                                      title = "Sample sizes to achieve a given target power", 
                                      TooltipHost(content = "TEST: Click and select the row with the number of clusters you intend to use for your study",
                                                  delay = 0,
-                                                 Text(htmltools::em("TEST: Interact with the table below"))
+                                                 Text(htmltools::em("TEST: Interact with the table below. Note to self: only one table below for 80% ATM"))
                                      ),
                                      br(),
                                      selectInput(
@@ -79,7 +79,7 @@ dashboardPage(#theme = "flatly",
                                        selected = 0.5
                                      ),
                                      DTOutput("sample_size_table"),
-                                     verbatimTextOutput("table_NA")
+                                     textOutput("table_NA")
                                  )
                         ),
                         tabPanel("Final cluster sizes",
