@@ -59,7 +59,7 @@ function(input, output, session) {
   
   # TODO: make sure this shows the table representing the correct power selected by the user - when Bob sends final sample size estimates
   
-  observeEvent(input$user_pow, ignoreNULL = T, ignoreInit = F, {
+  observeEvent(input$user_pow, {
     print("Target power selected")
     
     output$sample_size_table <- renderDT({
