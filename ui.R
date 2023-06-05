@@ -101,7 +101,7 @@ dashboardPage(#theme = "flatly",
                                          selected = 10,
                                        ),
                                        textOutput("text_edit_clusttab"), 
-                                       DTOutput("user_clusttab"),
+                                       DTOutput("editable_clusttab"),
                                        br(),
                                        actionButton(
                                          inputId = "calc_sizes",
