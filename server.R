@@ -96,28 +96,38 @@ function(input, output, session) {
   # TODO: n clusters/sample sizes default
   
   # get input value from user-specified n clusters
-  observeEvent(input$user_nclust, {
-    print("Number of cluster selected")
+  observeEvent(input$user_nclust, ignoreNULL=T, ignoreInit=T, {
+    print("Number of clusters selected")
+    
+    session$sendCustomMessage(type = "testmessage",
+                              message = paste0("You have entered ", input$user_nclust, " clusters in your study"))
+    
+    output$text_edit_clusttab <- renderText("The table below now has rows corresponding to the number of clusters in your study. 
+                                            Please edit the target sample size and expected proportion of participant drop-out for each cluster by double-clicking 
+                                            and editing the table below. When you are finished click the 'Calculate final sample sizes' button")
     
     n_rows <- input$user_nclust
 
     # create the data frame with fixed columns and rows based on user input
+    # TODO: This needs to be updated to ideal numbers based on final simulations
+    
     df <- data.frame(
       cluster = c(rep(1:n_rows)),
       sample_size = c(rep(100, n_rows)),
       prop_dropout = c(rep(0.1, n_rows))
     )
 
-    output$user_table <- renderDT({
+    output$user_clusttab <- renderDT({
       datatable(df,
                 editable = list(
-                  target = 'column',
+                  target = 'column', 
                   disable = list(
                     columns = c(0,3)
                     )
                   ),
                 rownames = FALSE,
-                options = list(dom = 'rti',
+                colnames = c("Cluster", "Target sample size", "% drop-out"),
+                options = list(dom = 'rt',
                                autoWidth = TRUE,
                                pageLength=20))
     })
@@ -131,6 +141,8 @@ function(input, output, session) {
   
   # TODO: add function to calculate final sample size in 3rd column once user has edited the table - maybe have a button to calculate final sample size
   # need to check how to save table from before with user-entered values
+  # TODO: make sure that the user cannot click 'calculate final sample sizes' before choosing number of clusters and user-entry table is displayed - maybe make the button 
+  # appear only when the user has selected number of clusters
   
    observeEvent(input$calc_sizes, {
     print("Calculate final sample sizes values button clicked")
@@ -142,7 +154,6 @@ function(input, output, session) {
      
      n_rows <- input$user_nclust
      
-     # TODO: This needs to be updated to ideal numbers based on final simulations
      final_df <- data.frame(
        cluster = c(rep(1:n_rows)),
        final_sample_size = c(rep(150, n_rows))
@@ -151,7 +162,7 @@ function(input, output, session) {
     output$final_sizes_table <- renderDT({
       datatable(final_df, 
                 rownames=F,
-                options = list(dom = 'rti', 
+                options = list(dom = 'rt', 
                                width=4))
     })
   })
@@ -170,9 +181,9 @@ function(input, output, session) {
 
     # ATM this is hard-coded but will be flexible eventually
     power_output <- DRpower::get_power_threshold(N = c(rep(100, 10)),
-                                                 prevalence = 0.06,
-                                                 ICC = 0.1,
-                                                 reps = 100
+                                                 prevalence = as.numeric(input$param_prev),
+                                                 ICC = as.numeric(input$param_icc),
+                                                 reps = as.numeric(input$param_n_sims)
     )
     
 
