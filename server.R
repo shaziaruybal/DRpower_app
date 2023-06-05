@@ -192,7 +192,7 @@ function(input, output, session) {
                     columns = c(1)
                     )
                   ),
-                #rownames = FALSE,
+                #rownames = FALSE, # remove rownames so that indexing is accurate
                 colnames = c("Cluster", "Target sample size", "% drop-out"),
                 options = list(dom = 'rt',
                                autoWidth = TRUE,
@@ -211,22 +211,15 @@ function(input, output, session) {
     
     # df[input$editable_clusttab_cell_edit$row,input$editable_clusttab_cell_edit$col] <<- input$editable_clusttab_cell_edit$value
     
-    
   })
   
   # ----------------------------------
   #  Calculate final sample sizes
   # ----------------------------------
   
-  # TODO: add function to calculate final sample size in 3rd column once user has edited the table - maybe have a button to calculate final sample size
-  # need to check how to save table from before with user-entered values
-  # TODO: make sure that the user cannot click 'calculate final sample sizes' before choosing number of clusters and user-entry table is displayed - maybe make the button 
-  # appear only when the user has selected number of clusters
-  
   # observe when test button is clicked 
    observeEvent(input$calc_sizes, {
     print("Calculate final sample sizes values button clicked")
-
 
      # save new data frame with values from the editable table (either updated or not)
      design_values$final_design_data <- df
@@ -241,8 +234,12 @@ function(input, output, session) {
                                              n is the target sample size, and d is the expected drop-out proportion")
 
      observe({
+       
        # get reactive object
        final_df <- design_values$final_design_data
+       
+       # calculate adjusted sample size
+       final_df <- final_df %>% mutate(final_sample_size = ceiling(sample_size/(1-prop_dropout)))
        
        print(final_df)
       
@@ -250,7 +247,8 @@ function(input, output, session) {
        # TODO: make sure final sample size is now calculated
        output$final_sizes_table <- renderDT({
          datatable(final_df,
-                   #rownames=F,
+                   #rownames=F, # remove rownames so that indexing is accurate
+                   colnames = c("Cluster", "Target sample size", "% drop-out", "Final adjusted sample size"),
                    options = list(dom = 'rt',
                                   width=4))
        })
