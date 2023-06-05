@@ -87,11 +87,11 @@ dashboardPage(#theme = "flatly",
                                  br(),
                                  fluidRow(
                                    box(width = 7,
-                                       title = "1. Enter the values specific to your study", 
-                                       TooltipHost(content = "Select the number of clusters in your study so that you can populate the table with your sample sizes and the estimated proportion of study participant drop-out.",
-                                                   delay = 0,
-                                                   Text(htmltools::em("Select the number of clusters in your study"))
-                                       ),
+                                       title = "1. Enter the values specific to your study",
+                                       # TooltipHost(content = "Select the number of clusters in your study so that you can populate the table with your sample sizes and the estimated proportion of study participant drop-out.",
+                                       #             delay = 0,
+                                       #             Text(htmltools::em("Select the number of clusters in your study"))
+                                       # ),
                                        selectInput(
                                          inputId = "user_nclust",
                                          label = strong("Select number of clusters: "),
@@ -99,9 +99,8 @@ dashboardPage(#theme = "flatly",
                                          choices = c(1, 2, 3, 4, 5, 6,7, 8, 9, 10, 15, 20), 
                                          selected = 10,
                                        ),
-                                       br(),
-                                       # verbatimTextOutput("output_text"), # this is a test to check what cluster integer is selected
-                                       DTOutput("user_table"),
+                                       textOutput("text_edit_clusttab"), 
+                                       DTOutput("user_clusttab"),
                                        br(),
                                        actionButton(
                                          inputId = "calc_sizes",
