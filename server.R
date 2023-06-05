@@ -198,19 +198,34 @@ function(input, output, session) {
                                autoWidth = TRUE,
                                pageLength=20))
     })
-
-    # output$output_text <- renderText(paste0("Number of clusters: ", input$user_nclust))
+  
+    print("After user select cluster n, this is the df:")
+    print(df)
+    
+    # store dataframe at this stage as reactive object
+    design_values$orig_design_data <- df
   })
 
   # observe when table is edited
   observeEvent(input$editable_clusttab_cell_edit, {
     print("Editable design table has been edited")
     
+    # store the edited data frame with all values as the original
+    orig_df <- design_values$orig_design_data
+    
+    # debugging, remove later
+    print("After user clicks the calc sample size button, this is the original df: ")
+    print(orig_df) 
+    
+    print("And this is the edited df: ")
     # update the data frame with edited values
+    # TODO the issue is here: editData() only keeps updated values and removes the rest, 
+    # I think I have to check index by index? ie if same keep, if not update
+    
     df <<- editData(df, input$editable_clusttab_cell_edit)
     
     # df[input$editable_clusttab_cell_edit$row,input$editable_clusttab_cell_edit$col] <<- input$editable_clusttab_cell_edit$value
-    
+    print(df)
   })
   
   # ----------------------------------
@@ -225,7 +240,7 @@ function(input, output, session) {
      design_values$final_design_data <- df
      
      # update the reactive original_data with the latest changes
-     design_values$orig_design_data <- df
+     # design_values$orig_design_data <- df
      
      # output text
      output$title_finalsizesbox <- renderText("The final sample sizes are below: ")
