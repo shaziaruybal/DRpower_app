@@ -37,18 +37,69 @@ function(input, output, session) {
   #   })
   # })
   
-  shiny::observeEvent(input$test_button, {
-    plot_data <- rnorm(100)
-    print("Test button clicked")
+  # shiny::observeEvent(input$test_button, {
+  #   plot_data <- rnorm(100)
+  #   print("Test button clicked")
+  #   
+  #   output$test_plot <- renderPlot({
+  #     hist(plot_data, main = "Histogram of Random Data")
+  #   })
+  #   
+  #   session$sendCustomMessage(type = "testmessage",
+  #                             message = "Thanks for clicking")
+  # })
+  
+  # make test editable table
+  
+  # make sure data and original_data are reactive
+  values <- reactiveValues(data = NULL, original_data = NULL)
+
+  df <- data.frame(
+    cluster = c(rep(1:5)),
+    sample_size = c(rep(100, 5)),
+    prop_dropout = c(rep(0.1, 5))
+  )
+  
+  # render editable tab
+  output$editable_table <- renderDT({
+    datatable(df, editable = TRUE)
+  })
+  
+  # observe when table is edited
+  observeEvent(input$editable_table_cell_edit, {
+    print("Table has been edited")
+    # Update the data frame with edited values
+    df <<- editData(df, input$editable_table_cell_edit)
+  })
+  
+  # observe when test button is clicked 
+  observeEvent(input$test_button, {
+    # check if data has been edited
+    if (!identical(df, values$original_data)) {
+      # update the reactiveValues object with new data
+      values$data <- df
+      
+      # update the original_data with the latest changes
+      values$original_data <- df
+    }
+  })
+  
+  # render updated table and reactive object
+  observe({
+    # get reactive object
+    reactive_data <- values$data
     
-    output$test_plot <- renderPlot({
-      hist(plot_data, main = "Histogram of Random Data")
+    # render the edited table
+    output$editable_table <- renderDT({
+      datatable(reactive_data, editable = TRUE)
     })
     
-    session$sendCustomMessage(type = "testmessage",
-                              message = "Thanks for clicking")
+    # print the reactive object
+    output$reactive_values <- renderPrint({
+      reactive_data
+    })
   })
-
+  
   ##################################################
   # DESIGN
   ##################################################

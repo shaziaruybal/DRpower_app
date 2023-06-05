@@ -39,7 +39,8 @@ dashboardPage(#theme = "flatly",
       # TESTING
       tabItem(tabName = "test_tab",
               actionButton("test_button", "Test me"),
-              plotOutput("test_plot")
+              # plotOutput("test_plot"),
+              DTOutput("editable_table")
               ),
       # ----------------------------------
       # Tab 1 - About
