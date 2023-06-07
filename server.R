@@ -151,7 +151,7 @@ function(input, output, session) {
                    sample_size = integer(),
                    prop_dropout = numeric())
   
-  # render editable table
+  # render the initial table (no rows)
   output$editable_clusttab <- renderDT({
     datatable(df,
               editable = list(
@@ -162,7 +162,11 @@ function(input, output, session) {
               options = list(dom = 'rt', autoWidth = TRUE, pageLength = 20))
   })
   
-  # get input value from user-specified n clusters
+  
+  # create a reactive value for df_sizes_update
+  design_rv <- reactiveValues(df_sizes_update = NULL)
+  
+  # observe when the user specifies n clusters
   observeEvent(input$user_nclust, ignoreNULL=T, ignoreInit=T, {
     print("Number of clusters selected")
 
@@ -174,11 +178,13 @@ function(input, output, session) {
     
     print("After user selects N clusters, this is the df:")
     print(df_sizes())
+    
+    # when df_sizes() is created, store the initial values in df_sizes_update()
+    design_rv$df_sizes_update <- df_sizes()
   })
   
   # Make the editable data frame reactive and dependent on the number of clusters entered by the user
   df_sizes <- eventReactive(input$user_nclust, ignoreNULL=T, ignoreInit=T, {
-    
     # create the data frame with fixed columns and rows based on user input
     # TODO: This needs to be updated to ideal numbers based on final simulations
     data.frame(
@@ -188,26 +194,44 @@ function(input, output, session) {
     )
   })
   
-    # render editable table
-    output$editable_clusttab <- renderDT({
-      datatable(df_sizes(), 
-                editable = list(
-                  target = 'cell',
-                  disable = list(
-                    columns = c(1)
-                    )
-                  ),
-                #rownames = FALSE, # remove rownames so that indexing is accurate
-                colnames = c("Cluster", "Target sample size", "% drop-out"),
-                options = list(dom = 'rt',
-                               autoWidth = TRUE,
-                               pageLength=20))
-    })
+  # render editable table
+  output$editable_clusttab <- renderDT({
+    datatable(df_sizes(), 
+              editable = list(
+                target = 'cell',
+                disable = list(
+                  columns = c(1)
+                )
+              ),
+              #rownames = FALSE, # remove rownames so that indexing is accurate
+              colnames = c("Cluster", "Target sample size", "% drop-out"),
+              options = list(dom = 'rt',
+                             autoWidth = TRUE,
+                             pageLength=20))
+  })
 
-  # observe when table is edited
+  # observe when table is edited and update the data frame with the user entered values
   observeEvent(input$editable_clusttab_cell_edit, {
     print("Editable design table has been edited")
+    
+    # get the latest updated data frame
+    df <- design_rv$df_sizes_update
+
+    # iterate over each cell edit event
+    for (i in seq_along(input$editable_clusttab_cell_edit$row)) {
+      row <- input$editable_clusttab_cell_edit$row[i]
+      col <- input$editable_clusttab_cell_edit$col[i]
+      value <- input$editable_clusttab_cell_edit$value[i]
+
+      # update the corresponding cell in the new data frame
+      df[row, col] <- value
+    }
+
+    # assign the updated data frame to df_sizes_update
+    design_rv$df_sizes_update <- df
+    
   })
+  
   
   # ----------------------------------
   #  Calculate final sample sizes
@@ -217,41 +241,28 @@ function(input, output, session) {
    observeEvent(input$calc_sizes, {
      print("Calculate final sample sizes values button clicked")
      # debugging, remove later
-     print("After user clicks the calc sample size button, this is the original df: ")
-     print(df_sizes()) 
-     print("And this is the edited df: ")
-     print(df_sizes_update())
-     
+     print("After user clicks the calc sample size button, this is the edited df: ")
+     print(design_rv$df_sizes_update)
      # output text
      output$title_finalsizesbox <- renderText("The final sample sizes are below: ")
      output$text_finalsizesbox <- renderText("Based on the values you entered for sample size and taking into account the proportion drop-out,
                                              the final adjusted sample sizes are calculated using the formula: Nadj=n/(1-d) where Nadj is the adjusted sample size,
                                              n is the target sample size, and d is the expected drop-out proportion")
-   })
+     })
      
   # update the data frame with edited values
-  df_sizes_update <- eventReactive(input$calc_sizes, {
-    df <- df_sizes()
-    
-    # iterate over each cell edit event
-    for (i in seq_along(input$editable_clusttab_cell_edit$row)) {
-      row <- input$editable_clusttab_cell_edit$row[i]
-      col <- input$editable_clusttab_cell_edit$col[i]
-      value <- input$editable_clusttab_cell_edit$value[i]
+  df_sizes_final <- eventReactive(input$calc_sizes, {
+    df <- design_rv$df_sizes_update
 
-      # update the corresponding cell in the new data frame
-      df[row, col] <- value 
-    }
-    
     # calculate adjusted sample size
     df <- df %>% mutate(final_sample_size = ceiling(sample_size/(1-prop_dropout)))
-    
+
     return(df)
   })
-     
+
   # render the edited table
   output$final_sizes_table <- renderDT({
-    datatable(df_sizes_update(),
+    datatable(df_sizes_final(),
               #rownames=F, # remove rownames so that indexing is accurate
               colnames = c("Cluster", "Target sample size", "% drop-out", "Final adjusted sample size"),
               options = list(dom = 'rt',
