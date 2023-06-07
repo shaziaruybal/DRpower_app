@@ -22,13 +22,13 @@ function(input, output, session) {
   # TESTING
   ################################################## 
   
-  # shiny::observeEvent(input$user_nclust, {
+  # shiny::observeEvent(input$design_nclust, {
   #   print("Test button clicked")
   #   
   #   plot_data <- data.frame(
-  #     cluster = c(rep(1:input$user_nclust)),
-  #     sample_size = c(rep(100, input$user_nclust)),
-  #     prop_dropout = c(rep(0.1, input$user_nclust))
+  #     cluster = c(rep(1:input$design_nclust)),
+  #     sample_size = c(rep(100, input$design_nclust)),
+  #     prop_dropout = c(rep(0.1, input$design_nclust))
   #   )
   # 
   #   output$test_plot <- renderPlot({
@@ -167,11 +167,11 @@ function(input, output, session) {
   design_rv <- reactiveValues(df_sizes_update = NULL)
   
   # observe when the user specifies n clusters
-  observeEvent(input$user_nclust, ignoreNULL=T, ignoreInit=T, {
+  observeEvent(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     print("Number of clusters selected")
 
     # session$sendCustomMessage(type = "testmessage",
-    #                           message = paste0("You have entered ", input$user_nclust, " clusters in your study"))
+    #                           message = paste0("You have entered ", input$design_nclust, " clusters in your study"))
     output$text_edit_clusttab <- renderText("The table below now has rows corresponding to the number of clusters in your study.
                                             Please edit the target sample size and expected proportion of participant drop-out for each cluster by double-clicking
                                             and editing the table below. When you are finished click the 'Calculate final sample sizes' button")
@@ -184,13 +184,13 @@ function(input, output, session) {
   })
   
   # Make the editable data frame reactive and dependent on the number of clusters entered by the user
-  df_sizes <- eventReactive(input$user_nclust, ignoreNULL=T, ignoreInit=T, {
+  df_sizes <- eventReactive(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     # create the data frame with fixed columns and rows based on user input
     # TODO: This needs to be updated to ideal numbers based on final simulations
     data.frame(
-      cluster = rep(1:input$user_nclust),
-      sample_size = rep(100, input$user_nclust),
-      prop_dropout = rep(0.1, input$user_nclust)
+      cluster = rep(1:input$design_nclust),
+      sample_size = rep(100, input$design_nclust),
+      prop_dropout = rep(0.1, input$design_nclust)
     )
   })
   

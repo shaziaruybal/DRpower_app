@@ -94,7 +94,7 @@ dashboardPage(#theme = "flatly",
                                        #             Text(htmltools::em("Select the number of clusters in your study"))
                                        # ),
                                        selectInput(
-                                         inputId = "user_nclust",
+                                         inputId = "design_nclust",
                                          label = strong("Select number of clusters: "),
                                          width = "auto",
                                          choices = c(1, 2, 3, 4, 5, 6,7, 8, 9, 10, 15, 20), 
