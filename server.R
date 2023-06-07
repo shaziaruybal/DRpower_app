@@ -299,7 +299,7 @@ function(input, output, session) {
                  shape = 21,
                  fill = "skyblue3") +
       geom_hline(yintercept = 0.8, color = "darkgrey", linetype = "dashed") +
-      geom_text(aes(x=, " ", y = 0.825, label = "80% threshold"), color = "darkgrey") +
+      geom_text(aes(x= " ", y = 0.825, label = "80% threshold"), color = "darkgrey") +
       scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
       labs(x = "",
            y = "Estimated power",
@@ -338,35 +338,87 @@ function(input, output, session) {
   # ----------------------------------
   #  User-input table: number of deletions and final sample sizes
   # ----------------------------------
-
+  # TODO: make sure an error appears if the user has not entered the sizes
+  
+  # initialize empty data frame
+  df_a <- data.frame(
+    cluster = integer(),
+    n_deletions = integer(),
+    sample_size = integer()
+  )
+  
+  output$editable_deltab <- renderDT({
+    datatable(df_a, 
+              editable = list(
+                target = 'cell',
+                disable = list(
+                  columns = c(0)
+                )
+              ),
+              # rownames = FALSE,
+              # colnames = c(), # add colnames
+              options = list(dom = 'rt',
+                             autoWidth = TRUE, pageLength = 20)) 
+    
+    
+  })
+  
+  # create a reactive value for df_analysis_update
+  analysis_rv <- reactiveValues(df_analysis_update = NULL)
+  
   # get input value from user-specified n clusters
-  observeEvent(input$analysis_nclust, {
+  observeEvent(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
     print("Number of final clusters selected")
     
-    n_rows <- input$analysis_nclust
-    
-    # create the data frame with fixed columns and rows based on user input
-    analysis_table <- data.frame(
-      cluster = c(rep(1:n_rows)),
-      n_deletions = c(rep(5, n_rows)),
-      sample_size = c(rep(100, n_rows))
-    )
-    
-    output$analysis_table <- renderDT({
-      datatable(analysis_table, 
-                editable = list(
-                  target = 'column',
-                  disable = list(
-                    columns = c(0)
-                  )
-                ),
-                rownames = FALSE,
-                options = list(dom = 'rtip',
-                               autoWidth = TRUE)) 
-  
-
-  })
+    analysis_rv$df_analysis_update <- df_deletions()
   }) 
+
+  # Make the editable data frame reactive and dependent on the deletion and sample sizes entered by the user
+  df_deletions <- eventReactive(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
+    # create the data frame with fixed columns and rows based on user input
+    data.frame(
+      cluster = c(rep(1:input$analysis_nclust)),
+      n_deletions = c(rep(5, input$analysis_nclust)),
+      sample_size = c(rep(100, input$analysis_nclust))
+    )
+  })  
+  
+  # Render editable table
+  output$editable_deltab <- renderDT({
+    datatable(df_deletions(), 
+              editable = list(
+                target = 'cell',
+                disable = list(
+                  columns = c(0)
+                )
+              ),
+              # rownames = FALSE,
+              # colnames = c(), # add colnames
+              options = list(dom = 'rt',
+                             autoWidth = TRUE, pageLength = 20)) 
+  })
+  
+  # observe when table is edited and update the data frame with the user entered values
+  observeEvent(input$editable_deltab_cell_edit, {
+    print("Editable analysis table has been edited")
+    
+    # get the latest updated data frame
+    df <- analysis_rv$df_analysis_update
+    
+    # iterate over each cell edit event
+    for (i in seq_along(input$editable_deltab_cell_edit$row)) {
+      row <- input$editable_deltab_cell_edit$row[i]
+      col <- input$editable_deltab_cell_edit$col[i]
+      value <- input$editable_deltab_cell_edit$value[i]
+      
+      # update the corresponding cell in the new data frame
+      df[row, col] <- value
+    }
+    
+    # assign the updated data frame to df_sizes_update
+    analysis_rv$df_analysis_update <- df
+    
+  })
   
   # ----------------------------------
   #  Results table/plot: estimated prevalence
@@ -376,16 +428,25 @@ function(input, output, session) {
   observeEvent(input$est_prev, {
     print("Estimate prevalence button clicked")
     
-    # df_prev_output <- df_prev_output %>% select(simple_mean, lower_CrI, upper_CrI, prob_above_threshold)
+    # debugging, remove later
+    print("After user clicks the estimate prev button, this is the edited df: ")
+    print(analysis_rv$df_analysis_update)
     
     output$title_prevbox <- renderText("The estimated prevalence value is below: ")
     output$text_prevbox <- renderText("The table and plot show the mean and lower and upper credible interval")
+  })    
+  
+  # Calculate prevalence using DRpower 
+  prev_output <- eventReactive(input$est_prev, {
+    df <- analysis_rv$df_analysis_update
     
-    # ATM this is hard-coded but will be flexible eventually
-    prev_output <- DRpower::get_prevalence(n = c(rep(5, 10)), N = c(rep(100, 10)))
-
-    output$est_prev_table <- renderDT({
-      datatable(prev_output,
+    DRpower::get_prevalence(n = df$n_deletions, 
+                            N = df$sample_size)
+    
+  })
+  
+  output$est_prev_table <- renderDT({
+      datatable(prev_output(),
                 rownames = FALSE,
                 colnames = c("Mean prevalence", "Lower CrI", "Upper CrI", "Probability above threshold"),
                 options = list(autoWidth = TRUE,
@@ -398,27 +459,25 @@ function(input, output, session) {
     # NOTE need to divide by 100 to convert to proportion
 
     est_prev_plot <- reactive({
-      ggplot(prev_output) +
+      ggplot(prev_output()) +
         geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100),
                      color = "black", linewidth = 1) +
         geom_point(aes(x = " ", y = MAP/100),
                    size = 3,
                    shape = 21,
                    fill = "skyblue3") +
-        # geom_hline(aes(y=0.06),
-        #            color = "darkgrey",
-        #            linetype = "dashed") +
+        geom_hline(aes(yintercept=0.06),
+                   color = "darkgrey",
+                   linetype = "dashed") +
+        geom_text(aes(x= " ", y = 0.07, label = "6% threshold"), color = "darkgrey") +
         scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
         labs(x = "",
              y = "Estimated prevalence") +
-        # coord_flip() +
         theme_light() +
         theme(text = element_text(size = 16))
     })
 
     output$est_prev_plot <- renderPlot(est_prev_plot())
-    
-  })
   
   # ----------------------------------
   #  Results table/plot: estimated ICC
@@ -427,13 +486,25 @@ function(input, output, session) {
   observeEvent(input$est_icc, {
     print("Estimate ICC button clicked")
     
-    df_prev_output <- df_prev_output %>% select(simple_mean, lower_CrI, upper_CrI, prob_above_threshold)
+    # debugging, remove later
+    print("After user clicks the estimate ICC button, this is the edited df: ")
+    print(analysis_rv$df_analysis_update)
     
     output$title_iccbox <- renderText("The estimated ICC value is below: ")
     output$text_iccbox <- renderText("The table and plot show the mean and lower and upper credible interval")
+  })
+    
+  # Calculate ICC using DRpower
+    icc_output <- eventReactive(input$est_icc, {
+      df <- analysis_rv$df_analysis_update
+      
+      DRpower::get_ICC(n = df$n_deletions,
+                       N = df$sample_size)
+      
+    })
     
     output$est_icc_table <- renderDT({
-      datatable(df_prev_output,
+      datatable(icc_output(),
                 rownames = FALSE,
                 options = list(autoWidth = TRUE,
                                fixedHeader = TRUE,
@@ -443,26 +514,22 @@ function(input, output, session) {
     })
   
     est_icc_plot <- reactive({
-      ggplot() +
-        geom_segment(aes(x = " ", xend = " ", y = 0.2, yend = 0.6), 
-                     linewidth = 2,
-                     color = "darkgrey",
-                     alpha = 0.8) +
-        geom_point(aes(x = " ", y = 0.46), 
+      ggplot(icc_output()) +
+        geom_segment(aes(x = " ", xend = " ", y = CrI_lower, yend = CrI_upper), 
+                     color = "black", linewidth = 1) +
+        geom_point(aes(x = " ", y = MAP), 
                    size = 4, 
                    shape = 21,
                    fill = "skyblue3") +
         scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
         labs(x = "",
              y = "Estimated ICC") +
-        # coord_flip() +
         theme_light() +
         theme(text = element_text(size = 16)) 
     })
   
     output$est_icc_plot <- renderPlot(est_icc_plot())
-  })
-  
+
   # ----------------------------------
   #  Render downloadable analysis report  
   # ----------------------------------
