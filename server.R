@@ -272,7 +272,7 @@ function(input, output, session) {
   # ----------------------------------
   #  Results plot: estimated power
   # ----------------------------------
-  # TODO: store the user-input values from the table and use them as params for DRpower::get_power_threshold()
+  # TODO: make sure an error appears if the user has not entered the sizes
   
   # Display results once estimate power is clicked
   observeEvent(input$est_pow, {
@@ -280,29 +280,32 @@ function(input, output, session) {
     output$title_powbox <- renderText("The estimated power is below: ")
     output$text_powbox <- renderText(paste0("The plot shows the mean and lower and upper credible interval based on the parameters: ",
                                             "prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims))
-
-    # ATM this is hard-coded but will be flexible eventually
-    power_output <- DRpower::get_power_threshold(N = c(rep(100, 10)),
-                                                 prevalence = as.numeric(input$param_prev),
-                                                 ICC = as.numeric(input$param_icc),
-                                                 reps = as.numeric(input$param_n_sims)
-    )
     
-
-    output$est_power_plot <- renderPlot({
-      ggplot(power_output) +
-        geom_segment(aes(x = " ", xend = " ",y = lower, yend = upper), color = "black", linewidth = 1) +
-        geom_point(aes(x = " ", y = power),
-                   size = 4,
-                   shape = 21,
-                   fill = "skyblue3") +
-        scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
-        labs(x = "",
-             y = "Estimated power",
-             caption = paste0("Parameters: prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims)) +
-        theme_light() +
-        theme(text = element_text(size = 16))
-    })
+  })
+  
+  power_output <- eventReactive(input$est_pow, {
+    DRpower::get_power_threshold(N = df_sizes_final()$final_sample_size, # this needs to be based on df_sizes_final
+                                   prevalence = as.numeric(input$param_prev),
+                                   ICC = as.numeric(input$param_icc),
+                                   reps = as.numeric(input$param_n_sims)
+      )
+  })
+  
+  output$est_power_plot <- renderPlot({
+    ggplot(power_output()) +
+      geom_segment(aes(x = " ", xend = " ",y = lower, yend = upper), color = "black", linewidth = 1) +
+      geom_point(aes(x = " ", y = power),
+                 size = 4,
+                 shape = 21,
+                 fill = "skyblue3") +
+      geom_hline(yintercept = 0.8, color = "darkgrey", linetype = "dashed") +
+      geom_text(aes(x=, " ", y = 0.825, label = "80% threshold"), color = "darkgrey") +
+      scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
+      labs(x = "",
+           y = "Estimated power",
+           caption = paste0("Parameters: prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims)) +
+      theme_light() +
+      theme(text = element_text(size = 16))
   })
   
   # ----------------------------------
@@ -317,7 +320,8 @@ function(input, output, session) {
       file.copy("test_design_report.Rmd", tempReport, overwrite = TRUE)
       
       params <- list(est_prev_plot = est_prev_plot(),
-                     est_icc_plot = est_icc_plot())
+                     est_icc_plot = est_icc_plot(),
+                     )
       
       rmarkdown::render(tempReport,
                         output_file = file,
