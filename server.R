@@ -146,9 +146,6 @@ function(input, output, session) {
   #  User-input table: sample size and proportion drop-out
   # ----------------------------------
   
-  # make all design table values reactive
-  design_values <- reactiveValues(orig_design_data = NULL, final_design_data = NULL)
-  
   # initialize empty data frame
   df <- data.frame(cluster = integer(),
                    sample_size = integer(),
