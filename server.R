@@ -20,7 +20,7 @@ function(input, output, session) {
   
   ##################################################
   # TESTING
-  ##################################################
+  ################################################## 
   
   # shiny::observeEvent(input$user_nclust, {
   #   print("Test button clicked")
@@ -109,6 +109,7 @@ function(input, output, session) {
   # ----------------------------------
   
   # TODO: make sure this shows the table representing the correct power selected by the user - when Bob sends final sample size estimates
+  # TODO: add eventReactive() once we have all the tables and make selection reactive vs occurring in observeEvent()
   
   observeEvent(input$user_pow, {
     print("Target power selected")
@@ -170,22 +171,29 @@ function(input, output, session) {
 
     # session$sendCustomMessage(type = "testmessage",
     #                           message = paste0("You have entered ", input$user_nclust, " clusters in your study"))
-
     output$text_edit_clusttab <- renderText("The table below now has rows corresponding to the number of clusters in your study.
                                             Please edit the target sample size and expected proportion of participant drop-out for each cluster by double-clicking
                                             and editing the table below. When you are finished click the 'Calculate final sample sizes' button")
-
+    
+    print("After user selects N clusters, this is the df:")
+    print(df_sizes())
+  })
+  
+  # Make the editable data frame reactive and dependent on the number of clusters entered by the user
+  df_sizes <- eventReactive(input$user_nclust, ignoreNULL=T, ignoreInit=T, {
+    
     # create the data frame with fixed columns and rows based on user input
     # TODO: This needs to be updated to ideal numbers based on final simulations
-    df <- data.frame(
+    data.frame(
       cluster = rep(1:input$user_nclust),
       sample_size = rep(100, input$user_nclust),
       prop_dropout = rep(0.1, input$user_nclust)
     )
-
+  })
+  
     # render editable table
     output$editable_clusttab <- renderDT({
-      datatable(df,
+      datatable(df_sizes(), 
                 editable = list(
                   target = 'cell',
                   disable = list(
@@ -198,79 +206,61 @@ function(input, output, session) {
                                autoWidth = TRUE,
                                pageLength=20))
     })
-  
-    print("After user select cluster n, this is the df:")
-    print(df)
-    
-    # store dataframe at this stage as reactive object
-    design_values$orig_design_data <- df
-  })
 
   # observe when table is edited
   observeEvent(input$editable_clusttab_cell_edit, {
     print("Editable design table has been edited")
-    
-    # store the edited data frame with all values as the original
-    orig_df <- design_values$orig_design_data
-    
-    # debugging, remove later
-    print("After user clicks the calc sample size button, this is the original df: ")
-    print(orig_df) 
-    
-    print("And this is the edited df: ")
-    # update the data frame with edited values
-    # TODO the issue is here: editData() only keeps updated values and removes the rest, 
-    # I think I have to check index by index? ie if same keep, if not update
-    
-    df <<- editData(df, input$editable_clusttab_cell_edit)
-    
-    # df[input$editable_clusttab_cell_edit$row,input$editable_clusttab_cell_edit$col] <<- input$editable_clusttab_cell_edit$value
-    print(df)
   })
   
   # ----------------------------------
   #  Calculate final sample sizes
   # ----------------------------------
   
-  # observe when test button is clicked 
+  # observe when calculate sample sizes button is clicked 
    observeEvent(input$calc_sizes, {
-    print("Calculate final sample sizes values button clicked")
-
-     # save new data frame with values from the editable table (either updated or not)
-     design_values$final_design_data <- df
-     
-     # update the reactive original_data with the latest changes
-     # design_values$orig_design_data <- df
+     print("Calculate final sample sizes values button clicked")
+     # debugging, remove later
+     print("After user clicks the calc sample size button, this is the original df: ")
+     print(df_sizes()) 
+     print("And this is the edited df: ")
+     print(df_sizes_update())
      
      # output text
      output$title_finalsizesbox <- renderText("The final sample sizes are below: ")
      output$text_finalsizesbox <- renderText("Based on the values you entered for sample size and taking into account the proportion drop-out,
                                              the final adjusted sample sizes are calculated using the formula: Nadj=n/(1-d) where Nadj is the adjusted sample size,
                                              n is the target sample size, and d is the expected drop-out proportion")
+   })
+     
+  # update the data frame with edited values
+  df_sizes_update <- eventReactive(input$calc_sizes, {
+    df <- df_sizes()
+    
+    # iterate over each cell edit event
+    for (i in seq_along(input$editable_clusttab_cell_edit$row)) {
+      row <- input$editable_clusttab_cell_edit$row[i]
+      col <- input$editable_clusttab_cell_edit$col[i]
+      value <- input$editable_clusttab_cell_edit$value[i]
 
-     observe({
-       
-       # get reactive object
-       final_df <- design_values$final_design_data
-       
-       # calculate adjusted sample size
-       final_df <- final_df %>% mutate(final_sample_size = ceiling(sample_size/(1-prop_dropout)))
-       
-       print(final_df)
-      
-       # render the edited table
-       # TODO: make sure final sample size is now calculated
-       output$final_sizes_table <- renderDT({
-         datatable(final_df,
-                   #rownames=F, # remove rownames so that indexing is accurate
-                   colnames = c("Cluster", "Target sample size", "% drop-out", "Final adjusted sample size"),
-                   options = list(dom = 'rt',
-                                  width=4))
-       })
-
-     })
+      # update the corresponding cell in the new data frame
+      df[row, col] <- value 
+    }
+    
+    # calculate adjusted sample size
+    df <- df %>% mutate(final_sample_size = ceiling(sample_size/(1-prop_dropout)))
+    
+    return(df)
   })
-  
+     
+  # render the edited table
+  output$final_sizes_table <- renderDT({
+    datatable(df_sizes_update(),
+              #rownames=F, # remove rownames so that indexing is accurate
+              colnames = c("Cluster", "Target sample size", "% drop-out", "Final adjusted sample size"),
+              options = list(dom = 'rt',
+                             width=4))
+  })
+
   # ----------------------------------
   #  Results plot: estimated power
   # ----------------------------------
