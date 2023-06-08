@@ -460,7 +460,10 @@ function(input, output, session) {
     print(analysis_rv$df_analysis_update)
     
     output$title_prevbox <- renderText("The estimated prevalence value is below: ")
-    output$text_prevbox <- renderText("The table and plot show the mean and lower and upper credible interval")
+    output$text_prevbox <- renderText(paste("The table and plot show the mean and lower and upper credible interval. There is a <b>",
+                                            ceiling(prev_output()$prob_above_threshold*100),
+                                            "% probability </b> that the ",
+                                            "pfhrp2 prevalence is above the 5% threshold."))
   })    
   
   # Calculate prevalence using DRpower 
