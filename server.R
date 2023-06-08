@@ -527,6 +527,8 @@ function(input, output, session) {
     
     output$title_iccbox <- renderText("The estimated ICC value is below: ")
     output$text_iccbox <- renderText("The table and plot show the mean and lower and upper credible interval")
+  
+    print(icc_output())
   })
     
   # Calculate ICC using DRpower
@@ -544,12 +546,12 @@ function(input, output, session) {
     
     })
   
-    # TODO: when value = 0 not plotting?
+    # NOTE need to divide by 100 to convert to proportion
     est_icc_plot <- reactive({
       ggplot(icc_output()) +
-        geom_segment(aes(x = " ", xend = " ", y = CrI_lower, yend = CrI_upper), 
+        geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100), 
                      color = "black", linewidth = 1) +
-        geom_point(aes(x = " ", y = MAP), 
+        geom_point(aes(x = " ", y = MAP/100), 
                    size = 4, 
                    shape = 21,
                    fill = "skyblue3") +
