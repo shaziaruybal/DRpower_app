@@ -205,6 +205,7 @@ function(input, output, session) {
   df_sizes <- eventReactive(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     # create the data frame with fixed columns and rows based on user input
     # TODO: This needs to be updated to ideal numbers based on final simulations (need to make design_nclust reactive)
+    # TODO: fix this so that there is no selection to begin with so 10 clusters also renders a table
     data.frame(
       cluster = rep(1:input$design_nclust),
       sample_size = rep(100, input$design_nclust),
