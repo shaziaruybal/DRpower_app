@@ -11,8 +11,13 @@ output:
       base_font: !expr bslib::font_google("Lato")
       code_font: !expr bslib::font_google("JetBrains Mono")
 params:
+  design_powerthreshold: NA
   design_final_sizes: NA
   design_nclusters: NA
+  design_paramprev: NA
+  design_paramicc: NA
+  design_paramsims: NA
+  design_poweroutput: NA
 ---
 
 ```{r setup, include=FALSE}
@@ -26,17 +31,62 @@ set.seed(10)
 
 ## *This is just a test document for now *
 
+### Sample size tables
+Maybe here would be nice to provide the sample size table for the selected power threshold?
+
+You selected a power threshold of `r as.numeric(params$design_powerthreshold)*100`%. 
+```{r}
+# pow_threshold <- params$design_powerthreshold
+# 
+# pow_threshold
+```
+
 ### Final cluster sizes
+Based on the values you entered, you selected `r params$design_nclusters` clusters for the study design. The final adjusted sample sizes based on the target sample size and expected drop-out proportion in each cluster are shown below:
 
 ```{r}
 # df <- as.data.frame(params$design_final_sizes)
 df_final_sizes <- params$design_final_sizes
 
-df_final_sizes
-# kable::kable(df_final_sizes)
+df_final_sizes %>% 
+  knitr::kable("html") %>%
+  kable_styling(bootstrap_options = "striped", 
+                position = "left",
+                full_width = F) 
 
-n <- params$design_nclusters
-
-n
+# n <- params$design_nclusters
+# 
+# n
 ```
 
+#### Estimated power 
+To estimate power we used the [DRpower package](https://mrc-ide.github.io/DRpower) with the following user-selected parameters: 
+
+- The final sample sizes for the `r params$design_nclusters` clusters (shown above)
+- Prevalence of `r params$design_paramprev` 
+- Intra-cluster correlation of `r params$design_paramicc` 
+- `r params$design_paramsims` simulations
+
+The estimated power is presented below:
+```{r}
+power_output <- params$design_poweroutput
+param_prev <- params$design_paramprev
+param_icc <- params$design_paramicc
+param_sims <- params$design_paramsims
+
+power_output %>% 
+  ggplot() +
+  geom_segment(aes(x = " ", xend = " ",y = lower, yend = upper), color = "black", linewidth = 1) +
+  geom_point(aes(x = " ", y = power),
+             size = 4,
+             shape = 21,
+             fill = "skyblue3") +
+  geom_hline(yintercept = 0.8, color = "darkgrey", linetype = "dashed") +
+  geom_text(aes(x= " ", y = 0.825, label = "80% threshold"), color = "darkgrey") +
+  scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
+  labs(x = "",
+       y = "Estimated power",
+       caption = paste0("Parameters: prev=", param_prev, ", ICC=", param_icc, ", sims=", param_sims)) +
+  theme_light() +
+  theme(text = element_text(size = 16))
+```

@@ -340,8 +340,14 @@ function(input, output, session) {
       file.copy("test_design_report.Rmd", tempReport, overwrite = TRUE)
 
       params <- list(
+                     design_powerthreshold = input$user_pow,
                      design_final_sizes = df_sizes_final(),
-                     design_nclusters = input$design_nclust
+                     design_nclusters = input$design_nclust,
+                     design_paramprev = input$param_prev,
+                     design_paramicc = input$param_icc,
+                     design_paramsims = input$param_n_sims,
+                     design_poweroutput = power_output()
+                     
       )
 
       rmarkdown::render(tempReport,
