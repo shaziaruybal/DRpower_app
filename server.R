@@ -270,6 +270,7 @@ function(input, output, session) {
      
   # update the data frame with edited values
   df_sizes_final <- eventReactive(input$calc_sizes, {
+
     df <- design_rv$df_sizes_update
 
     # calculate adjusted sample size
@@ -296,7 +297,7 @@ function(input, output, session) {
   observeEvent(input$est_pow, {
     # session$sendCustomMessage(type = "testmessage",
     #                           message = paste0("Estimating power based on prevalence=", input$param_prev, " and ICC= ", input$param_icc, " for ", input$param_n_sims, " simulations"))
-
+    
     output$title_powbox <- renderText("The estimated power is below: ")
     # TODO seems like the text is updating when params are changed, not just when button is clicked
     output$text_powbox <- renderText(paste0("The plot shows the mean and lower and upper credible interval based on the parameters: ",
@@ -338,8 +339,7 @@ function(input, output, session) {
   # ----------------------------------
   #  Render downloadable design report
   # ----------------------------------
-  # TODO: fix the reactive plot issue 
-  
+
   output$design_report <- downloadHandler(
     filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".html"),
     content = function(file) {
@@ -427,7 +427,7 @@ function(input, output, session) {
                 )
               ),
               # rownames = FALSE,
-              # colnames = c(), # add colnames
+              colnames = c("Number of clusters", "Number of deletions", "Sample size"), 
               options = list(dom = 'rt',
                              autoWidth = TRUE, pageLength = 20)) 
   })
@@ -467,10 +467,12 @@ function(input, output, session) {
     print(analysis_rv$df_analysis_update)
     
     output$title_prevbox <- renderText("The estimated prevalence value is below: ")
-    output$text_prevbox <- renderText(paste("The table and plot show the mean and lower and upper credible interval. There is a <b>",
+    output$text_prevbox <- renderText(paste("The table and plot show the mean and lower and upper credible interval. There is a ",
                                             ceiling(prev_output()$prob_above_threshold*100),
-                                            "% probability </b> that the ",
+                                            "% probability that the ",
                                             "pfhrp2 prevalence is above the 5% threshold."))
+    
+    print(prev_output())
   })    
   
   # Calculate prevalence using DRpower 
@@ -482,16 +484,10 @@ function(input, output, session) {
     
   })
   
-  output$est_prev_table <- renderDT({
-      datatable(prev_output(),
-                rownames = FALSE,
-                colnames = c("Mean prevalence", "Lower CrI", "Upper CrI", "Probability above threshold"),
-                options = list(autoWidth = TRUE,
-                               fixedHeader = TRUE,
-                               columnDefs = list(list(className = "dt-center",
-                                                      targets = "_all")),
-                               dom = 't'))
-    })
+  output$est_prev_table <- renderTable({
+    # TODO: figure out how to add column names
+    prev_output()
+  })
 
     # NOTE need to divide by 100 to convert to proportion
     # TODO: maybe put title to indicate prob above threshold? or in text
@@ -510,7 +506,7 @@ function(input, output, session) {
         scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
         labs(x = "",
              y = "Estimated prevalence",
-             subtitle = paste0("Result: ", ceiling(prev_output()$prob_above_threshold*100), "% probability that pfhrp2 prevalence is above 5%")) +
+             caption = paste0("Result: there is a ", ceiling(prev_output()$prob_above_threshold*100), "% probability that pfhrp2 prevalence is above 5%")) +
         theme_light() +
         theme(text = element_text(size = 16))
     })

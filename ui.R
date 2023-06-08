@@ -209,7 +209,7 @@ dashboardPage(#theme = "flatly",
                     title = textOutput("title_prevbox"),
                     p(textOutput("text_prevbox")),
                     br(),
-                    DTOutput("est_prev_table"),
+                    tableOutput("est_prev_table"),
                     br(),
                     plotOutput("est_prev_plot")
                 ),
