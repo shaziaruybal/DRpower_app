@@ -304,7 +304,9 @@ function(input, output, session) {
   })
   
   power_output <- eventReactive(input$est_pow, { 
-    id <- showNotification("Estimating power...", duration = NULL, closeButton = FALSE)
+    id <- showNotification(paste0("Estimating power ( ", input$param_n_sims, " simulations)..."), 
+                           duration = NULL, 
+                           closeButton = FALSE)
     on.exit(removeNotification(id), add = TRUE)
     
     DRpower::get_power_threshold(N = df_sizes_final()$sample_size, # this needs to be based on df_sizes_final
