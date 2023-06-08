@@ -245,8 +245,8 @@ dashboardPage(#theme = "flatly",
                   "Click the button below to generate report. This creates a pdf or similar with standardised text describing ",
                   "the assumptions set previously. This provides text that can be copied over directly into a paper/report to minimise mistakes",
                   br(), br(),
-                  downloadButton("analysis_report", "Download analysis report", icon("download"))
                 ),
+                downloadButton("analysis_report", "Download analysis report", icon("download"))
               )
             )
           )
