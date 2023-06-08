@@ -491,7 +491,6 @@ function(input, output, session) {
   })
 
     # NOTE need to divide by 100 to convert to proportion
-    # TODO: maybe put title to indicate prob above threshold? or in text
     est_prev_plot <- reactive({
       ggplot(prev_output()) +
         geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100),
