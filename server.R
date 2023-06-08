@@ -294,6 +294,8 @@ function(input, output, session) {
   
   # Display results once estimate power is clicked
   observeEvent(input$est_pow, {
+    session$sendCustomMessage(type = "testmessage",
+                              message = paste0("Estimating power based on prevalence=", input$param_prev, " and ICC= ", input$param_icc, " for ", input$param_n_sims, " simulations"))
     
     output$title_powbox <- renderText("The estimated power is below: ")
     # TODO seems like the text is updating when params are changed, not just when button is clicked
@@ -311,6 +313,7 @@ function(input, output, session) {
   })
   
   # TODO seems like the plot is not re-loading when params are changed, but working for button click
+  # TODO display an error if sample sizes haven't been entered and plot doesn't render
   output$est_power_plot <- renderPlot({
     ggplot(power_output()) +
       geom_segment(aes(x = " ", xend = " ",y = lower, yend = upper), color = "black", linewidth = 1) +
