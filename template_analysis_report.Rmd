@@ -1,5 +1,5 @@
 ---
-title: "Test Analysis report"
+title: "pfhrp2 Planner: Design report"
 date: "`r Sys.Date()`"
 output: 
   html_document:

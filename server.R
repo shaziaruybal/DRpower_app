@@ -343,8 +343,8 @@ function(input, output, session) {
   output$design_report <- downloadHandler(
     filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".html"),
     content = function(file) {
-      tempReport <- file.path(tempdir(), "test_design_report.Rmd")
-      file.copy("test_design_report.Rmd", tempReport, overwrite = TRUE)
+      tempReport <- file.path(tempdir(), "template_design_report.Rmd")
+      file.copy("template_design_report.Rmd", tempReport, overwrite = TRUE)
 
       params <- list(
                      design_powerthreshold = input$user_pow,
@@ -571,8 +571,8 @@ function(input, output, session) {
   output$analysis_report <- downloadHandler(
     filename = paste0("PfHRP2_Planner_Analysis_Report_", Sys.Date(), ".html"),
     content = function(file) {
-      tempReport <- file.path(tempdir(), "test_analysis_report.Rmd")
-      file.copy("test_analysis_report.Rmd", tempReport, overwrite = TRUE)
+      tempReport <- file.path(tempdir(), "template_analysis_report.Rmd")
+      file.copy("template_analysis_report.Rmd", tempReport, overwrite = TRUE)
       
       params <- list(analysis_nclusters = input$analysis_nclust,
                      analysis_study_data = analysis_rv$df_analysis_update,
