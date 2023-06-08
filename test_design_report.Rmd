@@ -12,26 +12,31 @@ output:
       code_font: !expr bslib::font_google("JetBrains Mono")
 params:
   design_final_sizes: NA
-  design_clusters: NA
+  design_nclusters: NA
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(kableExtra)
 
 set.seed(10)
 ```
 
 ## *This is just a test document for now *
 
-#### Estimated prevalence plot
-```{r}
-df <- params$design_final_sizes
-n <- params$design_clusters
+### Final cluster sizes
 
-df
+```{r}
+# df <- as.data.frame(params$design_final_sizes)
+df_final_sizes <- params$design_final_sizes
+
+df_final_sizes
+# kable::kable(df_final_sizes)
+
+n <- params$design_nclusters
+
 n
 ```
-
 

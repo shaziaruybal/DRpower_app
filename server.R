@@ -296,6 +296,7 @@ function(input, output, session) {
   observeEvent(input$est_pow, {
     
     output$title_powbox <- renderText("The estimated power is below: ")
+    # TODO seems like the text is updating when params are changed, not just when button is clicked
     output$text_powbox <- renderText(paste0("The plot shows the mean and lower and upper credible interval based on the parameters: ",
                                             "prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims))
     
@@ -309,6 +310,7 @@ function(input, output, session) {
       )
   })
   
+  # TODO seems like the plot is not re-loading when params are changed, but working for button click
   output$est_power_plot <- renderPlot({
     ggplot(power_output()) +
       geom_segment(aes(x = " ", xend = " ",y = lower, yend = upper), color = "black", linewidth = 1) +
@@ -338,8 +340,8 @@ function(input, output, session) {
       file.copy("test_design_report.Rmd", tempReport, overwrite = TRUE)
 
       params <- list(
-                     design_final_sizes = design_rv$df_sizes_updated,
-                     design_clusters = input$design_nclust
+                     design_final_sizes = df_sizes_final(),
+                     design_nclusters = input$design_nclust
       )
 
       rmarkdown::render(tempReport,
