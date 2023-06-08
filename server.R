@@ -493,13 +493,14 @@ function(input, output, session) {
                    size = 3,
                    shape = 21,
                    fill = "skyblue3") +
-        geom_hline(aes(yintercept=0.06),
+        geom_hline(aes(yintercept=0.05),
                    color = "darkgrey",
                    linetype = "dashed") +
-        geom_text(aes(x= " ", y = 0.07, label = "6% threshold"), color = "darkgrey") +
+        geom_text(aes(x= " ", y = 0.07, label = "5% threshold"), color = "darkgrey") +
         scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
         labs(x = "",
-             y = "Estimated prevalence") +
+             y = "Estimated prevalence",
+             subtitle = paste0("Result: ", ceiling(prev_output()$prob_above_threshold*100), "% probability that pfhrp2 prevalence is above 5%")) +
         theme_light() +
         theme(text = element_text(size = 16))
     })
