@@ -24,7 +24,7 @@ function(input, output, session) {
   
   # shiny::observeEvent(input$design_nclust, {
   #   print("Test button clicked")
-  #   
+  # 
   #   plot_data <- data.frame(
   #     cluster = c(rep(1:input$design_nclust)),
   #     sample_size = c(rep(100, input$design_nclust)),
@@ -37,17 +37,35 @@ function(input, output, session) {
   #   })
   # })
   
-  # shiny::observeEvent(input$test_button, {
-  #   plot_data <- rnorm(100)
-  #   print("Test button clicked")
-  #   
-  #   output$test_plot <- renderPlot({
-  #     hist(plot_data, main = "Histogram of Random Data")
-  #   })
-  #   
-  #   session$sendCustomMessage(type = "testmessage",
-  #                             message = "Thanks for clicking")
-  # })
+  shiny::observeEvent(input$test_button, {
+    plot_data <- rnorm(100)
+    print("Test button clicked")
+
+    output$test_plot <- renderPlot({
+      hist(plot_data, main = "Histogram of Random Data")
+    })
+# 
+#     session$sendCustomMessage(type = "testmessage",
+#                               message = "Thanks for clicking")
+  })
+  
+  # output$design_report <- downloadHandler(
+  #   filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".html"),
+  #   content = function(file) {
+  #     tempReport <- file.path(tempdir(), "test_design_report.Rmd")
+  #     file.copy("test_design_report.Rmd", tempReport, overwrite = TRUE)
+  #     
+  #     params <- list(
+  #       design_final_sizes = input$test_button
+  #     )
+  #     
+  #     rmarkdown::render(tempReport,
+  #                       output_file = file,
+  #                       params = params,
+  #                       envir = new.env(parent = globalenv()),
+  #     )
+  #   }
+  # )
   
   # TESTING: user-editable table and storing user-entered values
   
@@ -318,11 +336,12 @@ function(input, output, session) {
     content = function(file) {
       tempReport <- file.path(tempdir(), "test_design_report.Rmd")
       file.copy("test_design_report.Rmd", tempReport, overwrite = TRUE)
-      
-      params <- list(est_prev_plot = est_prev_plot(),
-                     est_icc_plot = est_icc_plot(),
-                     )
-      
+
+      params <- list(
+                     design_final_sizes = design_rv$df_sizes_updated,
+                     design_clusters = input$design_nclust
+      )
+
       rmarkdown::render(tempReport,
                         output_file = file,
                         params = params,
@@ -538,8 +557,8 @@ function(input, output, session) {
   output$analysis_report <- downloadHandler(
     filename = paste0("PfHRP2_Planner_Analysis_Report_", Sys.Date(), ".html"),
     content = function(file) {
-      tempReport <- file.path(tempdir(), "test_design_report.Rmd")
-      file.copy("test_design_report.Rmd", tempReport, overwrite = TRUE)
+      tempReport <- file.path(tempdir(), "test_analysis_report.Rmd")
+      file.copy("test_analysis_report.Rmd", tempReport, overwrite = TRUE)
       
       params <- list(est_prev_plot = est_prev_plot(),
                      est_icc_plot = est_icc_plot())
