@@ -1,16 +1,24 @@
 ---
 title: "Test Design report"
 date: "`r Sys.Date()`"
-output: html_document
+output: 
+  html_document:
+    theme: 
+      version: 5
+      bg: "#F9F9F9"
+      fg: "#5e5ea3"
+      primary: "#5e5ea3"
+      base_font: !expr bslib::font_google("Lato")
+      code_font: !expr bslib::font_google("JetBrains Mono")
 params:
-  est_prev_plot: NA
-  est_icc_plot: NA
+  design_final_sizes: NA
+  design_clusters: NA
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-require(tidyverse)
+library(tidyverse)
 
 set.seed(10)
 ```
@@ -19,16 +27,11 @@ set.seed(10)
 
 #### Estimated prevalence plot
 ```{r}
-params$est_prev_plot
+df <- params$design_final_sizes
+n <- params$design_clusters
+
+df
+n
 ```
 
-
-#### Estimated ICC plot
-```{r}
-params$est_icc_plot
-```
-
-```{r}
-
-```
 
