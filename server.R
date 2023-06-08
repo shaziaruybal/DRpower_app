@@ -284,7 +284,7 @@ function(input, output, session) {
               #rownames=F, # remove rownames so that indexing is accurate
               colnames = c("Cluster", "Target sample size", "% drop-out", "Final adjusted sample size"),
               options = list(dom = 'rt',
-                             width=4))
+                             width=4, pageLength=20))
   })
 
   # ----------------------------------
