@@ -204,7 +204,7 @@ function(input, output, session) {
   # Make the editable data frame reactive and dependent on the number of clusters entered by the user
   df_sizes <- eventReactive(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     # create the data frame with fixed columns and rows based on user input
-    # TODO: This needs to be updated to ideal numbers based on final simulations
+    # TODO: This needs to be updated to ideal numbers based on final simulations (need to make design_nclust reactive)
     data.frame(
       cluster = rep(1:input$design_nclust),
       sample_size = rep(100, input$design_nclust),
@@ -303,7 +303,7 @@ function(input, output, session) {
   })
   
   power_output <- eventReactive(input$est_pow, {
-    DRpower::get_power_threshold(N = df_sizes_final()$final_sample_size, # this needs to be based on df_sizes_final
+    DRpower::get_power_threshold(N = df_sizes_final()$sample_size, # this needs to be based on df_sizes_final
                                    prevalence = as.numeric(input$param_prev),
                                    ICC = as.numeric(input$param_icc),
                                    reps = as.numeric(input$param_n_sims)
@@ -484,7 +484,7 @@ function(input, output, session) {
     })
 
     # NOTE need to divide by 100 to convert to proportion
-
+    # TODO: maybe put title to indicate prob above threshold? or in text
     est_prev_plot <- reactive({
       ggplot(prev_output()) +
         geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100),
@@ -540,6 +540,7 @@ function(input, output, session) {
                                dom = 't'))
     })
   
+    # TODO: when value = 0 not plotting?
     est_icc_plot <- reactive({
       ggplot(icc_output()) +
         geom_segment(aes(x = " ", xend = " ", y = CrI_lower, yend = CrI_upper), 
@@ -568,8 +569,11 @@ function(input, output, session) {
       tempReport <- file.path(tempdir(), "test_analysis_report.Rmd")
       file.copy("test_analysis_report.Rmd", tempReport, overwrite = TRUE)
       
-      params <- list(est_prev_plot = est_prev_plot(),
-                     est_icc_plot = est_icc_plot())
+      params <- list(analysis_nclusters = input$analysis_nclust,
+                     analysis_study_data = analysis_rv$df_analysis_update,
+                     analysis_prevoutput = prev_output(),
+                     analysis_iccoutput = icc_output()
+                     )
       
       rmarkdown::render(tempReport,
                         output_file = file,

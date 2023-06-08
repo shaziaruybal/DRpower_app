@@ -1,41 +1,55 @@
 ---
-title: "Test Design report"
-author: "Shazia Ruybal-Pesántez"
+title: "Test Analysis report"
 date: "`r Sys.Date()`"
 output: 
   html_document:
     theme: 
       version: 5
       bg: "#F9F9F9"
-      fg: "#5FA669"
-      primary: "#AD77B3"
+      fg: "#5e5ea3"
+      primary: "#5e5ea3"
       base_font: !expr bslib::font_google("Lato")
       code_font: !expr bslib::font_google("JetBrains Mono")
+params:
+  analysis_nclusters: NA
+  analysis_study_data: NA
+  analysis_prevoutput: NA
+  analysis_iccoutput: NA
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 set.seed(10)
+library(tidyverse)
 library(bslib)
 ```
 
-## R Markdown
+## *This is just a test document for now *
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+### Study details 
+Based on the values you entered, your study had  `r params$analysis_nclusters` clusters. The number of deletions identified and the sample sizes in each cluster are shown below:
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r}
+df_final_sizes <- params$analysis_study_data
 
-```{r cars}
-summary(cars)
+df_final_sizes %>% 
+  knitr::kable("html") %>%
+  kable_styling(bootstrap_options = "striped", 
+                position = "left",
+                full_width = F) 
+
+# n <- params$design_nclusters
+# 
+# n
 ```
 
-## Including Plots
+#### Estimated prevalence plot
+```{r}
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+#### Estimated ICC plot
+```{r}
+
+```
