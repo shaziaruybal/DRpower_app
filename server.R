@@ -487,6 +487,7 @@ function(input, output, session) {
   output$est_prev_table <- renderTable({
     # TODO: figure out how to add column names
     prev_output()
+    # colnames = c("Mean prevalence", "Lower CrI", "Upper CrI", "Probability above threshold"),
   })
 
     # NOTE need to divide by 100 to convert to proportion
@@ -537,14 +538,10 @@ function(input, output, session) {
       
     })
     
-    output$est_icc_table <- renderDT({
-      datatable(icc_output(),
-                rownames = FALSE,
-                options = list(autoWidth = TRUE,
-                               fixedHeader = TRUE,
-                               columnDefs = list(list(className = "dt-center",
-                                                      targets = "_all")),
-                               dom = 't'))
+    output$est_icc_table <- renderTable({
+      # TODO: figure out how to add column names
+      icc_output()
+    
     })
   
     # TODO: when value = 0 not plotting?

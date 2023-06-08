@@ -232,7 +232,7 @@ dashboardPage(#theme = "flatly",
                       title = textOutput("title_iccbox"),
                       p(textOutput("text_iccbox")),
                       br(),
-                      DTOutput("est_icc_table"),
+                      tableOutput("est_icc_table"),
                       br(),
                       plotOutput("est_icc_plot")
                 ),
