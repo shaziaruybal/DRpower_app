@@ -294,17 +294,19 @@ function(input, output, session) {
   
   # Display results once estimate power is clicked
   observeEvent(input$est_pow, {
-    session$sendCustomMessage(type = "testmessage",
-                              message = paste0("Estimating power based on prevalence=", input$param_prev, " and ICC= ", input$param_icc, " for ", input$param_n_sims, " simulations"))
-    
+    # session$sendCustomMessage(type = "testmessage",
+    #                           message = paste0("Estimating power based on prevalence=", input$param_prev, " and ICC= ", input$param_icc, " for ", input$param_n_sims, " simulations"))
+
     output$title_powbox <- renderText("The estimated power is below: ")
     # TODO seems like the text is updating when params are changed, not just when button is clicked
     output$text_powbox <- renderText(paste0("The plot shows the mean and lower and upper credible interval based on the parameters: ",
                                             "prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims))
-    
   })
   
-  power_output <- eventReactive(input$est_pow, {
+  power_output <- eventReactive(input$est_pow, { 
+    id <- showNotification("Estimating power...", duration = NULL, closeButton = FALSE)
+    on.exit(removeNotification(id), add = TRUE)
+    
     DRpower::get_power_threshold(N = df_sizes_final()$sample_size, # this needs to be based on df_sizes_final
                                    prevalence = as.numeric(input$param_prev),
                                    ICC = as.numeric(input$param_icc),
