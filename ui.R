@@ -39,8 +39,9 @@ dashboardPage(#theme = "flatly",
       # TESTING
       # tabItem(tabName = "test_tab",
       #         actionButton("test_button", "Test me"),
-      #         # plotOutput("test_plot"),
-      #         DTOutput("editable_table")
+      #         plotOutput("test_plot"),
+      #         # DTOutput("editable_table")
+      #         downloadButton("design_report", "Download design report", icon("download"))
       #         ),
       # ----------------------------------
       # Tab 1 - About
@@ -160,8 +161,9 @@ dashboardPage(#theme = "flatly",
                                    "Click the button below to generate report. This creates a pdf or similar with standardised text describing ",
                                    "the assumptions set previously. This provides text that can be copied over directly into a paper/report to minimise mistakes",
                                    br(), br(),
-                                   downloadButton("design_report", "Download design report", icon("download"))
+                                   # downloadButton("design_report", "Download design report", icon("download"))
                                  ),
+                                 downloadButton("design_report", "Download design report", icon("download"))
                         )
             )
           )
