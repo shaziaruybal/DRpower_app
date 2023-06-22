@@ -73,7 +73,7 @@ dashboardPage(#theme = "flatly",
                                        label = "Target power: ", 
                                        width = "auto",
                                        choices = c(seq(0.0, 1.0, by = 0.1)),
-                                       selected = 0.5
+                                       selected = 0.8
                                      ),
                                      DTOutput("sample_size_table"),
                                      textOutput("table_NA")
