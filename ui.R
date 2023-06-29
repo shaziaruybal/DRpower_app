@@ -106,6 +106,7 @@ dashboardPage(#theme = "flatly",
                                    ),
                                    box(width = 5, 
                                        background = "purple",
+                                       bsAlert("error_noclusters"), # this creates an error message if user clicks calculate without choosing number of clusters
                                        title = textOutput("title_finalsizesbox"),
                                        p(textOutput("text_finalsizesbox")),
                                        DTOutput("final_sizes_table")
