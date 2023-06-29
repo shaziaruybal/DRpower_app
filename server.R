@@ -5,6 +5,7 @@
 library(shiny)
 library(tidyverse)
 library(shiny.fluent)
+library(shinyWidgets)
 library(DRpower)
 
 load("dummy_data.RData")
@@ -200,7 +201,6 @@ function(input, output, session) {
   df_sizes <- eventReactive(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     # create the data frame with fixed columns and rows based on user input
     # TODO: This needs to be updated to ideal numbers based on final simulations (need to make design_nclust reactive)
-    # TODO: fix this so that there is no selection to begin with so 10 clusters also renders a table
     data.frame(
       cluster = rep(1:input$design_nclust),
       sample_size = rep(100, input$design_nclust),
@@ -291,13 +291,34 @@ function(input, output, session) {
   
   # Display results once estimate power is clicked
   observeEvent(input$est_pow, {
-    # session$sendCustomMessage(type = "testmessage",
-    #                           message = paste0("Estimating power based on prevalence=", input$param_prev, " and ICC= ", input$param_icc, " for ", input$param_n_sims, " simulations"))
+    output$title_powbox <- renderText({
+      # error message if the user has not entered the sample sizes 
+      if(is.null(design_rv$df_sizes_update)){
+        createAlert(session, 
+                    anchorId = "error_nosizes", 
+                    alertId = "alert_nosizes",
+                    style = "danger",
+                    title = "Error", 
+                    content = "You have not entered the sample sizes. Please go back to Step 1 and choose the number of clusters and enter the values in the table.", 
+                    append = FALSE)
+      }
+      else{
+      closeAlert(session, "alert_nosizes")
+      return("The estimated power is below: ")
+      }
+    })
     
-    output$title_powbox <- renderText("The estimated power is below: ")
+    
     # TODO seems like the text is updating when params are changed, not just when button is clicked
-    output$text_powbox <- renderText(paste0("The plot shows the mean and lower and upper credible interval based on the parameters: ",
-                                            "prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims))
+    output$text_powbox <- renderText({
+      if(is.null(design_rv$df_sizes_update)){
+        return(NULL)
+      }
+      else{
+      paste0("The plot shows the mean and lower and upper credible interval based on the parameters: ",
+                                            "prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims)
+      }
+    })
   })
   
   power_output <- eventReactive(input$est_pow, { 

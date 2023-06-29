@@ -7,6 +7,7 @@ library(DT)
 library(shiny.fluent)
 library(shiny.blueprint)
 library(shinydashboard)
+library(shinyWidgets)
 
 dashboardPage(#theme = "flatly",
   dashboardHeader(title = "pfhrp2 Planner"),
@@ -142,6 +143,7 @@ dashboardPage(#theme = "flatly",
                                    ),
                                    box(width = 5,
                                        background = "purple",
+                                       bsAlert("error_nosizes"), # this creates an error message if user clicks estimate power without entering sample sizes
                                        title = textOutput("title_powbox"),
                                        p(textOutput("text_powbox")),
                                        br(),
