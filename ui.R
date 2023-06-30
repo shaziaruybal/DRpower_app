@@ -204,6 +204,7 @@ dashboardPage(#theme = "flatly",
                   )
                 ),
                 box(width = 10, background = "purple",
+                    bsAlert("error_nodeletions"), # this creates an error message if user clicks estimate prevalence without entering deletions/sample sizes
                     title = textOutput("title_prevbox"),
                     p(textOutput("text_prevbox")),
                     br(),

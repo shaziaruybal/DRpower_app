@@ -311,7 +311,6 @@ function(input, output, session) {
   # ----------------------------------
   #  Results plot: estimated power
   # ----------------------------------
-  # TODO: make sure an error appears if the user has not entered the sizes
   
   # Display results once estimate power is clicked
   observeEvent(input$est_pow, {
@@ -507,13 +506,38 @@ function(input, output, session) {
     print("After user clicks the estimate prev button, this is the edited df: ")
     print(analysis_rv$df_analysis_update)
     
-    output$title_prevbox <- renderText("The estimated prevalence value is below: ")
-    output$text_prevbox <- renderText(paste("The table and plot show the mean and lower and upper credible interval. There is a ",
-                                            ceiling(prev_output()$prob_above_threshold*100),
-                                            "% probability that the ",
-                                            "pfhrp2 prevalence is above the 5% threshold."))
+    output$title_prevbox <- renderText({
+      
+      # display error message if the user has not entered the deletions and sample sizes
+      if(input$analysis_nclust==""){
+        createAlert(session, 
+                    anchorId = "error_nodeletions", 
+                    alertId = "alert_nodeletions",
+                    style = "danger",
+                    title = "Error", 
+                    content = "You have not selected the number of clusters or entered the values for your study. Please go back to Step 1 and choose the number of clusters and enter the values in the table.", 
+                    append = FALSE)
+      }
+      else{
+        closeAlert(session, "alert_nodeletions")
+        return("The estimated prevalence value is below: ")
+      }
+    })
     
-    print(prev_output())
+    output$text_prevbox <- renderText({
+      # display nothing if the user has not entered the deletions and sample sizes
+      if(input$analysis_nclust==""){
+        return(NULL)
+      }
+      else{
+        paste("The table and plot show the mean and lower and upper credible interval. There is a ",
+              ceiling(prev_output()$prob_above_threshold*100),
+              "% probability that the ",
+              "pfhrp2 prevalence is above the 5% threshold.")
+      }
+    })
+    
+    # print(prev_output())
   })    
   
   # Calculate prevalence using DRpower 
