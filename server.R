@@ -551,9 +551,9 @@ function(input, output, session) {
   
   output$est_prev_table <- renderTable({
     # TODO: figure out how to add column names
-    prev_output()
-    # colnames = c("Mean prevalence", "Lower CrI", "Upper CrI", "Probability above threshold"),
-  })
+    prev_output() %>% 
+      rename("Mean prevalence" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper, "Probability above threshold" = prob_above_threshold)
+  }, colnames = T)
 
     # NOTE need to divide by 100 to convert to proportion
     est_prev_plot <- reactive({
