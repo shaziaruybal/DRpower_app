@@ -8,6 +8,7 @@ library(shiny.fluent)
 library(shiny.blueprint)
 library(shinydashboard)
 library(shinyWidgets)
+library(shinyBS)
 
 dashboardPage(#theme = "flatly",
   dashboardHeader(title = "pfhrp2 Planner"),

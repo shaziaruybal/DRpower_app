@@ -6,6 +6,7 @@ library(shiny)
 library(tidyverse)
 library(shiny.fluent)
 library(shinyWidgets)
+library(shinyBS)
 library(DRpower)
 
 load("dummy_data.RData")
