@@ -259,39 +259,65 @@ function(input, output, session) {
      print("After user clicks the calc sample size button, this is the edited df: ")
      print(design_rv$df_sizes_update)
      
+     # error message if the user has not chosen the number of clusters
+     if(input$design_nclust==""){
+       # createAlert(session,
+       #             anchorId = "error_noclusters",
+       #             alertId = "alert_noclusters",
+       #             style = "danger",
+       #             title = "Error",
+       #             content = "You have not chosen the number of clusters. Please go back to Step 1 and choose the number of clusters and enter the values in the table.",
+       #             append = FALSE)
+       show_alert(
+         title = "Error!",
+         text = "You have not chosen the number of clusters. Please go back to Step 1 and choose the number of clusters and enter the values in the table.",
+         type = "error"
+       )
+     }
+     else{
+       # closeAlert(session, "alert_noclusters")
+       return(NULL)
+     }
+     
      # output text
      output$title_finalsizesbox <- renderText({
-       # error message if the user has not chosen the number of clusters
-       if(input$design_nclust==""){
-         createAlert(session, 
-                     anchorId = "error_noclusters", 
-                     alertId = "alert_noclusters",
-                     style = "danger",
-                     title = "Error", 
-                     content = "You have not chosen the number of clusters. Please go back to Step 1 and choose the number of clusters and enter the values in the table.", 
-                     append = FALSE)
-       }
-       else{
-         closeAlert(session, "alert_noclusters")
+       # require n clusters to be defined and calculate sizes button to be clicked
+       req(input$design_nclust, input$calc_sizes)
+       
+       # check if df_sizes_final() has been created, which means the user has selected n clusters, edited the data (or not), and clicked 'calculate sizes' button
+       if(!is.null(df_sizes_final())){
          return("The final sample sizes are below: ")
        }
+       # if it hasn't been created then display nothing
+       else{
+         return(NULL)
+       }
+
      })
        
      output$text_finalsizesbox <- renderText({
-       if(input$design_nclust==""){
-         return(NULL)
-       }
-       else{
+       # require n clusters to be defined and calculate sizes button to be clicked
+       req(input$design_nclust, input$calc_sizes)
+       
+       # check if df_sizes_final() has been created, which means the user has selected n clusters, edited the data (or not), and clicked 'calculate sizes' button
+       if(!is.null(df_sizes_final())){
          return("Based on the values you entered for sample size and taking into account the proportion drop-out,
                                              the final adjusted sample sizes are calculated using the formula: Nadj=n/(1-d) where Nadj is the adjusted sample size,
                                              n is the target sample size, and d is the expected drop-out proportion")
+       }
+       # if it hasn't been created then display nothing
+       else{
+         return(NULL)
        }
      })
    })     
    
   # update the data frame with edited values
   df_sizes_final <- eventReactive(input$calc_sizes, {
-
+    
+    # require n clusters to be defined
+    req(input$design_nclust)
+    
     df <- design_rv$df_sizes_update
 
     # calculate adjusted sample size
