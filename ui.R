@@ -59,8 +59,10 @@ dashboardPage(#theme = "flatly",
         tabName = "design",
         fluidRow(
           mainPanel(
+            # helpText("text"),
             tabsetPanel(type = "tabs",
                         tabPanel("Sample size tables",
+                                 helpText("Some text here to describe the sample size tab"),
                                  br(),
                                  box(width = 10, 
                                      title = "Sample sizes to achieve a given target power", 
@@ -81,6 +83,7 @@ dashboardPage(#theme = "flatly",
                                  )
                         ),
                         tabPanel("Final cluster sizes",
+                                 helpText(paste0(icon("info"), "Some text here to describe the sample size tab")),
                                  tags$head(tags$script(src = "message-handler.js")),
                                  br(),
                                  fluidRow(
