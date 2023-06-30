@@ -344,16 +344,22 @@ function(input, output, session) {
     output$title_powbox <- renderText({
       # error message if the user has not entered the sample sizes 
       if(is.null(design_rv$df_sizes_update)){
-        createAlert(session, 
-                    anchorId = "error_nosizes", 
-                    alertId = "alert_nosizes",
-                    style = "danger",
-                    title = "Error", 
-                    content = "You have not entered the sample sizes. Please go back to Step 1 and choose the number of clusters and enter the values in the table.", 
-                    append = FALSE)
+        # createAlert(session, 
+        #             anchorId = "error_nosizes", 
+        #             alertId = "alert_nosizes",
+        #             style = "danger",
+        #             title = "Error", 
+        #             content = "You have not entered the sample sizes. Please go back to Step 1 and choose the number of clusters and enter the values in the table.", 
+        #             append = FALSE)
+
+        show_alert(
+          title = "Error!",
+          text = "You have not entered the sample sizes. Please go back to Step 1 and choose the number of clusters and enter the values in the table.",
+          type = "error"
+        )
       }
       else{
-      closeAlert(session, "alert_nosizes")
+      # closeAlert(session, "alert_nosizes")
       return("The estimated power is below: ")
       }
     })
