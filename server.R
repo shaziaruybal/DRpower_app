@@ -550,10 +550,10 @@ function(input, output, session) {
   })
   
   output$est_prev_table <- renderTable({
-    # TODO: figure out how to add column names
     prev_output() %>% 
       rename("Mean prevalence" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper, "Probability above threshold" = prob_above_threshold)
-  }, colnames = T)
+  }, colnames = T
+  )
 
     # NOTE need to divide by 100 to convert to proportion
     est_prev_plot <- reactive({
@@ -605,10 +605,10 @@ function(input, output, session) {
     })
     
     output$est_icc_table <- renderTable({
-      # TODO: figure out how to add column names
-      icc_output()
-    
-    })
+      icc_output() %>% 
+        rename("Mean ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper)
+    }, colnames = T
+    )
   
     # NOTE need to divide by 100 to convert to proportion
     est_icc_plot <- reactive({
