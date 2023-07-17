@@ -185,8 +185,6 @@ function(input, output, session) {
   observeEvent(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     print("Number of clusters selected")
 
-    # session$sendCustomMessage(type = "testmessage",
-    #                           message = paste0("You have entered ", input$design_nclust, " clusters in your study"))
     output$text_edit_clusttab <- renderText("The table below now has rows corresponding to the number of clusters in your study.
                                             Please edit the target sample size and expected proportion of participant drop-out for each cluster by double-clicking
                                             and editing the table below. When you are finished click the 'Calculate final sample sizes' button")
@@ -252,6 +250,22 @@ function(input, output, session) {
   #  Calculate final sample sizes
   # ----------------------------------
   
+  # When 'calculate sample sizes' button is clicked:
+  # update the data frame with the user-entered values, calculate the adjusted sample size, and create a final df that is reactive
+  df_sizes_final <- eventReactive(input$calc_sizes, {
+    
+    # require n clusters to be defined
+    req(input$design_nclust)
+    
+    # get the stored (and edited) data frame with sample sizes
+    df <- design_rv$df_sizes_update
+    
+    # calculate adjusted sample size
+    df <- df %>% mutate(final_sample_size = ceiling(sample_size/(1-prop_dropout)))
+    
+    return(df)
+  })
+  
   # observe when calculate sample sizes button is clicked 
    observeEvent(input$calc_sizes, {
      print("Calculate final sample sizes values button clicked")
@@ -261,13 +275,6 @@ function(input, output, session) {
      
      # error message if the user has not chosen the number of clusters
      if(input$design_nclust==""){
-       # createAlert(session,
-       #             anchorId = "error_noclusters",
-       #             alertId = "alert_noclusters",
-       #             style = "danger",
-       #             title = "Error",
-       #             content = "You have not chosen the number of clusters. Please go back to Step 1 and choose the number of clusters and enter the values in the table.",
-       #             append = FALSE)
        show_alert(
          title = "Error!",
          text = "You have not chosen the number of clusters. Please go back to Step 1 and choose the number of clusters and enter the values in the table.",
@@ -275,11 +282,10 @@ function(input, output, session) {
        )
      }
      else{
-       # closeAlert(session, "alert_noclusters")
        return(NULL)
      }
      
-     # output text
+     # output text describing the final adjusted sample size table
      output$title_finalsizesbox <- renderText({
        # require n clusters to be defined and calculate sizes button to be clicked
        req(input$design_nclust, input$calc_sizes)
@@ -311,21 +317,7 @@ function(input, output, session) {
        }
      })
    })     
-   
-  # update the data frame with edited values
-  df_sizes_final <- eventReactive(input$calc_sizes, {
-    
-    # require n clusters to be defined
-    req(input$design_nclust)
-    
-    df <- design_rv$df_sizes_update
-
-    # calculate adjusted sample size
-    df <- df %>% mutate(final_sample_size = ceiling(sample_size/(1-prop_dropout)))
-
-    return(df)
-  })
-
+  
   # render the edited table
   output$final_sizes_table <- renderDT({
     datatable(df_sizes_final(),
