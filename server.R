@@ -543,16 +543,22 @@ function(input, output, session) {
       
       # display error message if the user has not entered the deletions and sample sizes
       if(input$analysis_nclust==""){
-        createAlert(session, 
-                    anchorId = "error_nodeletions", 
-                    alertId = "alert_nodeletions",
-                    style = "danger",
-                    title = "Error", 
-                    content = "You have not selected the number of clusters or entered the values for your study. Please go back to Step 1 and choose the number of clusters and enter the values in the table.", 
-                    append = FALSE)
+        # createAlert(session, 
+        #             anchorId = "error_nodeletions", 
+        #             alertId = "alert_nodeletions",
+        #             style = "danger",
+        #             title = "Error", 
+        #             content = "You have not selected the number of clusters or entered the values for your study. Please go back to Step 1 and choose the number of clusters and enter the values in the table.", 
+        #             append = FALSE)
+        
+        show_alert(
+          title = "Error!",
+          text = "You have not selected the number of clusters or entered the values for your study. Please go back to Step 1 and choose the number of clusters and enter the values in the table.",
+          type = "error"
+        )
       }
       else{
-        closeAlert(session, "alert_nodeletions")
+        # closeAlert(session, "alert_nodeletions")
         return("The estimated prevalence value is below: ")
       }
     })
