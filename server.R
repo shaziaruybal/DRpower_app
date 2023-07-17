@@ -331,19 +331,30 @@ function(input, output, session) {
   #  Results plot: estimated power
   # ----------------------------------
   
-  # Display results once estimate power is clicked
+  # When 'Estimate power' button is clicked:
+  # calculate power using DRpower::get_power_threshold() with the user-entered params
+  power_output <- eventReactive(input$est_pow, { 
+    # create a progress notification pop-up telling the user that power is being estimated based on n_sims
+    id <- showNotification(paste0("Estimating power ( ", input$param_n_sims, " simulations)..."), 
+                           duration = NULL, 
+                           closeButton = FALSE)
+    
+    # remove notification when calculation finishes
+    on.exit(removeNotification(id), add = TRUE)
+    
+    DRpower::get_power_threshold(N = df_sizes_final()$sample_size, 
+                                 prevalence = as.numeric(input$param_prev),
+                                 ICC = as.numeric(input$param_icc),
+                                 reps = as.numeric(input$param_n_sims)
+    )
+  })
+  
+  # If user clicks 'estimate power' button before entering sample sizes, an error message will pop-up
   observeEvent(input$est_pow, {
-    output$title_powbox <- renderText({
-      # error message if the user has not entered the sample sizes 
+      print("Estimate power button has been clicked")
+    
+      # error message pops up if the user has not entered the sample sizes (check that df_sizes_update() has been created)
       if(is.null(design_rv$df_sizes_update)){
-        # createAlert(session, 
-        #             anchorId = "error_nosizes", 
-        #             alertId = "alert_nosizes",
-        #             style = "danger",
-        #             title = "Error", 
-        #             content = "You have not entered the sample sizes. Please go back to Step 1 and choose the number of clusters and enter the values in the table.", 
-        #             append = FALSE)
-
         show_alert(
           title = "Error!",
           text = "You have not entered the sample sizes. Please go back to Step 1 and choose the number of clusters and enter the values in the table.",
@@ -351,36 +362,44 @@ function(input, output, session) {
         )
       }
       else{
-      # closeAlert(session, "alert_nosizes")
-      return("The estimated power is below: ")
-      }
-    })
-    
-    
-    # TODO seems like the text is updating when params are changed, not just when button is clicked
-    output$text_powbox <- renderText({
-      if(is.null(design_rv$df_sizes_update)){
         return(NULL)
       }
+    })
+    
+  # Display title text once estimate power is clicked and power_output() has been created
+  output$title_powbox <- renderText({
+    
+    # require estiamte power button click
+    req(input$est_pow)
+    
+    # check if power_output() has been created, which means the results have been calculated and can be displayed
+    if(!is.null(power_output())){
+      return("The estimated power is below: ")
+    }
+    # if it hasn't been created yet then return nothing (note error message will pop-up based on other reactivity vals)
+    else{
+      return(NULL)
+    }
+  })
+    
+    # TODO seems like the text is updating when params are changed, not just when button is clicked
+    # Display results text once estimate power is clicked and power_output() has been created
+    output$text_powbox <- renderText({
+      
+      # require estimate power to have been clicked
+      req(input$est_pow)
+      
+      # check if power_output() has been created, which means the results have been calculated and can be displayed
+      if(!is.null(power_output())){
+        paste0("The plot shows the mean and lower and upper credible interval based on the parameters: ",
+               "prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims)
+        
+      }
+      # if it hasn't been created yet then return nothing
       else{
-      paste0("The plot shows the mean and lower and upper credible interval based on the parameters: ",
-                                            "prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims)
+        return(NULL)     
       }
     })
-  })
-  
-  power_output <- eventReactive(input$est_pow, { 
-    id <- showNotification(paste0("Estimating power ( ", input$param_n_sims, " simulations)..."), 
-                           duration = NULL, 
-                           closeButton = FALSE)
-    on.exit(removeNotification(id), add = TRUE)
-    
-    DRpower::get_power_threshold(N = df_sizes_final()$sample_size, # this needs to be based on df_sizes_final
-                                   prevalence = as.numeric(input$param_prev),
-                                   ICC = as.numeric(input$param_icc),
-                                   reps = as.numeric(input$param_n_sims)
-      )
-  })
   
   # TODO seems like the plot is not re-loading when params are changed, but working for button click
   # TODO display an error if sample sizes haven't been entered and plot doesn't render
