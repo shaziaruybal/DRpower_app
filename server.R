@@ -339,6 +339,9 @@ function(input, output, session) {
   # When 'Estimate power' button is clicked:
   # calculate power using DRpower::get_power_threshold() with the user-entered params
   power_output <- eventReactive(input$est_pow, { 
+    
+    req(df_sizes_final())
+    
     # create a progress notification pop-up telling the user that power is being estimated based on n_sims
     id <- showNotification(paste0("Estimating power ( ", input$param_n_sims, " simulations)..."), 
                            duration = NULL, 
@@ -357,16 +360,21 @@ function(input, output, session) {
   # If user clicks 'estimate power' button before entering sample sizes, an error message will pop-up
   observeEvent(input$est_pow, {
       print("Estimate power button has been clicked")
-    
-      # error message pops up if the user has not entered the sample sizes (check that df_sizes_update() has been created)
-      if(is.null(design_rv$df_sizes_update)){
+      
+      # error message pops up if the user has not entered the sample sizes (check that calculate sizes button has been clicked)
+      if(input$calc_sizes==0){
+        # TODO debugging
+        print("calculate sizes is NULL")
+        print("error should have popped up")
         show_alert(
           title = "Error!",
-          text = "You have not entered the sample sizes. Please go back to Step 1 and choose the number of clusters and enter the values in the table.",
+          text = "You have not entered the sample sizes correctly. Please go back to Step 1 and choose the number of clusters and enter the values in the table, and then click the 'Calculate final sample sizes' button.",
           type = "error"
         )
       }
       else{
+        print("button has been clicked and df_sizes_final has been calculated (so no pop-up error needed):")
+        print(df_sizes_final())
         return(NULL)
       }
     })
