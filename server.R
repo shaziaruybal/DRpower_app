@@ -157,12 +157,19 @@ function(input, output, session) {
 
   # Make the editable data frame reactive and dependent on the number of clusters entered by the user
   df_sizes <- eventReactive(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
-    # create the data frame with fixed columns and rows based on user input
-    # TODO: This needs to be updated to ideal numbers based on final simulations (need to make design_nclust reactive), keep this fixed at default vals (prev==0.1), if prev=8,9,10 fix at 500 sample size
-    # store all dfs in list and access list by index number aka input$design_nclust
+    
+    # get the target sample sizes from table with fixed prev of 10%, fix it at 500 if nclust is 2 or 3 (because NA)
+    if(input$design_nclust==2 | input$design_nclust==3){
+      target_size <- 500
+    }
+    else{
+      target_size <- df_sample_sizes %>% filter(n_clust == input$design_nclust) %>% select(`0.1`) %>% as.integer()
+    }
+
+    # create the data frame with fixed columns and rows based on user input and target sample sizes as defaults
     data.frame(
-      cluster = rep(2:input$design_nclust),
-      sample_size = rep(100, input$design_nclust),
+      cluster = rep(1:input$design_nclust),
+      sample_size = rep(target_size, input$design_nclust),
       prop_dropout = rep(0.1, input$design_nclust)
     )
   })
