@@ -170,7 +170,7 @@ function(input, output, session) {
     # TODO: This needs to be updated to ideal numbers based on final simulations (need to make design_nclust reactive), keep this fixed at default vals (prev==0.1), if prev=8,9,10 fix at 500 sample size
     # store all dfs in list and access list by index number aka input$design_nclust
     data.frame(
-      cluster = rep(1:input$design_nclust),
+      cluster = rep(2:input$design_nclust),
       sample_size = rep(100, input$design_nclust),
       prop_dropout = rep(0.1, input$design_nclust)
     )
@@ -483,7 +483,7 @@ function(input, output, session) {
     # TODO this also needs to be updated to ideal numbers based on the final simulations?
     # create the data frame with fixed columns and rows based on user input
     data.frame(
-      cluster = c(rep(1:input$analysis_nclust)),
+      cluster = c(rep(2:input$analysis_nclust)),
       n_deletions = c(rep(5, input$analysis_nclust)),
       sample_size = c(rep(100, input$analysis_nclust))
     )
