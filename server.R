@@ -163,6 +163,18 @@ function(input, output, session) {
   
   # create a reactive value for df_sizes_update
   design_rv <- reactiveValues(df_sizes_update = NULL)
+
+  # Make the editable data frame reactive and dependent on the number of clusters entered by the user
+  df_sizes <- eventReactive(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
+    # create the data frame with fixed columns and rows based on user input
+    # TODO: This needs to be updated to ideal numbers based on final simulations (need to make design_nclust reactive), keep this fixed at default vals (prev==0.1), if prev=8,9,10 fix at 500 sample size
+    # store all dfs in list and access list by index number aka input$design_nclust
+    data.frame(
+      cluster = rep(1:input$design_nclust),
+      sample_size = rep(100, input$design_nclust),
+      prop_dropout = rep(0.1, input$design_nclust)
+    )
+  })
   
   # observe when the user specifies n clusters
   observeEvent(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
@@ -177,17 +189,6 @@ function(input, output, session) {
     
     # when df_sizes() is created, store the initial values in df_sizes_update()
     design_rv$df_sizes_update <- df_sizes()
-  })
-  
-  # Make the editable data frame reactive and dependent on the number of clusters entered by the user
-  df_sizes <- eventReactive(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
-    # create the data frame with fixed columns and rows based on user input
-    # TODO: This needs to be updated to ideal numbers based on final simulations (need to make design_nclust reactive)
-    data.frame(
-      cluster = rep(1:input$design_nclust),
-      sample_size = rep(100, input$design_nclust),
-      prop_dropout = rep(0.1, input$design_nclust)
-    )
   })
   
   # render editable table
