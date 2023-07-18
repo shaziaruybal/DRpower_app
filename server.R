@@ -264,14 +264,15 @@ function(input, output, session) {
     df <- df %>% mutate(final_sample_size = ceiling(sample_size/(1-prop_dropout)))
     
     return(df)
-  })
+  }) 
   
   # observe when calculate sample sizes button is clicked 
    observeEvent(input$calc_sizes, {
      print("Calculate final sample sizes values button clicked")
-     # debugging, remove later
+     #------- debugging, remove later ----
      print("After user clicks the calc sample size button, this is the edited df: ")
      print(design_rv$df_sizes_update)
+     #------------------------------------
      
      # error message if the user has not chosen the number of clusters
      if(input$design_nclust==""){
@@ -284,39 +285,43 @@ function(input, output, session) {
      else{
        return(NULL)
      }
+   })     
      
-     # output text describing the final adjusted sample size table
-     output$title_finalsizesbox <- renderText({
-       # require n clusters to be defined and calculate sizes button to be clicked
-       req(input$design_nclust, input$calc_sizes)
-       
-       # check if df_sizes_final() has been created, which means the user has selected n clusters, edited the data (or not), and clicked 'calculate sizes' button
-       if(!is.null(df_sizes_final())){
-         return("The final sample sizes are below: ")
-       }
-       # if it hasn't been created then display nothing
-       else{
-         return(NULL)
-       }
-
-     })
-       
-     output$text_finalsizesbox <- renderText({
-       # require n clusters to be defined and calculate sizes button to be clicked
-       req(input$design_nclust, input$calc_sizes)
-       
-       # check if df_sizes_final() has been created, which means the user has selected n clusters, edited the data (or not), and clicked 'calculate sizes' button
-       if(!is.null(df_sizes_final())){
-         return("Based on the values you entered for sample size and taking into account the proportion drop-out,
+   # output text describing the final adjusted sample size table
+   output$title_finalsizesbox <- renderText({
+     # require n clusters to be defined and calculate sizes button to be clicked
+     req(input$design_nclust, input$calc_sizes)
+     
+     # check if df_sizes_final() has been created, which means the user has selected n clusters, edited the data (or not), and clicked 'calculate sizes' button
+     if(!is.null(df_sizes_final())){
+       # TODO debugging, remove later
+       print("title_finalsizebox should have printed")
+       return("The final sample sizes are below: ")
+     }
+     # if it hasn't been created then display nothing
+     else{
+       # TODO debugging, remove later
+       print("title_finalsizebox didn't print")
+       return(NULL)
+     }
+     
+   })
+   
+   output$text_finalsizesbox <- renderText({
+     # require n clusters to be defined and calculate sizes button to be clicked
+     req(input$design_nclust, input$calc_sizes)
+     
+     # check if df_sizes_final() has been created, which means the user has selected n clusters, edited the data (or not), and clicked 'calculate sizes' button
+     if(!is.null(df_sizes_final())){
+       return("Based on the values you entered for sample size and taking into account the proportion drop-out,
                                              the final adjusted sample sizes are calculated using the formula: Nadj=n/(1-d) where Nadj is the adjusted sample size,
                                              n is the target sample size, and d is the expected drop-out proportion")
-       }
-       # if it hasn't been created then display nothing
-       else{
-         return(NULL)
-       }
-     })
-   })     
+     }
+     # if it hasn't been created then display nothing
+     else{
+       return(NULL)
+     }
+   })
   
   # render the edited table
   output$final_sizes_table <- renderDT({
