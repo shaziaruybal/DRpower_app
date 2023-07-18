@@ -161,23 +161,6 @@ function(input, output, session) {
   #  User-input table: sample size and proportion drop-out
   # ----------------------------------
   
-  # initialize empty data frame
-  df <- data.frame(cluster = integer(),
-                   sample_size = integer(),
-                   prop_dropout = numeric())
-  
-  # render the initial table (no rows)
-  output$editable_clusttab <- renderDT({
-    datatable(df,
-              editable = list(
-                target = 'cell',
-                disable = list(columns = c(1))
-              ),
-              colnames = c("Cluster", "Target sample size", "% drop-out"),
-              options = list(dom = 'rt', autoWidth = TRUE, pageLength = 20))
-  })
-  
-  
   # create a reactive value for df_sizes_update
   design_rv <- reactiveValues(df_sizes_update = NULL)
   
