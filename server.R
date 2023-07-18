@@ -379,27 +379,24 @@ function(input, output, session) {
     }
   })
     
-    # TODO seems like the text is updating when params are changed, not just when button is clicked
-    # Display results text once estimate power is clicked and power_output() has been created
-    output$text_powbox <- renderText({
+  # Display results text once estimate power is clicked and power_output() has been created
+  output$text_powbox <- renderText({
+    
+    # require estimate power to have been clicked
+    req(input$est_pow)
+    
+    # check if power_output() has been created, which means the results have been calculated and can be displayed
+    if(!is.null(power_output())){
+      paste0("The plot shows the mean and lower and upper credible interval based on the parameters selected and the sample sizes you entered in Step 1.")
       
-      # require estimate power to have been clicked
-      req(input$est_pow)
-      
-      # check if power_output() has been created, which means the results have been calculated and can be displayed
-      if(!is.null(power_output())){
-        paste0("The plot shows the mean and lower and upper credible interval based on the parameters: ",
-               "prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims)
-        
-      }
-      # if it hasn't been created yet then return nothing
-      else{
-        return(NULL)     
-      }
-    })
+    }
+    # if it hasn't been created yet then return nothing
+    else{
+      return(NULL)     
+    }
+  })
   
   # TODO seems like the plot is not re-loading when params are changed, but working for button click
-  # TODO display an error if sample sizes haven't been entered and plot doesn't render
   output$est_power_plot <- renderPlot({
     ggplot(power_output()) +
       geom_segment(aes(x = " ", xend = " ",y = lower, yend = upper), color = "black", linewidth = 1) +
@@ -453,43 +450,37 @@ function(input, output, session) {
   # ----------------------------------
   #  User-input table: number of deletions and final sample sizes
   # ----------------------------------
-  # TODO: make sure an error appears if the user has not entered the sizes
-  
+
   # initialize empty data frame
-  df_a <- data.frame(
-    cluster = integer(),
-    n_deletions = integer(),
-    sample_size = integer()
-  )
-  
-  output$editable_deltab <- renderDT({
-    datatable(df_a, 
-              editable = list(
-                target = 'cell',
-                disable = list(
-                  columns = c(0)
-                )
-              ),
-              # rownames = FALSE,
-              # colnames = c(), # add colnames
-              options = list(dom = 'rt',
-                             autoWidth = TRUE, pageLength = 20)) 
-    
-    
-  })
+  # df_a <- data.frame(
+  #   cluster = integer(),
+  #   n_deletions = integer(),
+  #   sample_size = integer()
+  # )
+  # 
+  # # render the initial table ()
+  # output$editable_deltab <- renderDT({
+  #   datatable(df_a, 
+  #             editable = list(
+  #               target = 'cell',
+  #               disable = list(
+  #                 columns = c(0)
+  #               )
+  #             ),
+  #             # rownames = FALSE,
+  #             # colnames = c(), # add colnames
+  #             options = list(dom = 'rt',
+  #                            autoWidth = TRUE, pageLength = 20)) 
+  #   
+  #   
+  # })
   
   # create a reactive value for df_analysis_update
   analysis_rv <- reactiveValues(df_analysis_update = NULL)
   
-  # get input value from user-specified n clusters
-  observeEvent(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
-    print("Number of final clusters selected")
-    
-    analysis_rv$df_analysis_update <- df_deletions()
-  }) 
-
   # Make the editable data frame reactive and dependent on the deletion and sample sizes entered by the user
   df_deletions <- eventReactive(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
+    # TODO this also needs to be updated to ideal numbers based on the final simulations?
     # create the data frame with fixed columns and rows based on user input
     data.frame(
       cluster = c(rep(1:input$analysis_nclust)),
@@ -497,6 +488,13 @@ function(input, output, session) {
       sample_size = c(rep(100, input$analysis_nclust))
     )
   })  
+  
+  # When the user selects the number of clusters, we store the initial values in df_sizes_update() so we can keep track of any user edits to the table
+  observeEvent(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
+    print("Number of final clusters selected")
+    
+    analysis_rv$df_analysis_update <- df_deletions()
+  }) 
   
   # Render editable table
   output$editable_deltab <- renderDT({
@@ -538,62 +536,84 @@ function(input, output, session) {
   # ----------------------------------
   #  Results table/plot: estimated prevalence
   # ----------------------------------
-  
-  # Display results once estimate prevalence is clicked
-  observeEvent(input$est_prev, {
-    print("Estimate prevalence button clicked")
-    
-    # debugging, remove later
-    print("After user clicks the estimate prev button, this is the edited df: ")
-    print(analysis_rv$df_analysis_update)
-    
-    output$title_prevbox <- renderText({
-      
-      # display error message if the user has not entered the deletions and sample sizes, require the reactiveVal 'df_analysis_update' to have been created
-      if(is.null(analysis_rv$df_analysis_update)){
-        # createAlert(session, 
-        #             anchorId = "error_nodeletions", 
-        #             alertId = "alert_nodeletions",
-        #             style = "danger",
-        #             title = "Error", 
-        #             content = "You have not selected the number of clusters or entered the values for your study. Please go back to Step 1 and choose the number of clusters and enter the values in the table.", 
-        #             append = FALSE)
-        
-        show_alert(
-          title = "Error!",
-          text = "You have not selected the number of clusters or entered the values for your study. Please go back to Step 1 and choose the number of clusters and enter the values in the table.",
-          type = "error"
-        )
-      }
-      else{
-        # closeAlert(session, "alert_nodeletions")
-        return("The estimated prevalence value is below: ")
-      }
-    })
-    
-    output$text_prevbox <- renderText({
-      # display nothing if the user has not entered the deletions and sample sizes
-      if(input$analysis_nclust==""){
-        return(NULL)
-      }
-      else{
-        paste("The table and plot show the mean and lower and upper credible interval. There is a ",
-              ceiling(prev_output()$prob_above_threshold*100),
-              "% probability that the ",
-              "pfhrp2 prevalence is above the 5% threshold.")
-      }
-    })
-    
-    # print(prev_output())
-  })    
-  
-  # Calculate prevalence using DRpower 
+ 
+  # When 'Estimate prevalence' button is clicked:
+  # Calculate prevalence using DRpower ::get_prevalence() with the user-entered deletions and sample sizes
   prev_output <- eventReactive(input$est_prev, {
+    
+    # require the updated data frame to have been created to make sure there is a data frame to get values from
+    req(analysis_rv$df_analysis_update)
+    
+    # create a progress notification pop-up telling the user that prevalence is being estimated
+    id <- showNotification(paste0("Estimating prevalence..."), 
+                           duration = 10, 
+                           closeButton = FALSE)
+    
+    # remove notification when calculation finishes
+    on.exit(removeNotification(id), add = TRUE)
+    
     df <- analysis_rv$df_analysis_update
     
     DRpower::get_prevalence(n = df$n_deletions, 
                             N = df$sample_size)
     
+  })
+  
+  # If user clicks 'estimate prevalence' button before selecting clusters and entering sample sizes, an error message will pop-up
+  observeEvent(input$est_prev, {
+    print("Estimate prevalence button clicked")
+    
+      # display error message if the user has not entered the deletions and sample sizes, require the reactiveVal 'df_analysis_update' to have been created
+      if(is.null(analysis_rv$df_analysis_update)){
+        # TODO debugging
+        print("estimate prev is NULL")
+        print("error should have popped up")
+        
+        show_alert(
+          title = "Error!",
+          text = "You have not selected the number of clusters or entered the values for your study. Please select the number of clusters from the drop-down menu and enter the values in the table.",
+          type = "error"
+        )
+      }
+      else{
+        # debugging, remove later
+        print("After user clicks the estimate prev button, this is the edited df (no pop-up error msg needed): ")
+        print(analysis_rv$df_analysis_update)
+        return(NULL)
+      }
+  })
+  
+  # Display title text once estimate power is clicked and power_output() has been created
+  output$title_prevbox <- renderText({
+    
+    # require estimate prevalence button click
+    req(input$est_prev)
+    
+    # check if prev_output() has been created, which means the results have been calculated and can be displayed
+    if(!is.null(prev_output())){
+      return("The estimated prevalence value is below: ")
+    }
+    # if it hasn't been created yet then return nothing (note error message will pop-up based on other reactivity vals)
+    else{
+      return(NULL)
+    }
+  })
+  
+  output$text_prevbox <- renderText({
+    
+    # require estimate pevalence button click
+    req(input$est_prev)
+    
+    # check if prev_output() has been created, which means the results have been calculated and can be displayed
+    if(!is.null(prev_output())){
+      paste0("The table and plot show the mean and lower and upper credible interval. There is a ",
+             ceiling(prev_output()$prob_above_threshold*100),
+             "% probability that the ",
+             "pfhrp2 prevalence is above the 5% threshold.")
+    }
+    else{
+      return(NULL)
+    }
   })
   
   output$est_prev_table <- renderTable({
