@@ -548,8 +548,8 @@ function(input, output, session) {
     
     output$title_prevbox <- renderText({
       
-      # display error message if the user has not entered the deletions and sample sizes
-      if(input$analysis_nclust==""){
+      # display error message if the user has not entered the deletions and sample sizes, require the reactiveVal 'df_analysis_update' to have been created
+      if(is.null(analysis_rv$df_analysis_update)){
         # createAlert(session, 
         #             anchorId = "error_nodeletions", 
         #             alertId = "alert_nodeletions",
