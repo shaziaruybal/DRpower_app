@@ -9,9 +9,16 @@ library(shinyWidgets)
 library(shinyBS)
 library(DRpower)
 
-load("dummy_data.RData")
-
 set.seed(10)
+
+df_ss <- readRDS("df_ss.rds")
+
+df_sample_sizes <- df_ss %>% 
+  filter(ICC == 0.05) %>% 
+  filter(prev_thresh == 0.05) %>% 
+  select(n_clust, prevalence, N_opt) %>% 
+  # mutate(N_opt = replace_na(as.character(N_opt), ">1000")) %>% # can use this is we don't care about re-ordering and want it to look good
+  pivot_wider(names_from = prevalence, values_from = N_opt) 
 
 function(input, output, session) {
   
@@ -123,39 +130,23 @@ function(input, output, session) {
   # Sample size table
   # ----------------------------------
   
-  # TODO: make sure this shows the table representing the correct power selected by the user - when Bob sends final sample size estimates
-  # TODO: add eventReactive() once we have all the tables and make selection reactive vs occurring in observeEvent()
-  
-  observeEvent(input$user_pow, {
-    print("Target power selected")
-    
-    output$sample_size_table <- renderDT({
-      if(input$user_pow==0.8){
-        datatable(df_samp_size2, 
-                  colnames = c("Number of clusters", "6%", "7%", "8%", "9%", "10%"),
-                  rownames = FALSE,
-                  extensions = c("Buttons", "FixedHeader"), 
-                  options = list(autoWidth = T, 
-                                 pageLength = 12,
-                                 fixedHeader = TRUE,
-                                 columnDefs = list(list(className = "dt-center", 
-                                                        targets = "_all")),
-                                 searchHighlight = TRUE,
-                                 language = list(search = 'Filter:'),
-                                 dom = 'rtB',
-                                 buttons = c('copy', 'csv', 'excel')
-                  ))
-      }
+  output$sample_size_table <- renderDT({
+    datatable(df_sample_sizes, 
+              colnames = c("Number of clusters", "1%", "2%", "3%", "4%", "5%", "6%", "7%", "8%", "9", "10%", "11%", "12%", "13%", "14%", "15%", "16%", "17%", "18%", "19%", "20%"),
+              rownames = FALSE,
+              extensions = c("Buttons", "FixedHeader", "FixedColumns"),
+              options = list(# autoWidth = T,
+                             pageLength = 20,
+                             fixedHeader = TRUE,
+                             columnDefs = list(list(className = "dt-center",
+                                                    targets = "_all")),
+                             fixedColumns = list(leftColumns = 1),
+                             scrollX = '500px',
+                             dom = 'tB',
+                             buttons = c('copy', 'csv', 'excel')
+              )
+              )
     })
-    
-    output$table_NA <- renderText({
-      if(input$user_pow !=0.8){
-        "There is no table for that target power yet"
-      }
-    })
-  })     
-  
-  
   
   # ----------------------------------
   #  User-input table: sample size and proportion drop-out
