@@ -583,7 +583,7 @@ function(input, output, session) {
       }
   })
   
-  # Display title text once estimate power is clicked and power_output() has been created
+  # Display title text once estimate prevalence is clicked and power_output() has been created
   output$title_prevbox <- renderText({
     
     # require estimate prevalence button click
@@ -622,6 +622,7 @@ function(input, output, session) {
   }, colnames = T
   )
 
+  # TODO: make sure plot re-renders (or fades out) when recalculating - power plot does this! 
     # NOTE need to divide by 100 to convert to proportion
     est_prev_plot <- reactive({
       ggplot(prev_output()) +
@@ -649,21 +650,21 @@ function(input, output, session) {
   #  Results table/plot: estimated ICC
   # ----------------------------------
   
-  observeEvent(input$est_icc, {
-    print("Estimate ICC button clicked")
-    
-    # debugging, remove later
-    print("After user clicks the estimate ICC button, this is the edited df: ")
-    print(analysis_rv$df_analysis_update)
-    
-    output$title_iccbox <- renderText("The estimated ICC value is below: ")
-    output$text_iccbox <- renderText("The table and plot show the mean and lower and upper credible interval")
-  
-    print(icc_output())
-  })
-    
-  # Calculate ICC using DRpower
+    # When 'Estimate ICC' button is clicked:
+    # Calculate ICC using DRpower::get_ICC() with the user-entered deletions and sample sizes
     icc_output <- eventReactive(input$est_icc, {
+      
+      # require the updated data frame to have been created to make sure there is a data frame to get values from
+      req(analysis_rv$df_analysis_update)
+      
+      # create a progress notification pop-up telling the user that ICC is being estimated
+      id <- showNotification(paste0("Estimating intra-cluster correlation..."), 
+                             duration = 10, 
+                             closeButton = FALSE)
+      
+      # remove notification when calculation finishes
+      on.exit(removeNotification(id), add = TRUE)
+      
       df <- analysis_rv$df_analysis_update
       
       DRpower::get_ICC(n = df$n_deletions,
@@ -671,29 +672,86 @@ function(input, output, session) {
       
     })
     
-    output$est_icc_table <- renderTable({
-      icc_output() %>% 
-        rename("Mean ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper)
-    }, colnames = T
-    )
+  # If user clicks 'estimate ICC' button before selecting clusters and entering sample sizes, an error message will pop-up
+  observeEvent(input$est_icc, {
+    print("Estimate ICC button clicked")
+    
+    # display error message if the user has not entered the deletions and sample sizes, require the reactiveVal 'df_analysis_update' to have been created
+    if(is.null(analysis_rv$df_analysis_update)){
+      # TODO debugging
+      print("error should have popped up")
+      
+      show_alert(
+        title = "Error!",
+        text = "You have not selected the number of clusters or entered the values for your study. Please go back to the previous section ('Estimate prevalence') and select the number of clusters from the drop-down menu and enter the values in the table.",
+        type = "error"
+      )
+    }
+    else{
+      # debugging, remove later
+      print("After user clicks the estimate ICC button, this is the edited df (no pop-up error msg needed): ")
+      print(analysis_rv$df_analysis_update)
+      return(NULL)
+    }
+    
+  })
   
-    # NOTE need to divide by 100 to convert to proportion
-    est_icc_plot <- reactive({
-      ggplot(icc_output()) +
-        geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100), 
-                     color = "black", linewidth = 1) +
-        geom_point(aes(x = " ", y = MAP/100), 
-                   size = 4, 
-                   shape = 21,
-                   fill = "skyblue3") +
-        scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
-        labs(x = "",
-             y = "Estimated ICC") +
-        theme_light() +
-        theme(text = element_text(size = 16)) 
-    })
+  # Display title text once estimate ICC is clicked and icc_output() has been created
+  output$title_iccbox <- renderText({
+    
+    # require estimate ICC button click
+    req(input$est_icc)
+    
+    # check if icc_output() has been created, which means the results have been calculated and can be displayed
+    if(!is.null(icc_output())){
+      return("The estimated ICC value is below: ")
+    }
+    # if it hasn't been created yet then return nothing (note error message will pop-up based on other reactivity vals)
+    else{
+      return(NULL)
+    }
+  })
   
-    output$est_icc_plot <- renderPlot(est_icc_plot())
+  # Display text once estimate ICC is clicked and icc_output() has been created
+  output$text_iccbox <- renderText({
+    
+    # require estimate ICC button click
+    req(input$est_icc)
+    
+    # check if icc_output() has been created, which means the results have been calculated and can be displayed
+    if(!is.null(icc_output())){
+      return("The table and plot show the mean and lower and upper credible interval")
+    }
+    # if it hasn't been created yet then return nothing (note error message will pop-up based on other reactivity vals)
+    else{
+      return(NULL)
+    }
+  })
+  
+  output$est_icc_table <- renderTable({
+    icc_output() %>% 
+      rename("Mean ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper)
+  }, colnames = T
+  )
+  
+  # TODO: make sure plot re-renders (or fades out) when recalculating - power plot does this! 
+  # NOTE need to divide by 100 to convert to proportion
+  est_icc_plot <- reactive({
+    ggplot(icc_output()) +
+      geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100), 
+                   color = "black", linewidth = 1) +
+      geom_point(aes(x = " ", y = MAP/100), 
+                 size = 4, 
+                 shape = 21,
+                 fill = "skyblue3") +
+      scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
+      labs(x = "",
+           y = "Estimated ICC") +
+      theme_light() +
+      theme(text = element_text(size = 16)) 
+  })
+  
+  output$est_icc_plot <- renderPlot(est_icc_plot())
 
   # ----------------------------------
   #  Render downloadable analysis report  
