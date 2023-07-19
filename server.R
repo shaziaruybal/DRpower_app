@@ -327,11 +327,19 @@ function(input, output, session) {
   
   # render the edited table
   output$final_sizes_table <- renderDT({
-    datatable(df_sizes_final(),
-              #rownames=F, # remove rownames so that indexing is accurate
+    datatable(df_sizes_final(), 
               colnames = c("Cluster", "Target sample size", "% drop-out", "Final adjusted sample size"),
+              extensions = c("FixedHeader", "FixedColumns"),
               options = list(dom = 'rt',
-                             width=4, pageLength=20))
+                             width=4,
+                             pageLength=20,
+                             fixedHeader = T,
+                             columnDefs = list(list(className = "dt-center",
+                                                    targets = "_all")),
+                             fixedColumns = list(leftColumns = c(2)),
+                             scrollX = '400px'
+                             )
+              )
   })
 
   # ----------------------------------
