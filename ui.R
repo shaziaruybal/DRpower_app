@@ -197,7 +197,7 @@ dashboardPage(#theme = "flatly",
                            "posterior mean and median, the credible interval (CrI)."
                          )
                   ),
-                  box(width = 10,
+                  box(width = 12,
                       title = "1. Enter the values specific to your study",
                       br(),
                       selectInput(
@@ -214,7 +214,7 @@ dashboardPage(#theme = "flatly",
                                    icon("clipboard-check")),
                   )
                 ),
-                box(width = 10, background = "purple",
+                box(width = 12, background = "purple",
                     bsAlert("error_nodeletions"), # this creates an error message if user clicks estimate prevalence without entering deletions/sample sizes
                     title = textOutput("title_prevbox"),
                     p(textOutput("text_prevbox")),
@@ -238,7 +238,7 @@ dashboardPage(#theme = "flatly",
                        )
                 ),
                 ),
-                box(width = 10, background = "purple",
+                box(width = 12, background = "purple",
                       title = textOutput("title_iccbox"),
                       p(textOutput("text_iccbox")),
                       br(),
