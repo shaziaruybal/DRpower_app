@@ -641,6 +641,10 @@ function(input, output, session) {
   })
   
   output$est_prev_table <- renderTable({
+    
+    # require prev_output() to exist
+    req(prev_output())
+    
     prev_output() %>% 
       rename("Mean prevalence" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper, "Probability above threshold" = prob_above_threshold)
   }, colnames = T
@@ -649,6 +653,9 @@ function(input, output, session) {
   # TODO: make sure plot re-renders (or fades out) when recalculating - power plot does this! 
     # NOTE need to divide by 100 to convert to proportion
     est_prev_plot <- reactive({
+      # require prev_output() to exist
+      req(prev_output())
+      
       ggplot(prev_output()) +
         geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100),
                      color = "black", linewidth = 1) +
