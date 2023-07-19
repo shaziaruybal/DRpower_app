@@ -170,12 +170,20 @@ function(input, output, session) {
   # Make the editable data frame reactive and dependent on the number of clusters entered by the user
   df_sizes <- eventReactive(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     
+    # TODO: question for Bob - do we want this to populate based on df_sample_sizes() or defaults? 
+    df_targets <- df_ss %>% 
+        filter(ICC == 0.05) %>% 
+        filter(prev_thresh == 0.05) %>% 
+        # filter(prior_ICC_shape2==9) %>% # fixed at 9 once we have the new table
+        select(n_clust, prevalence, N_opt) %>% 
+        pivot_wider(names_from = prevalence, values_from = N_opt) 
+    
     # get the target sample sizes from table with fixed prev of 10%, fix it at 500 if nclust is 2 or 3 (because NA)
     if(input$design_nclust==2 | input$design_nclust==3){
       target_size <- 500
     }
     else{
-      target_size <- df_sample_sizes %>% filter(n_clust == input$design_nclust) %>% select(`0.1`) %>% as.integer()
+      target_size <- df_targets %>% filter(n_clust == input$design_nclust) %>% select(`0.1`) %>% as.integer()
     }
 
     # create the data frame with fixed columns and rows based on user input and target sample sizes as defaults
