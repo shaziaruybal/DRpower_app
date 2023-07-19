@@ -123,6 +123,7 @@ function(input, output, session) {
   # Sample size table
   # ----------------------------------
   
+  # When user selects and ICC value and prevalence threshold, create a reactive data frame df_sample_sizes() filtered on these values
   df_sample_sizes <- reactive({ 
     
     # require the user inputs to create the table
@@ -510,6 +511,7 @@ function(input, output, session) {
     datatable(df_deletions(), 
               editable = list(
                 target = 'cell',
+                numeric = c(1,2),
                 disable = list(
                   columns = c(0)
                 )
@@ -531,7 +533,8 @@ function(input, output, session) {
     for (i in seq_along(input$editable_deltab_cell_edit$row)) {
       row <- input$editable_deltab_cell_edit$row[i]
       col <- input$editable_deltab_cell_edit$col[i]
-      value <- input$editable_deltab_cell_edit$value[i]
+      # make sure edited value is numeric
+      value <- as.numeric(input$editable_deltab_cell_edit$value[i])
       
       # update the corresponding cell in the new data frame
       df[row, col] <- value
@@ -563,8 +566,20 @@ function(input, output, session) {
     
     df <- analysis_rv$df_analysis_update
     
-    DRpower::get_prevalence(n = df$n_deletions, 
-                            N = df$sample_size)
+    # check that values are numeric and that no value is NA (and if so show pop-up error message)
+    if(is.numeric(df$n_deletions) && !any(is.na(df$n_deletions)) && is.numeric(df$sample_size) && !any(is.na(df$sample_size))){
+      print(str(df))
+      DRpower::get_prevalence(n = df$n_deletions, 
+                              N = df$sample_size)
+    }
+    else {
+      print(str(df))
+      show_alert(
+        title = "Error!",
+        text = "Make sure you have only entered integers in your table and/or make sure you have filled in all the cells. Please go back and enter the values again.",
+        type = "error"
+      )
+    }
     
   })
   
