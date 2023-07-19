@@ -13,13 +13,6 @@ set.seed(10)
 
 df_ss <- readRDS("df_ss.rds")
 
-df_sample_sizes <- df_ss %>% 
-  filter(ICC == 0.05) %>% 
-  filter(prev_thresh == 0.05) %>% 
-  select(n_clust, prevalence, N_opt) %>% 
-  # mutate(N_opt = replace_na(as.character(N_opt), ">1000")) %>% # can use this is we don't care about re-ordering and want it to look good
-  pivot_wider(names_from = prevalence, values_from = N_opt) 
-
 function(input, output, session) {
   
   ##################################################
@@ -130,8 +123,21 @@ function(input, output, session) {
   # Sample size table
   # ----------------------------------
   
+  df_sample_sizes <- reactive({ 
+    
+    # require the user inputs to create the table
+    req(input$ss_icc, input$ss_prev)
+    
+    df_ss %>% 
+    filter(ICC == input$ss_icc) %>% 
+    filter(prev_thresh == input$ss_prev) %>% 
+    # filter(prior_ICC_shape2==9) %>% # fixed at 9 once we have the new table
+    select(n_clust, prevalence, N_opt) %>% 
+    pivot_wider(names_from = prevalence, values_from = N_opt) 
+  })
+  
   output$sample_size_table <- renderDT({
-    datatable(df_sample_sizes, 
+    datatable(df_sample_sizes(), 
               colnames = c("Number of clusters", "1%", "2%", "3%", "4%", "5%", "6%", "7%", "8%", "9", "10%", "11%", "12%", "13%", "14%", "15%", "16%", "17%", "18%", "19%", "20%"),
               rownames = FALSE,
               extensions = c("Buttons", "FixedHeader", "FixedColumns"),
@@ -144,8 +150,13 @@ function(input, output, session) {
                              scrollX = '500px',
                              dom = 'tB',
                              buttons = c('copy', 'csv', 'excel')
-              )
-              )
+              ), 
+              caption = paste0("This table shows target sample sizes assuming an intra-cluster correlation of: ", input$ss_icc, " \n and a prevalence threshold of: ", input$ss_prev)
+              ) %>% 
+      formatStyle("0.1",
+                  backgroundColor = "green",
+                  fontWeight = 'bold'
+      )
     })
   
   # ----------------------------------

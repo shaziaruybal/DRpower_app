@@ -65,26 +65,33 @@ dashboardPage(#theme = "flatly",
                         tabPanel("Sample size tables",
                                  helpText("Some text here to describe the sample size tab"),
                                  br(),
-                                 box(width = 10, 
-                                     title = "Sample sizes to achieve a given target power", 
-                                     TooltipHost(content = "TEST: Click and select the row with the number of clusters you intend to use for your study",
-                                                 delay = 0,
-                                                 Text(htmltools::em("TEST: Interact with the table below. Note to self: only one table below for 80% ATM"))
-                                     ),
+                                 box(width = 12, 
+                                     title = "Sample sizes required to achieve a target power of 80% based on the number of clusters", 
+                                     # TooltipHost(content = "TEST: Click and select the row with the number of clusters you intend to use for your study",
+                                     #             delay = 0,
+                                     #             Text(htmltools::em("TEST: Interact with the table below. Note to self: only one table below for 80% ATM"))
+                                     # ),
                                      br(),
                                      selectInput(
-                                       inputId = "user_pow",
-                                       label = "Target power: ", 
+                                       inputId = "ss_icc",
+                                       label = strong("Select the intra-cluster correlation: "),
                                        width = "auto",
-                                       choices = c(seq(0.0, 1.0, by = 0.1)),
-                                       selected = 0.8
+                                       choices = c("", 0.00, 0.01, 0.02, 0.05, 0.10, 0.20), 
+                                       selected = NULL,
                                      ),
-                                     DTOutput("sample_size_table"),
-                                     textOutput("table_NA")
+                                     selectInput(
+                                       inputId = "ss_prev",
+                                       label = strong("Select the prevalence threshold: "),
+                                       width = "auto",
+                                       choices = c("", 0.05, 0.08, 0.10), 
+                                       selected = NULL,
+                                     ),
+                                     br(),
+                                     DTOutput("sample_size_table")
                                  )
                         ),
                         tabPanel("Final cluster sizes",
-                                 helpText(paste0(icon("info"), "Some text here to describe the sample size tab")),
+                                 helpText("Some text here to describe the sample size tab"),
                                  tags$head(tags$script(src = "message-handler.js")),
                                  br(),
                                  fluidRow(
