@@ -129,9 +129,12 @@ function(input, output, session) {
     # require the user inputs to create the table
     req(input$ss_icc, input$ss_prev)
     
+    icc <- as.numeric(input$ss_icc)
+    prev <- as.numeric(input$ss_prev)/100
+    
     df_ss %>% 
-    filter(ICC == input$ss_icc) %>% 
-    filter(prev_thresh == input$ss_prev) %>% 
+    filter(ICC == icc) %>% 
+    filter(prev_thresh == prev) %>% 
     # filter(prior_ICC_shape2==9) %>% # fixed at 9 once we have the new table
     select(n_clust, prevalence, N_opt) %>% 
     pivot_wider(names_from = prevalence, values_from = N_opt) 
@@ -209,7 +212,7 @@ function(input, output, session) {
 
     output$text_edit_clusttab <- renderText("The table below now has rows corresponding to the number of clusters in your study.
                                             Please edit the target sample size and expected proportion of participant drop-out for each cluster by double-clicking
-                                            and editing the table below. When you are finished click the 'Calculate final sample sizes' button")
+                                            and editing each cell in the table below. When you are finished click the 'Calculate final sample sizes' button. ")
     
     print("After user selects N clusters, this is the df:")
     print(df_sizes())
@@ -320,7 +323,7 @@ function(input, output, session) {
      if(!is.null(df_sizes_final())){
        # TODO debugging, remove later
        print("title_finalsizebox should have printed")
-       return("The final sample sizes are below: ")
+       return("Adjusted sample sizes")
      }
      # if it hasn't been created then display nothing
      else{
@@ -337,9 +340,7 @@ function(input, output, session) {
      
      # check if df_sizes_final() has been created, which means the user has selected n clusters, edited the data (or not), and clicked 'calculate sizes' button
      if(!is.null(df_sizes_final())){
-       return("Based on the values you entered for sample size and taking into account the percentage drop-out,
-                                             the final adjusted sample sizes are calculated using the formula: Nadj=n/(1-d) where Nadj is the adjusted sample size,
-                                             n is the target sample size, and d is the expected drop-out proportion")
+       return("Based on the values you entered for sample size (n) and taking into account the proportion drop-out (d), the adjusted sample size is calculated using the formula n_adj = n/(1-d). This still refers to confirmed malaria positive cases.")
      }
      # if it hasn't been created then display nothing
      else{
@@ -434,7 +435,7 @@ function(input, output, session) {
     
     # check if power_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(power_output())){
-      paste0("The plot shows the mean and lower and upper credible interval based on the parameters selected and the sample sizes you entered in Step 1.")
+      paste0("The plot shows the mean and lower and upper 95% confidence interval based on cluster sizes and parameters chosen above.  ")
       
     }
     # if it hasn't been created yet then return nothing
@@ -455,8 +456,9 @@ function(input, output, session) {
       geom_text(aes(x= " ", y = 0.825, label = "80% threshold"), color = "darkgrey") +
       scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
       labs(x = "",
-           y = "Estimated power",
-           caption = paste0("Parameters: prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims)) +
+           y = "Estimated power" # ,
+           # caption = paste0("Parameters: prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims)
+           ) +
       theme_light() +
       theme(text = element_text(size = 16))
   })
@@ -526,6 +528,9 @@ function(input, output, session) {
   
   # Make the editable data frame reactive and dependent on the deletion and sample sizes entered by the user
   df_deletions <- eventReactive(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
+    
+    print("number of analysis clusters selected")
+    
     # create the data frame with fixed columns and rows based on user input
     data.frame(
       cluster = c(rep(1:input$analysis_nclust)),
@@ -590,7 +595,7 @@ function(input, output, session) {
     
     # require the updated data frame to have been created to make sure there is a data frame to get values from
     req(input$analysis_prevthresh, analysis_rv$df_analysis_update)
-    
+
     # create a progress notification pop-up telling the user that prevalence is being estimated
     id <- showNotification(paste0("Estimating prevalence..."), 
                            duration = 10, 
@@ -604,7 +609,8 @@ function(input, output, session) {
     # check that values are numeric and that no value is NA (and if so show pop-up error message)
     if(is.numeric(df$n_deletions) && !any(is.na(df$n_deletions)) && is.numeric(df$sample_size) && !any(is.na(df$sample_size))){
       print(str(df))
-      DRpower::get_prevalence(n = df$n_deletions, 
+
+      DRpower::get_prevalence(n = df$n_deletions,
                               N = df$sample_size,
                               prev_thresh = as.numeric(input$analysis_prevthresh))
     }
@@ -651,7 +657,7 @@ function(input, output, session) {
     
     # check if prev_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(prev_output())){
-      return("The estimated prevalence value is below: ")
+      return("Prevalence estimates")
     }
     # if it hasn't been created yet then return nothing (note error message will pop-up based on other reactivity vals)
     else{
@@ -666,10 +672,11 @@ function(input, output, session) {
     
     # check if prev_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(prev_output())){
-      paste0("The table and plot show the mean and lower and upper credible interval. There is a ",
-             ceiling(prev_output()$prob_above_threshold*100),
-             "% probability that the ",
-             "pfhrp2 prevalence is above the 5% threshold.")
+      paste0("The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. ",
+             "The table also gives the probability of being above the threshold. ",
+             # "The table also gives the probability of being above the threshold ", "( ", ceiling(prev_output()$prob_above_threshold*100), "% probability that the pfhrp2 prevalence is above the ", ceiling(input$analysis_prevthresh*100), "% threshold).", 
+             "As mentioned above, if you are using this value in a hypothesis test then we recommend accepting that prevalence is above the threshold if probability is 0.95 or higher.")
+             
     }
     else{
       return(NULL)
@@ -706,7 +713,7 @@ function(input, output, session) {
         scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
         labs(x = "",
              y = "Estimated prevalence",
-             caption = paste0("Result: there is a ", ceiling(prev_output()$prob_above_threshold*100), "% probability that pfhrp2 prevalence is above 5%")) +
+             caption = paste0("Result: there is a ", ceiling(prev_output()$prob_above_threshold*100), "% probability that pfhrp2/3 prevalence is above ", ceiling(as.numeric(input$analysis_prevthresh)*100), "%")) +
         theme_light() +
         theme(text = element_text(size = 16))
     })
