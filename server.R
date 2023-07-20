@@ -589,7 +589,7 @@ function(input, output, session) {
       print(str(df))
       DRpower::get_prevalence(n = df$n_deletions, 
                               N = df$sample_size,
-                              prev_thresh = input$analysis_prevthresh)
+                              prev_thresh = as.numeric(input$analysis_prevthresh))
     }
     else {
       print(str(df))
