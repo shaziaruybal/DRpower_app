@@ -457,28 +457,43 @@ function(input, output, session) {
   # ----------------------------------
 
   output$design_report <- downloadHandler(
-    filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".html"),
-    content = function(file) {
-      tempReport <- file.path(tempdir(), "template_design_report.Rmd")
-      file.copy("template_design_report.Rmd", tempReport, overwrite = TRUE)
-
-      params <- list(
-                     design_powerthreshold = input$user_pow,
-                     design_final_sizes = df_sizes_final(),
-                     design_nclusters = input$design_nclust,
-                     design_paramprev = input$param_prev,
-                     design_paramicc = input$param_icc,
-                     design_paramsims = input$param_n_sims,
-                     design_poweroutput = power_output()
-                     
-      )
-
-      rmarkdown::render(tempReport,
-                        output_file = file,
-                        params = params,
-                        envir = new.env(parent = globalenv()),
-      )
-    }
+    
+    # checking if downloadHandler can accept error message pop-up
+    # if(!is.null(df_sizes_final() && !is.null(power_output()))){
+      
+      filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".html"),
+      content = function(file) {
+        tempReport <- file.path(tempdir(), "template_design_report.Rmd")
+        file.copy("template_design_report.Rmd", tempReport, overwrite = TRUE)
+        
+        params <- list(
+          design_ss_icc = input$ss_icc,
+          design_ss_prev = input$ss_prev,
+          design_final_sizes = df_sizes_final(),
+          design_nclusters = input$design_nclust,
+          design_paramprev = input$param_prev,
+          design_paramicc = input$param_icc,
+          design_paramsims = input$param_n_sims,
+          design_poweroutput = power_output()
+          
+        )
+        
+        rmarkdown::render(tempReport,
+                          output_file = file,
+                          params = params,
+                          envir = new.env(parent = globalenv()),
+        )
+      }
+    # }
+    # else{
+    #   print("error should pop up")
+    #   show_alert(
+    #     title = "Error!",
+    #     text = "Error message here",
+    #     type = "error"
+    #   )
+    # }
+    
   )
 
   ##################################################
@@ -489,41 +504,16 @@ function(input, output, session) {
   #  User-input table: number of deletions and final sample sizes
   # ----------------------------------
 
-  # initialize empty data frame
-  # df_a <- data.frame(
-  #   cluster = integer(),
-  #   n_deletions = integer(),
-  #   sample_size = integer()
-  # )
-  # 
-  # # render the initial table ()
-  # output$editable_deltab <- renderDT({
-  #   datatable(df_a, 
-  #             editable = list(
-  #               target = 'cell',
-  #               disable = list(
-  #                 columns = c(0)
-  #               )
-  #             ),
-  #             # rownames = FALSE,
-  #             # colnames = c(), # add colnames
-  #             options = list(dom = 'rt',
-  #                            autoWidth = TRUE, pageLength = 20)) 
-  #   
-  #   
-  # })
-  
   # create a reactive value for df_analysis_update
   analysis_rv <- reactiveValues(df_analysis_update = NULL)
   
   # Make the editable data frame reactive and dependent on the deletion and sample sizes entered by the user
   df_deletions <- eventReactive(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
-    # TODO this also needs to be updated to ideal numbers based on the final simulations?
     # create the data frame with fixed columns and rows based on user input
     data.frame(
-      cluster = c(rep(2:input$analysis_nclust)),
-      n_deletions = c(rep(5, input$analysis_nclust)),
-      sample_size = c(rep(100, input$analysis_nclust))
+      cluster = c(rep(1:input$analysis_nclust)),
+      n_deletions = c(rep(NA, input$analysis_nclust)),
+      sample_size = c(rep(NA, input$analysis_nclust))
     )
   })  
   
