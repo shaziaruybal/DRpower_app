@@ -190,7 +190,7 @@ function(input, output, session) {
     data.frame(
       cluster = rep(1:input$design_nclust),
       sample_size = rep(target_size, input$design_nclust),
-      prop_dropout = rep(0.1, input$design_nclust)
+      percent_dropout = rep(10, input$design_nclust)
     )
   })
   
@@ -267,7 +267,7 @@ function(input, output, session) {
     if(is.numeric(df$sample_size) && !any(is.na(df$sample_size))){
       
       # calculate adjusted sample size
-      df <- df %>% mutate(final_sample_size = ceiling(sample_size/(1-prop_dropout)))
+      df <- df %>% mutate(final_sample_size = ceiling(sample_size/(1-(percent_dropout/100))))
     
       return(df)
     }
@@ -328,7 +328,7 @@ function(input, output, session) {
      
      # check if df_sizes_final() has been created, which means the user has selected n clusters, edited the data (or not), and clicked 'calculate sizes' button
      if(!is.null(df_sizes_final())){
-       return("Based on the values you entered for sample size and taking into account the proportion drop-out,
+       return("Based on the values you entered for sample size and taking into account the percentage drop-out,
                                              the final adjusted sample sizes are calculated using the formula: Nadj=n/(1-d) where Nadj is the adjusted sample size,
                                              n is the target sample size, and d is the expected drop-out proportion")
      }
