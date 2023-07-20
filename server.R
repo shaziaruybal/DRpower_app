@@ -214,6 +214,7 @@ function(input, output, session) {
     datatable(df_sizes(), 
               editable = list(
                 target = 'cell',
+                numeric = c(2,3),
                 disable = list(
                   columns = c(1)
                 )
@@ -232,11 +233,11 @@ function(input, output, session) {
     # get the latest updated data frame
     df <- design_rv$df_sizes_update
 
-    # iterate over each cell edit event
+    # iterate over each cell edit event, make sure the values are numeric
     for (i in seq_along(input$editable_clusttab_cell_edit$row)) {
       row <- input$editable_clusttab_cell_edit$row[i]
       col <- input$editable_clusttab_cell_edit$col[i]
-      value <- input$editable_clusttab_cell_edit$value[i]
+      value <- as.numeric(input$editable_clusttab_cell_edit$value[i])
 
       # update the corresponding cell in the new data frame
       df[row, col] <- value
@@ -262,10 +263,22 @@ function(input, output, session) {
     # get the stored (and edited) data frame with sample sizes
     df <- design_rv$df_sizes_update
     
-    # calculate adjusted sample size
-    df <- df %>% mutate(final_sample_size = ceiling(sample_size/(1-prop_dropout)))
+    # check that sample size values are numeric and that no value is NA (and if so show pop-up error message)
+    if(is.numeric(df$sample_size) && !any(is.na(df$sample_size))){
+      
+      # calculate adjusted sample size
+      df <- df %>% mutate(final_sample_size = ceiling(sample_size/(1-prop_dropout)))
     
-    return(df)
+      return(df)
+    }
+    else{
+      print(design_rv$df_sizes_update)
+      show_alert(
+        title = "Error!",
+        text = "Make sure you have only entered integers in your table and/or make sure you have filled in all the cells. Please go back and enter the values again.",
+        type = "error"
+      )
+    }
   }) 
   
   # observe when calculate sample sizes button is clicked 
@@ -359,12 +372,11 @@ function(input, output, session) {
     
     # remove notification when calculation finishes
     on.exit(removeNotification(id), add = TRUE)
-    
+      
     DRpower::get_power_threshold(N = df_sizes_final()$sample_size, 
                                  prevalence = as.numeric(input$param_prev),
                                  ICC = as.numeric(input$param_icc),
-                                 reps = as.numeric(input$param_n_sims)
-    )
+                                 reps = as.numeric(input$param_n_sims))
   })
   
   # If user clicks 'estimate power' button before entering sample sizes, an error message will pop-up
