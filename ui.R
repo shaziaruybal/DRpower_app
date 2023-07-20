@@ -84,9 +84,9 @@ dashboardPage(#theme = "flatly",
                                  br(),
                                  Callout(
                                    title = "Step 1. Consult sample size tables",
-                                   br(),
+                                   # br(),
                                    "The table below gives the number of confirmed malaria positive samples required ", em("per cluster "), "in order for study power to be 80% or higher. You can use these numbers as a general guide when scoping out a study plan, before moving to more tailored sample sizes in the next step.",
-                                   br(),
+                                   br(), br(),
                                    "In general, it is recommended to focus efforts on recruiting more clusters, rather than obtaining large numbers of samples from just a few clusters. Not only will the overall study sample size be lower, but this will also make results more robust to variation within a province. "
                                  ),
                                  br(),
@@ -106,13 +106,13 @@ dashboardPage(#theme = "flatly",
                                        choices = c("", 0.00, 0.01, 0.02, 0.05, 0.10, 0.20), 
                                        selected = NULL,
                                      ),
-                                     helpText(em("A high ICC value implies a high variation in the prevalence of deletions between clusters. A value of 5% is suggested by default based on an analysis of historical studies.")),
+                                     helpText(em("A high ICC value implies a high variation in the prevalence of deletions between clusters. A value of 0.05 is suggested by default based on an analysis of historical studies.")),
                                      br(),
                                      selectInput(
                                        inputId = "ss_prev",
-                                       label = strong("Select the prevalence threshold: "),
+                                       label = strong("Select the prevalence threshold (%): "),
                                        width = "auto",
-                                       choices = c("", 0.05, 0.08, 0.10), 
+                                       choices = c("", 5, 8, 10), 
                                        selected = NULL,
                                      ),
                                      helpText(em("The prevalence value that we are comparing against in our hypothesis test (5% by default).")),
@@ -122,12 +122,18 @@ dashboardPage(#theme = "flatly",
                                  )
                         ),
                         tabPanel("Final cluster sizes",
-                                 helpText("Some text here to describe the sample size tab"),
-                                 tags$head(tags$script(src = "message-handler.js")),
+                                 br(),
+                                 Callout(
+                                   title = "Step 2. Refine your cluster sizes",
+                                   # br(),
+                                   "Sample size tables assume you will collect the same number of samples in every cluster, but this may not be possible in practice. Here, you can enter your final target sample size in each cluster and then estimate power directly.",
+                                   br(), br(),
+                                   "When choosing sample sizes, remember this is the number of ", em("confirmed malaria positive "), "individuals. Check with local teams to see how many cases can realistically be recruited within the study period based on local incidence trends. You can also use this table to account for drop-out, which can occur for many reasons from failure of lab samples to participants withdrawing consent. Local staff and technicians may be able to advise on sensible values for assumed drop-out."
+                                 ),
                                  br(),
                                  fluidRow(
                                    box(width = 7,
-                                       title = "1. Enter the values specific to your study",
+                                       title = "1. Enter sample sizes specific to your study",
                                        # TooltipHost(content = "Select the number of clusters in your study so that you can populate the table with your sample sizes and the estimated proportion of study participant drop-out.",
                                        #             delay = 0,
                                        #             Text(htmltools::em("Select the number of clusters in your study"))
@@ -151,6 +157,7 @@ dashboardPage(#theme = "flatly",
                                        bsAlert("error_noclusters"), # this creates an error message if user clicks calculate without choosing number of clusters
                                        title = textOutput("title_finalsizesbox"),
                                        p(textOutput("text_finalsizesbox")),
+                                       br(),
                                        DTOutput("final_sizes_table")
                                        ),
                                  ),
@@ -158,33 +165,41 @@ dashboardPage(#theme = "flatly",
                                    box(
                                      width = 7,
                                      title = "2. Estimate power", 
-                                     TooltipHost(content = "Select the parameters.",
-                                                 delay = 0,
-                                                 Text(htmltools::em("Select the parameters"))
-                                     ),
+                                     p("Using the sample sizes above, you can estimate the power of your study by simulation."),
+                                     # TooltipHost(content = "Select the parameters.",
+                                     #             delay = 0,
+                                     #             Text(htmltools::em("Select the parameters"))
+                                     # ),
                                      selectInput("param_prev",
-                                                 label = "Select prevalence:",
+                                                 label = "Select the prevalence",
                                                  choices = c(0.06, 0.07, 0.08, 0.09, 0.10), 
                                                  selected = "0.06",
                                                  width = "200px",
                                      ),
+                                     helpText(em("This is the assumed true prevalence of pfhrp2/3 deletions in the province. A value of 10% is used by default (see [here](LINK) for help choosing this value).")),
+                                     br(),
                                      selectInput("param_icc", 
-                                                 label = "Select intra-cluster correlation:",
+                                                 label = "Select the intra-cluster correlation",
                                                  choices = c(0.01, 0.05, 0.10), 
                                                  selected = "0.1",
                                                  width = "200px",
                                      ),
+                                     helpText(em("A high value implies a high variation in the prevalence of deletions between clusters. A value of 0.05 is suggested by default based on an analysis of historical studies.")),
+                                     br(),
                                      selectInput("param_n_sims", 
-                                                 label = "Select the number of simulations:",
+                                                 label = "Select the number of simulations",
                                                  choices = c(seq(100, 1000, by=100)), 
                                                  selected = "100",
                                                  width = "250px",
                                      ),
+                                     helpText(em("A larger number of simulations will produce more accurate estimates of the power but will take longer to compute. We recommend 100 simulations for exploration and 1000 simulations for final analysis.")),
+                                     br(),
                                      actionButton(inputId = "est_pow",
                                                   label = "Estimate power",
                                                   icon = icon("clipboard-check"))
                                    ),
-                                   box(width = 5,
+                                   
+                                   box(width = 5, 
                                        background = "purple",
                                        bsAlert("error_nosizes"), # this creates an error message if user clicks estimate power without entering sample sizes
                                        title = textOutput("title_powbox"),
@@ -196,23 +211,19 @@ dashboardPage(#theme = "flatly",
                         ),
                         tabPanel(title = "Generate report",
                                  br(),
-                                 # Callout(
-                                 #   title = "Download the design phase report",
-                                 #   "Click the button below to generate report. This creates a pdf or similar with standardised text describing ",
-                                 #   "the assumptions set previously. This provides text that can be copied over directly into a paper/report to minimise mistakes",
-                                 #   # br(), br(),
-                                 #   # actionButton(inputId = "design_report", 
-                                 #   #              label = "Download design report", 
-                                 #   #              icon = icon("download"))
-                                 # ),
+                                 Callout(
+                                   title = "Download the design phase report",
+                                   "Click the button below to generate report. Click the button below to generate a report based on the information you entered in the previous tab. This creates a pdf with standardised text to minimise mistakes.",
+                                   br()
+                                 ),                                 
+                                 downloadButton("design_report", "Download design report", icon("download")),
                                  box(width = 12,
                                      # background = "navy", #Valid colors are: blue, light-blue, navy, olive.
                                      title = "Download the design phase report",
-                                     p("Click the button below to generate report. This creates a pdf or similar with standardised text describing the assumptions set previously. This provides text that can be copied over directly into a paper/report to minimise mistakes"),
+                                     p("Click the button below to generate a report based on the information you entered in the previous tab. This creates a pdf with standardised text to minimise mistakes."),
                                      br(),
-                                     downloadButton("design_report", "Download design report", icon("download"))
+                                     # downloadButton("design_report", "Download design report", icon("download"))
                                  ),
-                                 # downloadButton("design_report", "Download design report", icon("download"))
                         )
             )
           )
@@ -231,20 +242,21 @@ dashboardPage(#theme = "flatly",
                 fluidRow(
                   column(width = 12, style='padding:20px;',
                          Callout(
-                           title = "Estimate prevalence",
-                           "To estimate the prevalence of *pfhrp2* deletions, enter the final values obtained from the study in the table below. ",
-                           "These parameters are used for inference and to produce various estimates of the prevalence, including simple mean, ",
-                           "posterior mean and median, the credible interval (CrI)."
+                           title = "Step 1. Estimate prevalence and compare against a threshold",
+                           "Here, you can enter your observed counts of pfhrp2/3 deletions in each cluster and use the DRpower model to estimate the prevalence of deletions along with a 95% credible interval (CrI). You can also compare prevalence against a threshold to work out the probability of being above this threshold.",
+                           br(), br(),
+                           "If your intention is to make a binary decision as to whether prevalence is above or below the threshold (i.e., a hypothesis test) then it is worth being clear about your analysis plan ", strong("before "), "you see the result. For example, we recommend accepting that prevalence is above the threshold if the probability of this outcome is 0.95 or higher (the power calculations in the Design tab assume this value). You should not change your criteria for accepting/rejecting a hypothesis once you have seen the result, as this introduces bias. "
                          )
                   ),
                   box(width = 12,
                       title = "1. Enter the values specific to your study",
+                      p("Enter the raw number of observed pfhrp2/3 deletion counts, and the number of confirmed malaria cases per cluster. Also set the prevalence threshold against which we want to compare."),
                       br(),
                       selectInput(
                         inputId = "analysis_prevthresh",
                         label = strong("Select prevalence threshold: "),
                         width = "auto",
-                        choices = c("", 0.05, 0.08, 0.10), 
+                        choices = c("", 0.05, 0.08, 0.10),
                         selected = NULL
                       ),
                       selectInput(
@@ -276,9 +288,9 @@ dashboardPage(#theme = "flatly",
                 fluidRow(
                 column(width = 12, style='padding:20px;',
                        Callout(
-                         title = "Estimate ICC",
-                         "Supplementary analyses include calculating ICC.... bla bla ",
-                         br(),
+                         title = "Step 2. Analysis of intra-cluster correlation (ICC)",
+                         "Although the prevalence of pfhrp2/3 deletions is usually the main focus of our analysis, the intra-cluster correlation is an extremely valuable supplementary analysis. Reporting this value not only contextualises the prevalence estimates, but it also provides valuable information to future studies to assist with design.",
+                         br(), br(),
                          actionButton(inputId = "est_icc",
                                       label = "Estimate ICC",
                                       icon("clipboard-check"))
