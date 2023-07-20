@@ -11,6 +11,7 @@ library(shinyWidgets)
 library(shinyBS)
 
 dashboardPage(#theme = "flatly",
+  skin = "purple",
   dashboardHeader(title = "pfhrp2 Planner"),
   dashboardSidebar(width = 150,
                    # size = "thin",
@@ -31,6 +32,7 @@ dashboardPage(#theme = "flatly",
                     )
   )),
   dashboardBody(
+   
     tabItems(
       # ----------------------------------
       # TESTING
@@ -61,10 +63,17 @@ dashboardPage(#theme = "flatly",
         fluidRow(
           mainPanel(
             # helpText("text"),
+            Callout(
+              title = "How to design your study",
+              "Some instruction text here that describe the 'design' phase and all tabs"
+            ),
+            br(),
             tabsetPanel(type = "tabs",
                         tabPanel("Sample size tables",
-                                 helpText("Some text here to describe the sample size tab"),
                                  br(),
+                                 # p(paste("Testing some text"), em("italics"), strong("bold")),
+                                 # helpText("Some text here to describe the sample size tab", em("italics"), strong("bold")),
+                                 # br(),
                                  box(width = 12, 
                                      title = "Sample sizes required to achieve a target power of 80% based on the number of clusters", 
                                      # TooltipHost(content = "TEST: Click and select the row with the number of clusters you intend to use for your study",
@@ -165,14 +174,23 @@ dashboardPage(#theme = "flatly",
                         ),
                         tabPanel(title = "Generate report",
                                  br(),
-                                 Callout(
-                                   title = "Download the design phase report",
-                                   "Click the button below to generate report. This creates a pdf or similar with standardised text describing ",
-                                   "the assumptions set previously. This provides text that can be copied over directly into a paper/report to minimise mistakes",
-                                   br(), br(),
-                                   # downloadButton("design_report", "Download design report", icon("download"))
+                                 # Callout(
+                                 #   title = "Download the design phase report",
+                                 #   "Click the button below to generate report. This creates a pdf or similar with standardised text describing ",
+                                 #   "the assumptions set previously. This provides text that can be copied over directly into a paper/report to minimise mistakes",
+                                 #   # br(), br(),
+                                 #   # actionButton(inputId = "design_report", 
+                                 #   #              label = "Download design report", 
+                                 #   #              icon = icon("download"))
+                                 # ),
+                                 box(width = 12,
+                                     # background = "navy", #Valid colors are: blue, light-blue, navy, olive.
+                                     title = "Download the design phase report",
+                                     p("Click the button below to generate report. This creates a pdf or similar with standardised text describing the assumptions set previously. This provides text that can be copied over directly into a paper/report to minimise mistakes"),
+                                     br(),
+                                     downloadButton("design_report", "Download design report", icon("download"))
                                  ),
-                                 downloadButton("design_report", "Download design report", icon("download"))
+                                 # downloadButton("design_report", "Download design report", icon("download"))
                         )
             )
           )
@@ -250,18 +268,26 @@ dashboardPage(#theme = "flatly",
               tabPanel(
                 title = "Generate report",
                 br(),
-                Callout(
-                  title = "Download the analysis phase report",
-                  "Click the button below to generate report. This creates a pdf or similar with standardised text describing ",
-                  "the assumptions set previously. This provides text that can be copied over directly into a paper/report to minimise mistakes",
-                  br(), br(),
-                ),
-                downloadButton("analysis_report", "Download analysis report", icon("download"))
+                # Callout(
+                #   title = "Download the analysis phase report",
+                #   "Click the button below to generate report. This creates a pdf or similar with standardised text describing ",
+                #   "the assumptions set previously. This provides text that can be copied over directly into a paper/report to minimise mistakes",
+                #   br(), br(),
+                # ),
+                box(width = 12,
+                    # background = "navy", #Valid colors are: blue, light-blue, navy, olive.
+                    title = "Download the analysis phase report",
+                    p("Click the button below to generate report. This creates a pdf or similar with standardised text describing ",
+                      "the assumptions set previously. This provides text that can be copied over directly into a paper/report to minimise mistakes",
+                    ),
+                    br(),
+                    downloadButton("analysis_report", "Download analysis report", icon("download"))
+                )
               )
             )
           )
         )
       )
     )
-  ), skin = "purple"
+  )
 )
