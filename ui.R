@@ -29,6 +29,10 @@ dashboardPage(#theme = "flatly",
                     menuItem(tabName = "analysis",
                              text = " Analysis",
                              icon = icon("chart-line")
+                    ),
+                    menuItem(tabName = "faq",
+                             text = " FAQ",
+                             icon = icon("info-circle")
                     )
   )),
   dashboardBody(
@@ -306,6 +310,20 @@ dashboardPage(#theme = "flatly",
                 )
               )
             )
+          )
+        )
+      ),
+      # ----------------------------------
+      # Tab 4 - FAQ
+      tabItem(
+        tabName = "faq",
+        fluidRow(
+          column(width = 12, style='padding:20px;',
+                 Callout(
+                   title = "Frequently Asked Questions",
+                   br(),
+                   "the text goes here"
+                 )
           )
         )
       )
