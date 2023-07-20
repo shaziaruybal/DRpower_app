@@ -460,9 +460,17 @@ function(input, output, session) {
     
     # checking if downloadHandler can accept error message pop-up
     # if(!is.null(df_sizes_final() && !is.null(power_output()))){
-      
+    
       filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".html"),
       content = function(file) {
+        # create a progress notification pop-up telling the user that the report is rendering
+        id <- showNotification(paste0("Preparing report..."), 
+                               duration = 10, 
+                               closeButton = FALSE)
+        
+        # remove notification when calculation finishes
+        on.exit(removeNotification(id), add = TRUE)
+        
         tempReport <- file.path(tempdir(), "template_design_report.Rmd")
         file.copy("template_design_report.Rmd", tempReport, overwrite = TRUE)
         
@@ -811,6 +819,14 @@ function(input, output, session) {
   output$analysis_report <- downloadHandler(
     filename = paste0("PfHRP2_Planner_Analysis_Report_", Sys.Date(), ".html"),
     content = function(file) {
+      # create a progress notification pop-up telling the user that the report is rendering
+      id <- showNotification(paste0("Preparing report..."), 
+                             duration = 10, 
+                             closeButton = FALSE)
+      
+      # remove notification when calculation finishes
+      on.exit(removeNotification(id), add = TRUE)
+      
       tempReport <- file.path(tempdir(), "template_analysis_report.Rmd")
       file.copy("template_analysis_report.Rmd", tempReport, overwrite = TRUE)
       
