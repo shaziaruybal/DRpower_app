@@ -137,6 +137,15 @@ function(input, output, session) {
     pivot_wider(names_from = prevalence, values_from = N_opt) 
   })
   
+  # render explanatory text for the sample sizes table that should appear when the user selects ICC and prev
+  output$text_ss <- renderText({
+    # require the user inputs to render the text
+    req(input$ss_icc, input$ss_prev)
+    
+    "Columns give the assumed true prevalence of pfhrp2/3 deletions in the province. 10% is highlighted as the suggested default. Rows give the number of clusters (e.g., health facilities) within the province. "
+    
+  })
+  
   output$sample_size_table <- renderDT({
     datatable(df_sample_sizes(), 
               colnames = c("Number of clusters", "1%", "2%", "3%", "4%", "5%", "6%", "7%", "8%", "9", "10%", "11%", "12%", "13%", "14%", "15%", "16%", "17%", "18%", "19%", "20%"),
@@ -152,7 +161,7 @@ function(input, output, session) {
                              dom = 'tB',
                              buttons = c('copy', 'csv', 'excel')
               ), 
-              caption = paste0("This table shows target sample sizes assuming an intra-cluster correlation of: ", input$ss_icc, " \n and a prevalence threshold of: ", input$ss_prev)
+              # caption = paste0("This table shows target sample sizes assuming an intra-cluster correlation of: ", input$ss_icc, " \n and a prevalence threshold of: ", input$ss_prev)
               ) %>% 
       formatStyle("0.1",
                   backgroundColor = "green",

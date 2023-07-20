@@ -114,6 +114,7 @@ dashboardPage(#theme = "flatly",
                                        selected = NULL,
                                      ),
                                      br(),
+                                     textOutput("text_ss"),
                                      DTOutput("sample_size_table")
                                  )
                         ),
