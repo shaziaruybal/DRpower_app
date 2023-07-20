@@ -539,9 +539,9 @@ function(input, output, session) {
     datatable(df_deletions(), 
               editable = list(
                 target = 'cell',
-                numeric = c(1,2),
+                numeric = c(2,3),
                 disable = list(
-                  columns = c(0)
+                  columns = c(1)
                 )
               ),
               # rownames = FALSE,
