@@ -219,6 +219,13 @@ dashboardPage(#theme = "flatly",
                       title = "1. Enter the values specific to your study",
                       br(),
                       selectInput(
+                        inputId = "analysis_prevthresh",
+                        label = strong("Select prevalence threshold: "),
+                        width = "auto",
+                        choices = c("", 0.05, 0.08, 0.10), 
+                        selected = NULL
+                      ),
+                      selectInput(
                         inputId = "analysis_nclust",
                         label = strong("Select final number of clusters: "),
                         width = "auto",

@@ -572,7 +572,7 @@ function(input, output, session) {
   prev_output <- eventReactive(input$est_prev, {
     
     # require the updated data frame to have been created to make sure there is a data frame to get values from
-    req(analysis_rv$df_analysis_update)
+    req(input$analysis_prevthresh, analysis_rv$df_analysis_update)
     
     # create a progress notification pop-up telling the user that prevalence is being estimated
     id <- showNotification(paste0("Estimating prevalence..."), 
@@ -588,7 +588,8 @@ function(input, output, session) {
     if(is.numeric(df$n_deletions) && !any(is.na(df$n_deletions)) && is.numeric(df$sample_size) && !any(is.na(df$sample_size))){
       print(str(df))
       DRpower::get_prevalence(n = df$n_deletions, 
-                              N = df$sample_size)
+                              N = df$sample_size,
+                              prev_thresh = input$analysis_prevthresh)
     }
     else {
       print(str(df))
@@ -605,15 +606,15 @@ function(input, output, session) {
   observeEvent(input$est_prev, {
     print("Estimate prevalence button clicked")
     
-      # display error message if the user has not entered the deletions and sample sizes, require the reactiveVal 'df_analysis_update' to have been created
-      if(is.null(analysis_rv$df_analysis_update)){
+      # display error message if the user has not selected prev_thresh and/or entered the deletions and sample sizes, require the reactiveVal 'df_analysis_update' to have been created
+      if(input$analysis_prevthresh=="" || is.null(analysis_rv$df_analysis_update)){
         # TODO debugging
         print("estimate prev is NULL")
         print("error should have popped up")
         
         show_alert(
           title = "Error!",
-          text = "You have not selected the number of clusters or entered the values for your study. Please select the number of clusters from the drop-down menu and enter the values in the table.",
+          text = "You have not selected the prevalence threshold, number of clusters and/or entered the values for your study. Please select the prevalence threshold and number of clusters from the drop-down menu and enter the values in the table.",
           type = "error"
         )
       }
