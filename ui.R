@@ -291,8 +291,10 @@ dashboardPage(#theme = "flatly",
                          title = "Step 2. Analysis of intra-cluster correlation (ICC)",
                          "Although the prevalence of pfhrp2/3 deletions is usually the main focus of our analysis, the intra-cluster correlation is an extremely valuable supplementary analysis. Reporting this value not only contextualises the prevalence estimates, but it also provides valuable information to future studies to assist with design.",
                          br(), br(),
+                         em("The raw data for this analysis are taken from the previous tab, and there are no additional parameters needed."),
+                         br(), br(),
                          actionButton(inputId = "est_icc",
-                                      label = "Estimate ICC",
+                                      label = " Estimate ICC",
                                       icon("clipboard-check"))
                        )
                 ),
@@ -309,20 +311,18 @@ dashboardPage(#theme = "flatly",
               tabPanel(
                 title = "Generate report",
                 br(),
-                # Callout(
-                #   title = "Download the analysis phase report",
-                #   "Click the button below to generate report. This creates a pdf or similar with standardised text describing ",
-                #   "the assumptions set previously. This provides text that can be copied over directly into a paper/report to minimise mistakes",
-                #   br(), br(),
-                # ),
+                Callout(
+                  title = "Download the analysis phase report",
+                  "Click the button below to generate a report based on the information you entered in the previous tabs. This creates a pdf with standardised text to minimise mistakes. ",
+                  br(), br(),
+                ),
+                downloadButton("analysis_report", "Download analysis report", icon("download")),
                 box(width = 12,
                     # background = "navy", #Valid colors are: blue, light-blue, navy, olive.
                     title = "Download the analysis phase report",
-                    p("Click the button below to generate report. This creates a pdf or similar with standardised text describing ",
-                      "the assumptions set previously. This provides text that can be copied over directly into a paper/report to minimise mistakes",
-                    ),
+                    p("Click the button below to generate a report based on the information you entered in the previous tabs. This creates a pdf with standardised text to minimise mistakes. "),
                     br(),
-                    downloadButton("analysis_report", "Download analysis report", icon("download"))
+                    # downloadButton("analysis_report", "Download analysis report", icon("download"))
                 )
               )
             )
@@ -338,7 +338,33 @@ dashboardPage(#theme = "flatly",
                  Callout(
                    title = "Frequently Asked Questions",
                    br(),
-                   "the text goes here"
+                   strong("1. What is statistical power?"),
+                   br(),br(),
+                   "Statistical power is defined as the probability of correctly rejecting the null hypothesis. In simple terms, it is the probably of finding something interesting if it is really there.",
+                   br(), br(),
+                   "For example, imagine that the true prevalence of pfhrp2/3 deletions in your province is 10%, and that you design a study that has 50% power to detect a prevalence over 5%. This means you are just as likely to (correctly) conclude that prevalence is above 5% as you are to reach the opposite conclusion.",
+                   br(), br(),
+                   "Studies should generally aim for high power because conducting studies that have a low chance of success can be a waste of resources and also raises ethical issues. That being said, we cannot aim for 100% power because this would involve sampling the entire population. As a general rule of thumb we tend to aim for power of around 80%, which is what is 
+                   assumed in this app.",
+                   br(), br(),
+                   strong("2. Why do I have to choose a prevalence value? Isn’t this the thing I’m trying to estimate?"),
+                   br(), br(),
+                   "This can be one of the most confusing things about power analysis! The best way to think about this is to make a distinction between the ", 
+                   em("true prevalence in the province"), 
+                   ", i.e., the prevalence of pfhrp2/3 deletions if we were able to survey every single individual, and the ",
+                   em("prevalence in the sample"), 
+                   ". The prevalence in the sample is only an estimate of the true prevalence and will tend to vary around the true value by random chance. For example, we might get “lucky” and find a lot of people with the deletion, in which case our sample prevalence will be higher than the true prevalence, or we might get “unlucky” and see the opposite effect.",
+                   br(), br(),
+                   "Imagine that the true prevalence in our province is 6%. It would only take a small amount of bad luck for the sample prevalence to be less than 5%, meaning we would come to the wrong conclusion that prevalence was below the 5% threshold. On the other hand, if the prevalence in our province is 20% then we would have to be extremely unlucky for the sample prevalence to dip this low. This means that our chance of coming to the correct conclusion is highest when the true prevalence is a long way from the threshold. For this reason, we cannot perform power analysis without first fixing how strong our effect size is.",
+                   br(), br(),
+                   strong("3. How should I decide what “true prevalence” value to assume?"),
+                   br(), br(),
+                   "This is a tricky question to answer, as it depends on the details of your study area your specific objectives. We can ask instead; what prevalence level do you really care about detecting, i.e., what is relevant for control purposes? If the prevalence of pfhrp2/3 deletions was 5.1% then would you want to know so that you can immediately switch RDTs? What if the prevalence was 5.001%?",
+                   br(), br(),
+                   "In reality, we should remember that the 5% level was chosen based on an argument that this is ",
+                   em("roughly "),
+                   "the level at which missed cases due to deletions match missed cases due to loss of sensitivity in alternative RDTs. We should treat this number as a useful guide, not a value to slavishly follow. We should also keep in mind that the closer our assumed prevalence is to the 5% threshold, the larger our sample size will be, up to values that are completely unrealistic for any control programme. There is a balance to be struck between sensitivity to detect a given effect size, and pragmatic arguments based on logistics, budget, and ethical considerations. Here, we opt for an assumed 10% prevalence as the default, as this gives a reasonable level of sensitivity while also leading to realistic sample sizes."
+
                  )
           )
         )

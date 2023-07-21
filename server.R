@@ -778,7 +778,7 @@ function(input, output, session) {
     
     # check if icc_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(icc_output())){
-      return("The estimated ICC value is below: ")
+      return("ICC estimates")
     }
     # if it hasn't been created yet then return nothing (note error message will pop-up based on other reactivity vals)
     else{
@@ -794,7 +794,7 @@ function(input, output, session) {
     
     # check if icc_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(icc_output())){
-      return("The table and plot show the mean and lower and upper credible interval")
+      return("The table and the plot below show the maximum a posteriori (MAP) estimate of the ICC, along with a 95% credible interval (CrI). For context, an ICC of 0.05 is used by default in the Design tab based on an analysis of historical studies. ")
     }
     # if it hasn't been created yet then return nothing (note error message will pop-up based on other reactivity vals)
     else{
