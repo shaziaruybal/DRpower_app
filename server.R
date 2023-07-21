@@ -340,7 +340,7 @@ function(input, output, session) {
      
      # check if df_sizes_final() has been created, which means the user has selected n clusters, edited the data (or not), and clicked 'calculate sizes' button
      if(!is.null(df_sizes_final())){
-       return("Based on the values you entered for sample size (n) and taking into account the proportion drop-out (d), the adjusted sample size is calculated using the formula n_adj = n/(1-d). This still refers to confirmed malaria positive cases.")
+       return("Based on the values you entered for sample size (n) and taking into account the proportion drop-out (d), the adjusted sample size is calculated using the formula n_adj = n/(1-d). This still refers to confirmed malaria positive cases. Scroll the table to view.")
      }
      # if it hasn't been created then display nothing
      else{
