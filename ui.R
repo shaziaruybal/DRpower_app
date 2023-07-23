@@ -369,6 +369,24 @@ dashboardPage(#theme = "flatly",
           )
         )
       )
-    )
+    ),
+    tags$style(HTML("
+    .footer {
+      background-color: #242d31; 
+      color: white;
+      text-align: center;
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      font-style: italic;
+    }"
+    )),
+    fluidRow(
+      column(12, class = "footer", HTML("<span style='font-size:12px;background-color: black;'><p>Developed by Shazia Ruybal-Pesántez and Bob Verity</span>")))
+      # this option has hyperlinks to github if needed
+      # column(12, class = "footer", HTML("<span style='font-size:12px;background-color: black;'><p>Developed by <a href='https://www.github.com/shaziaruybal' style='color:#535394;'>Shazia Ruybal-Pesántez</a> and <a href='https://www.github.com/bobverity' style='color:#535394;'>Bob Verity</a></span>")))
+    # this option uses dashboardFooter() from shinydashboardPlus package - would be better to not have to use it if possible as formatting not ideal
+    # dashboardFooter(left = HTML("<span style='font-size:12px;background-color: black;'><p>Developed by <a href='https://www.github.com/shaziaruybal' style='color:#535394;'>Shazia Ruybal-Pesántez</a> and <a href='https://www.github.com/bobverity' style='color:#535394;'>Bob Verity</a></span>"),
+    #                 right = HTML("<span style='font-size:12px;'>© 2023</span>"))
   )
 )
