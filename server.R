@@ -444,8 +444,22 @@ function(input, output, session) {
     }
   })
   
+  output$est_power_table <- renderTable({
+    
+    # require prev_output() to exist
+    req(power_output())
+    
+    power_output() %>% 
+      rename("Power" = power, "Lower 95%CI" = lower, "Upper 95%CI" = upper)
+  }, colnames = T
+  )
+  
   # TODO seems like the plot is not re-loading when params are changed, but working for button click
-  output$est_power_plot <- renderPlot({
+  est_power_plot <- reactive({
+    
+    # require power_output() to exist
+    req(power_output())
+    
     ggplot(power_output()) +
       geom_segment(aes(x = " ", xend = " ",y = lower, yend = upper), color = "black", linewidth = 1) +
       geom_point(aes(x = " ", y = power),
