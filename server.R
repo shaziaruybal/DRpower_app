@@ -477,14 +477,93 @@ function(input, output, session) {
       theme(text = element_text(size = 16))
   })
   
+output$est_power_plot <- renderPlot(est_power_plot())
+  
+  
   # ----------------------------------
-  #  Render downloadable design report
+  #  Save results and render downloadable design report
   # ----------------------------------
+  
+  # Store a reactive value that checks whether the summary data is complete or not (T/F)
+  design_rv <- reactiveValues(design_data_ready = FALSE)
+  
+  # TODO I think we should save all the outputs as a list to feed into the report?! 
+  
+  # The save button allows the user to cross-check the assumed parameters entered and check the numbers that will be printed in the report
+  # - if the user has not entered the values correctly in the previous tab, an error message will pop-up and the design_data_ready reactive val will be set to FALSE
+  # - if it passes all validation checks (ie user has entered everything), design_data_ready will be set to TRUE 
+  observeEvent(input$save_design_data, {
+    print("Save design data button has been clicked")
 
-  output$design_report <- downloadHandler(
+    # If all conditions are not met - ie the user has gone through the entire Step 2 Final cluster sizes tab, set design_data_ready as FALSE
+    if (input$design_nclust=="" || input$calc_sizes==0 || input$est_pow==0 || is.null(df_sizes_final()) || is.null(power_output())) {
+      print("error should pop up when save results is clicked")
+      show_alert(
+        title = "Error!",
+        text = "The summary cannot be displayed because you haven't completed Step 2. Please go back to 'Final cluster sizes' and follow all the steps.",
+        type = "error"
+      )
+      
+      design_rv$design_data_ready <- FALSE
+      print("design data is not ready")
+      print(design_rv$design_data_ready)
+    }
     
-    # checking if downloadHandler can accept error message pop-up
-    # if(!is.null(df_sizes_final() && !is.null(power_output()))){
+    # If all conditions have been met, set design_data_ready to TRUE
+    else {
+      design_rv$design_data_ready <- TRUE
+      print("design data is ready for download")
+      print(design_rv$design_data_ready)
+    }
+
+  })
+  
+  # Display a summary of the assumed parameters and data once the save button is clicked 
+  output$text_design_summary <- renderUI({
+    
+    req(input$save_design_data)
+    
+    if (design_rv$design_data_ready==TRUE) {
+      print("text design summary should print")
+      
+      box(width = 12, 
+          # solidHeader = "purple",
+          # background = "purple", 
+          collapsible = TRUE,
+          title = "Data summary",
+          h4("Final cluster sizes:"),
+          renderTable(df_sizes_final()),
+          br(), br(),
+          h4("Parameters for power calculation:"),
+          p("ICC: ", input$param_icc),
+          p("Prevalence: ", ceiling(as.numeric(input$param_prev)*100), "%"), 
+          p("Number of simulations: ", input$param_n_sims),
+          br(), br(),
+          h4("Power estimates:"),
+          renderTable(power_output()),
+          renderPlot(est_power_plot()),
+      )
+    }
+  })
+  
+  # Render the download button only if the user has clicked on the save button and the data is ready to be downloaded (ie design_data_ready==TRUE)
+  output$design_download <- renderUI({
+    req(input$save_design_data)
+    
+    if(design_rv$design_data_ready==TRUE){
+      print("download button shown because everything has been entered")
+      
+      box(width = 12,
+          title = "Click below to download your design report.",
+          em("This creates a pdf summary of the assumed parameters and your results, with standardised text to minimise mistakes."),
+          br(), br(),
+          downloadButton("design_report", "Download design report", icon("download")))
+    }
+
+  })
+  
+  # The downloadHandler() for the design report will be triggered if the downloadButton() is clicked 
+  output$design_report <- downloadHandler(
     
       filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".html"),
       content = function(file) {
