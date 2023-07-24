@@ -596,15 +596,6 @@ output$est_power_plot <- renderPlot(est_power_plot())
                           envir = new.env(parent = globalenv()),
         )
       }
-    # }
-    # else{
-    #   print("error should pop up")
-    #   show_alert(
-    #     title = "Error!",
-    #     text = "Error message here",
-    #     type = "error"
-    #   )
-    # }
     
   )
 
