@@ -790,10 +790,15 @@ output$est_power_plot <- renderPlot(est_power_plot())
                    size = 3,
                    shape = 21,
                    fill = "skyblue3") +
-        geom_hline(aes(yintercept=0.05),
+        # use the user-entered prev_thresh to plot threshold line
+        geom_hline(aes(yintercept = as.numeric(input$analysis_prevthresh)),
                    color = "darkgrey",
                    linetype = "dashed") +
-        geom_text(aes(x= " ", y = 0.07, label = "5% threshold"), color = "darkgrey") +
+        # use the user-entered prev_thresh to plot threshold line
+        geom_text(aes(x= " ", 
+                      y = as.numeric(input$analysis_prevthresh)+0.02, 
+                      label = paste0(ceiling(as.numeric(input$analysis_prevthresh)*100),"% threshold")), 
+                      color = "darkgrey") +
         scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
         labs(x = "",
              y = "Estimated prevalence",
