@@ -917,10 +917,91 @@ output$est_power_plot <- renderPlot(est_power_plot())
   output$est_icc_plot <- renderPlot(est_icc_plot())
 
   # ----------------------------------
-  #  Render downloadable analysis report  
+  #  Save results and render downloadable analysis report  
   # ----------------------------------
   # TODO: fix the reactive plot issue 
   
+  # Store a reactive value that checks whether the summary data is complete or not (T/F)
+  analysis_rv <- reactiveValues(analysis_data_ready = FALSE)
+  
+  # TODO I think we should save all the outputs as a list to feed into the report?! 
+  
+  # The save button allows the user to cross-check the assumed parameters entered and check the numbers that will be printed in the report
+  # - if the user has not entered the values correctly in the previous tabs, an error message will pop-up and the analysis_data_ready reactive val will be set to FALSE
+  # - if it passes all validation checks (ie user has entered everything), analysis_data_ready will be set to TRUE 
+  observeEvent(input$save_analysis_data, {
+    print("Save analysis data button has been clicked")
+    
+    # If all conditions are not met - ie the user has gone through the entire Estimate Prevalence and ICC tabs, set analysis_data_ready as FALSE
+    if (input$analysis_prevthresh=="" || input$analysis_nclust=="" || input$est_prev==0 || input$est_icc==0 || is.null(prev_output()) || is.null(icc_output())) {
+      print("error should pop up when save results is clicked")
+      show_alert(
+        title = "Error!",
+        text = "The summary cannot be displayed because you haven't completed Steps 1 and/or 2. Please go back to 'Estimate prevalence' and 'Estimate ICC' and follow all the steps.",
+        type = "error"
+      )
+      
+      analysis_rv$analysis_data_ready <- FALSE
+      print("analysis data is not ready")
+      print(analysis_rv$analysis_data_ready)
+    }
+    
+    # If all conditions have been met, set analysis_data_ready to TRUE
+    else {
+      analysis_rv$analysis_data_ready <- TRUE
+      print("analysis data is ready for download")
+      print(analysis_rv$analysis_data_ready)
+    }
+    
+  })
+  
+  # Display a summary of the assumed parameters and data once the save button is clicked 
+  output$text_analysis_summary <- renderUI({
+    
+    req(input$save_analysis_data)
+    
+    if (analysis_rv$analysis_data_ready==TRUE) {
+      print("text analysis summary should print")
+      
+      box(width = 12, 
+          # solidHeader = "purple",
+          # background = "purple", 
+          collapsible = TRUE,
+          title = "Data summary",
+          h4("Final study values:"),
+          renderTable(analysis_rv$df_analysis_update),
+          br(), br(),
+          h4("Parameters for calculations:"),
+          p("Prevalence threshold: ", ceiling(as.numeric(input$analysis_prevthresh)*100), "%"), 
+          br(), br(),
+          h4("Prevalence estimates:"),
+          renderTable(prev_output()),
+          renderPlot(est_prev_plot()),
+          br(), br(),
+          h4("ICC estimates:"),
+          renderTable(icc_output()),
+          renderPlot(est_icc_plot()),
+      )
+    }
+  })
+  
+  # Render the download button only if the user has clicked on the save button and the data is ready to be downloaded (ie analysis_data_ready==TRUE)
+  output$analysis_download <- renderUI({
+    req(input$save_analysis_data)
+    
+    if(analysis_rv$analysis_data_ready==TRUE){
+      print("download button shown because everything has been entered")
+      
+      box(width = 12,
+          title = "Click below to download your analysis report.",
+          em("This creates a pdf summary of the assumed parameters and your results, with standardised text to minimise mistakes."),
+          br(), br(),
+          downloadButton("analysis_report", "Download analysis report", icon("download")))
+    }
+    
+  })
+  
+  # The downloadHandler() for the design report will be triggered if the downloadButton() is clicked 
   output$analysis_report <- downloadHandler(
     filename = paste0("PfHRP2_Planner_Analysis_Report_", Sys.Date(), ".html"),
     content = function(file) {
