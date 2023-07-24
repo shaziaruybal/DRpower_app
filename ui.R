@@ -205,6 +205,8 @@ dashboardPage(#theme = "flatly",
                                        title = textOutput("title_powbox"),
                                        p(textOutput("text_powbox")),
                                        br(),
+                                       tableOutput("est_power_table"),
+                                       br(),
                                        plotOutput("est_power_plot")
                                    ),
                                  )
@@ -213,17 +215,21 @@ dashboardPage(#theme = "flatly",
                                  br(),
                                  Callout(
                                    title = "Download the design phase report",
-                                   "Click the button below to generate report. Click the button below to generate a report based on the information you entered in the previous tab. This creates a pdf with standardised text to minimise mistakes.",
+                                   "Click the button below to save your assumed parameters and results and generate a report based on the information you entered in the previous tab.",
                                    br()
-                                 ),                                 
-                                 downloadButton("design_report", "Download design report", icon("download")),
+                                 ),      
+                                 br(), 
                                  box(width = 12,
                                      # background = "navy", #Valid colors are: blue, light-blue, navy, olive.
-                                     title = "Download the design phase report",
-                                     p("Click the button below to generate a report based on the information you entered in the previous tab. This creates a pdf with standardised text to minimise mistakes."),
+                                     title = "Check and save your parameters and results",
+                                     p("Click the button below to display a summary of the information you entered in the previous tab. If everything looks as expected, click on the download button to download your report PDF."),
                                      br(),
-                                     # downloadButton("design_report", "Download design report", icon("download"))
+                                     actionButton("save_design_data", " Save results", icon("floppy-disk"))
                                  ),
+                                 # box(width = 12, 
+                                 #     background = "purple"),
+                                 uiOutput("text_design_summary"),
+                                 uiOutput("design_download"),
                         )
             )
           )
