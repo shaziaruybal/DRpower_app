@@ -733,7 +733,7 @@ output$est_power_plot <- renderPlot(est_power_plot())
       }
   })
   
-  # TODO testing dynamicUI for results
+  # The results box, text and plots are displayed once the estimate prevalence button is clicked 
   output$est_prev_results <- renderUI({
     req(input$est_prev, prev_output())
 
@@ -851,7 +851,7 @@ output$est_power_plot <- renderPlot(est_power_plot())
     
   })
   
-  # TODO testing dynamicUI for results
+  # The results box, text and plots are displayed once the estimate icc button is clicked 
   output$est_icc_results <- renderUI({
     req(input$est_icc, icc_output())
     
