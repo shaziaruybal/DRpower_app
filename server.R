@@ -851,47 +851,27 @@ output$est_power_plot <- renderPlot(est_power_plot())
     
   })
   
-  # Display title text once estimate ICC is clicked and icc_output() has been created
-  output$title_iccbox <- renderText({
+  # TODO testing dynamicUI for results
+  output$est_icc_results <- renderUI({
+    req(input$est_icc, icc_output())
     
-    # require estimate ICC button click
-    req(input$est_icc)
+    print("est_icc results should print")
     
-    # check if icc_output() has been created, which means the results have been calculated and can be displayed
-    if(!is.null(icc_output())){
-      return("ICC estimates")
-    }
-    # if it hasn't been created yet then return nothing (note error message will pop-up based on other reactivity vals)
-    else{
-      return(NULL)
-    }
+    box(width = 12, 
+        background = "purple",
+        title = "ICC estimates",
+        p("The table and the plot below show the maximum a posteriori (MAP) estimate of the ICC, along with a 95% credible interval (CrI). For context, an ICC of 0.05 is used by default in the Design tab based on an ", a("analysis of historical studies.", href = "https://github.com/mrc-ide/drpower")),
+        br(),
+        renderTable(icc_output() %>% 
+                      rename("Mean ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper), colnames = T),
+        br(),
+        plotOutput("est_icc_plot")
+    )
   })
-  
-  # Display text once estimate ICC is clicked and icc_output() has been created
-  output$text_iccbox <- renderText({
-    
-    # require estimate ICC button click
-    req(input$est_icc)
-    
-    # check if icc_output() has been created, which means the results have been calculated and can be displayed
-    if(!is.null(icc_output())){
-      return("The table and the plot below show the maximum a posteriori (MAP) estimate of the ICC, along with a 95% credible interval (CrI). For context, an ICC of 0.05 is used by default in the Design tab based on an analysis of historical studies. ")
-    }
-    # if it hasn't been created yet then return nothing (note error message will pop-up based on other reactivity vals)
-    else{
-      return(NULL)
-    }
-  })
-  
-  output$est_icc_table <- renderTable({
-    icc_output() %>% 
-      rename("Mean ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper)
-  }, colnames = T
-  )
   
   # TODO: make sure plot re-renders (or fades out) when recalculating - power plot does this! 
   # NOTE need to divide by 100 to convert to proportion
-  est_icc_plot <- reactive({
+  output$est_icc_plot <- renderPlot({
     ggplot(icc_output()) +
       geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100), 
                    color = "black", linewidth = 1) +
@@ -906,8 +886,6 @@ output$est_power_plot <- renderPlot(est_power_plot())
       theme(text = element_text(size = 16)) 
   })
   
-  output$est_icc_plot <- renderPlot(est_icc_plot())
-
   # ----------------------------------
   #  Save results and render downloadable analysis report  
   # ----------------------------------

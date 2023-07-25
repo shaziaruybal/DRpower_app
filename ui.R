@@ -285,6 +285,7 @@ dashboardPage(#theme = "flatly",
                 column(width = 12, style='padding:20px;',
                        Callout(
                          title = "Step 2. Analysis of intra-cluster correlation (ICC)",
+                         html = TRUE,
                          "Although the prevalence of pfhrp2/3 deletions is usually the main focus of our analysis, the intra-cluster correlation is an extremely valuable supplementary analysis. Reporting this value not only contextualises the prevalence estimates, but it also provides valuable information to future studies to assist with design.",
                          br(), br(),
                          em("The raw data for this analysis are taken from the previous tab, and there are no additional parameters needed."),
@@ -295,14 +296,7 @@ dashboardPage(#theme = "flatly",
                        )
                 ),
                 ),
-                box(width = 12, background = "purple",
-                      title = textOutput("title_iccbox"),
-                      p(textOutput("text_iccbox")),
-                      br(),
-                      tableOutput("est_icc_table"),
-                      br(),
-                      plotOutput("est_icc_plot")
-                ),
+                uiOutput("est_icc_results"),
               ),
               tabPanel(
                 title = "Generate report",
