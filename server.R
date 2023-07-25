@@ -183,6 +183,7 @@ function(input, output, session) {
   df_sizes <- eventReactive(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     
     # TODO: question for Bob - do we want this to populate based on df_sample_sizes() or defaults? 
+    # getting target sizes to pre-populate the table from fixed defaults of ICC=0.05 and prev_thresh=0.05 
     df_targets <- df_ss %>% 
         filter(ICC == 0.05) %>% 
         filter(prev_thresh == 0.05) %>% 
@@ -419,7 +420,7 @@ function(input, output, session) {
     
     # check if power_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(power_output())){
-      return("The estimated power is below: ")
+      return("Estimated power ")
     }
     # if it hasn't been created yet then return nothing (note error message will pop-up based on other reactivity vals)
     else{
@@ -758,7 +759,7 @@ output$est_power_plot <- renderPlot(est_power_plot())
     if(!is.null(prev_output())){
       paste0("The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. ",
              "The table also gives the probability of being above the threshold. ",
-             # "The table also gives the probability of being above the threshold ", "( ", ceiling(prev_output()$prob_above_threshold*100), "% probability that the pfhrp2 prevalence is above the ", ceiling(input$analysis_prevthresh), "% threshold).", 
+             # "The table also gives the probability of being above the threshold ", "( ", ceiling(prev_output()$prob_above_threshold*100), "% probability that the pfhrp2 prevalence is above the ", ceiling(input$analysis_prevthresh), "% threshold).",
              "As mentioned above, if you are using this value in a hypothesis test then we recommend accepting that prevalence is above the threshold if probability is 0.95 or higher.")
              
     }
@@ -919,8 +920,7 @@ output$est_power_plot <- renderPlot(est_power_plot())
   # ----------------------------------
   #  Save results and render downloadable analysis report  
   # ----------------------------------
-  # TODO: fix the reactive plot issue 
-  
+
   # Store a reactive value that checks whether the summary data is complete or not (T/F)
   analysis_rv <- reactiveValues(analysis_data_ready = FALSE)
   
