@@ -271,22 +271,13 @@ dashboardPage(#theme = "flatly",
                       ),
                       DTOutput("editable_deltab"),
                       br(),
+                      bsAlert("error_nodeletions"), # this creates an error message if user clicks estimate prevalence without entering deletions/sample sizes
                       actionButton(inputId = "est_prev", 
                                    label = "Estimate prevalence", 
                                    icon("clipboard-check")),
                   )
                 ),
-                box(width = 12, background = "purple",
-                    bsAlert("error_nodeletions"), # this creates an error message if user clicks estimate prevalence without entering deletions/sample sizes
-                    title = textOutput("title_prevbox"),
-                    p(textOutput("text_prevbox")),
-                    br(),
-                    tableOutput("est_prev_table"),
-                    br(),
-                    h4(textOutput("result_prevbox")),
-                    br(),
-                    plotOutput("est_prev_plot")
-                ),
+                uiOutput("est_prev_results"),
               ),
               tabPanel(
                 title= "Estimate ICC",

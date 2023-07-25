@@ -733,48 +733,27 @@ output$est_power_plot <- renderPlot(est_power_plot())
       }
   })
   
-  # Display title text once estimate prevalence is clicked and power_output() has been created
-  output$title_prevbox <- renderText({
-    
-    # require estimate prevalence button click
-    req(input$est_prev)
-    
-    # check if prev_output() has been created, which means the results have been calculated and can be displayed
-    if(!is.null(prev_output())){
-      return("Prevalence estimates")
-    }
-    # if it hasn't been created yet then return nothing (note error message will pop-up based on other reactivity vals)
-    else{
-      return(NULL)
-    }
-  })
-  
-  output$text_prevbox <- renderText({
-    
-    # require estimate prevalence button click
-    req(input$est_prev)
-    
-    # check if prev_output() has been created, which means the results have been calculated and can be displayed
-    if(!is.null(prev_output())){
-      
-      "The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. "
-    }
-    else{
-      return(NULL)
-    }
-  })
-  
-  output$est_prev_table <- renderTable({
-    
-    # require prev_output() to exist
-    req(prev_output())
-    
-    prev_output() %>% 
-      rename("Mean prevalence" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper, "Probability above threshold" = prob_above_threshold)
-  }, colnames = T
-  )
+  # TODO testing dynamicUI for results
+  output$est_prev_results <- renderUI({
+    req(input$est_prev, prev_output())
 
-  output$result_prevbox <- renderText({
+    print("est_prev results should print")
+    
+    box(width = 12,
+        background = "purple",
+        title = "Prevalence estimates",
+        p("The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. "),
+        br(),
+        renderTable(prev_output() %>% 
+                      rename("Mean prevalence" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper, "Probability above threshold" = prob_above_threshold), colnames = T),
+        br(),
+        h4(textOutput("est_prev_resulttext")),
+        br(),
+        plotOutput("est_prev_plot")
+    )
+  })
+
+  output$est_prev_resulttext <- renderText({
     # require estimate prevalence button click
     req(prev_output())
     
@@ -792,10 +771,9 @@ output$est_power_plot <- renderPlot(est_power_plot())
     }
   })
   
-  
   # TODO: make sure plot re-renders (or fades out) when recalculating - power plot does this! 
     # NOTE need to divide by 100 to convert to proportion
-    est_prev_plot <- reactive({
+  output$est_prev_plot <- renderPlot({
       # require prev_output() to exist
       req(prev_output())
       
@@ -822,8 +800,6 @@ output$est_power_plot <- renderPlot(est_power_plot())
         theme_light() +
         theme(text = element_text(size = 16))
     })
-
-    output$est_prev_plot <- renderPlot(est_prev_plot())
   
   # ----------------------------------
   #  Results table/plot: estimated ICC
