@@ -143,10 +143,6 @@ dashboardPage(#theme = "flatly",
                                  fluidRow(
                                    box(width = 7,
                                        title = "1. Enter sample sizes specific to your study",
-                                       # TooltipHost(content = "Select the number of clusters in your study so that you can populate the table with your sample sizes and the estimated proportion of study participant drop-out.",
-                                       #             delay = 0,
-                                       #             Text(htmltools::em("Select the number of clusters in your study"))
-                                       # ),
                                        selectInput(
                                          inputId = "design_nclust",
                                          label = strong("Select number of clusters: "),
