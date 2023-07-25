@@ -541,8 +541,7 @@ output$est_power_plot <- renderPlot(est_power_plot())
           p("Number of simulations: ", input$param_n_sims),
           br(), br(),
           h4("Power estimates:"),
-          renderTable(power_output()),
-          renderPlot(est_power_plot()),
+          renderTable(power_output())
       )
     }
   })
@@ -976,11 +975,9 @@ output$est_power_plot <- renderPlot(est_power_plot())
           br(), br(),
           h4("Prevalence estimates:"),
           renderTable(prev_output()),
-          renderPlot(est_prev_plot()),
           br(), br(),
           h4("ICC estimates:"),
-          renderTable(icc_output()),
-          renderPlot(est_icc_plot()),
+          renderTable(icc_output())
       )
     }
   })
