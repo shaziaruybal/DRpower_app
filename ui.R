@@ -153,20 +153,21 @@ dashboardPage(#theme = "flatly",
                                        textOutput("text_edit_clusttab"), 
                                        DTOutput("editable_clusttab"),
                                        br(),
+                                       bsAlert("error_noclusters"), # this creates an error message if user clicks calculate without choosing number of clusters
                                        actionButton(
                                          inputId = "calc_sizes",
                                          label = "Calculate final sample sizes",
                                          icon = icon("clipboard-check")),
                                        helpText(em("If you update these values, make sure you remember to recalculate your final sample sizes and estimate power below"))
                                    ),
-                                   box(width = 5, 
-                                       background = "purple",
-                                       bsAlert("error_noclusters"), # this creates an error message if user clicks calculate without choosing number of clusters
-                                       title = textOutput("title_finalsizesbox"),
-                                       p(textOutput("text_finalsizesbox")),
-                                       br(),
-                                       DTOutput("final_sizes_table")
-                                       ),
+                                   uiOutput("final_sizes_results"),
+                                   # box(width = 5, 
+                                   #     background = "purple",
+                                   #     title = textOutput("title_finalsizesbox"),
+                                   #     p(textOutput("text_finalsizesbox")),
+                                   #     br(),
+                                   #     DTOutput("final_sizes_table")
+                                   #     ),
                                  ),
                                  fluidRow(
                                    box(

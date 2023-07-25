@@ -315,38 +315,20 @@ function(input, output, session) {
      }
    })     
      
-   # output text describing the final adjusted sample size table
-   output$title_finalsizesbox <- renderText({
+   # The results box, text and plots are displayed once the estimate prevalence button is clicked 
+   output$final_sizes_results <- renderUI({
+     
      # require n clusters to be defined and calculate sizes button to be clicked
-     req(input$design_nclust, input$calc_sizes)
+     req(input$design_nclust, input$calc_sizes, df_sizes_final())
      
-     # check if df_sizes_final() has been created, which means the user has selected n clusters, edited the data (or not), and clicked 'calculate sizes' button
-     if(!is.null(df_sizes_final())){
-       # TODO debugging, remove later
-       print("title_finalsizebox should have printed")
-       return("Adjusted sample sizes")
-     }
-     # if it hasn't been created then display nothing
-     else{
-       # TODO debugging, remove later
-       print("title_finalsizebox didn't print")
-       return(NULL)
-     }
-     
-   })
-   
-   output$text_finalsizesbox <- renderText({
-     # require n clusters to be defined and calculate sizes button to be clicked
-     req(input$design_nclust, input$calc_sizes)
-     
-     # check if df_sizes_final() has been created, which means the user has selected n clusters, edited the data (or not), and clicked 'calculate sizes' button
-     if(!is.null(df_sizes_final())){
-       return("Based on the values you entered for sample size (n) and taking into account the proportion drop-out (d), the adjusted sample size is calculated using the formula n_adj = n/(1-d). This still refers to confirmed malaria positive cases. Scroll the table to view.")
-     }
-     # if it hasn't been created then display nothing
-     else{
-       return(NULL)
-     }
+     box(width = 5, 
+         # height = "auto",
+         background = "purple",
+         title = "Adjusted sample sizes",
+         p("Based on the values you entered for sample size (n) and taking into account the proportion drop-out (d), the adjusted sample size is calculated using the formula n_adj = n/(1-d). This still refers to confirmed malaria positive cases. Scroll the table to view."),
+         br(),
+         DTOutput("final_sizes_table")
+     )
    })
   
   # render the edited table
