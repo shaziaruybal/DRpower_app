@@ -283,6 +283,8 @@ dashboardPage(#theme = "flatly",
                     br(),
                     tableOutput("est_prev_table"),
                     br(),
+                    h4(textOutput("result_prevbox")),
+                    br(),
                     plotOutput("est_prev_plot")
                 ),
               ),

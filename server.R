@@ -756,11 +756,8 @@ output$est_power_plot <- renderPlot(est_power_plot())
     
     # check if prev_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(prev_output())){
-      paste0("The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. ",
-             "The table also gives the probability of being above the threshold. ",
-             # "The table also gives the probability of being above the threshold ", "( ", ceiling(prev_output()$prob_above_threshold*100), "% probability that the pfhrp2 prevalence is above the ", ceiling(input$analysis_prevthresh), "% threshold).",
-             "As mentioned above, if you are using this value in a hypothesis test then we recommend accepting that prevalence is above the threshold if probability is 0.95 or higher.")
-             
+      
+      "The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. "
     }
     else{
       return(NULL)
@@ -777,6 +774,25 @@ output$est_power_plot <- renderPlot(est_power_plot())
   }, colnames = T
   )
 
+  output$result_prevbox <- renderText({
+    # require estimate prevalence button click
+    req(prev_output())
+    
+    # check if prev_output() has been created, which means the results have been calculated and can be displayed
+    if(!is.null(prev_output()) && prev_output()$prob_above_threshold >= 0.95){
+      paste0("RESULT: We accept the null hypothesis that the pfhrp2/3 deletion prevalence is above the ", ceiling(as.numeric(input$analysis_prevthresh)), "% threshold (", ceiling(prev_output()$prob_above_threshold*100), "% probability).")
+    }
+    
+    else if(!is.null(prev_output()) && prev_output()$prob_above_threshold < 0.95){
+      paste0("RESULT: We reject the null hypothesis that the pfhrp2/3 deletion prevalence is above the ", ceiling(as.numeric(input$analysis_prevthresh)), "% threshold (", ceiling(prev_output()$prob_above_threshold*100), "% probability).")
+    }
+    
+    else {
+      return(NULL)
+    }
+  })
+  
+  
   # TODO: make sure plot re-renders (or fades out) when recalculating - power plot does this! 
     # NOTE need to divide by 100 to convert to proportion
     est_prev_plot <- reactive({
