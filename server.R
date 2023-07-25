@@ -232,7 +232,7 @@ function(input, output, session) {
                   columns = c(1)
                 )
               ),
-              #rownames = FALSE, # remove rownames so that indexing is accurate
+              # rownames = FALSE, # remove rownames so that indexing is accurate
               colnames = c("Cluster", "Target sample size", "% drop-out"),
               options = list(dom = 'rt',
                              autoWidth = TRUE,
@@ -815,7 +815,7 @@ function(input, output, session) {
     box(width = 12, 
         background = "purple",
         title = "ICC estimates",
-        p("The table and the plot below show the maximum a posteriori (MAP) estimate of the ICC, along with a 95% credible interval (CrI). For context, an ICC of 0.05 is used by default in the Design tab based on an ", a("analysis of historical studies.", href = "https://github.com/mrc-ide/drpower")),
+        p("The table and the plot below show the maximum a posteriori (MAP) estimate of the ICC, along with a 95% credible interval (CrI). For context, an ICC of 0.05 is used by default in the Design tab based on an ", a("analysis of historical studies.", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html")),
         br(),
         renderTable(icc_output() %>% 
                       rename("Mean ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper), colnames = T),
