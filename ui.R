@@ -322,14 +322,15 @@ dashboardPage(#theme = "flatly",
                   "Click the button below to generate a report based on the information you entered in the previous tabs. This creates a pdf with standardised text to minimise mistakes. ",
                   br(), br(),
                 ),
-                downloadButton("analysis_report", "Download analysis report", icon("download")),
                 box(width = 12,
                     # background = "navy", #Valid colors are: blue, light-blue, navy, olive.
-                    title = "Download the analysis phase report",
-                    p("Click the button below to generate a report based on the information you entered in the previous tabs. This creates a pdf with standardised text to minimise mistakes. "),
+                    title = "Check and save your parameters and results",
+                    p("Click the button below to display a summary of the information you entered in the previous tab. If everything looks as expected, click on the download button to download your report PDF."),
                     br(),
-                    # downloadButton("analysis_report", "Download analysis report", icon("download"))
-                )
+                    actionButton("save_analysis_data", " Save results", icon("floppy-disk"))
+                ),
+                uiOutput("text_analysis_summary"),
+                uiOutput("analysis_download"),
               )
             )
           )
