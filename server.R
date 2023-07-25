@@ -11,7 +11,7 @@ library(DRpower)
 
 set.seed(10)
 
-df_ss <- readRDS("df_ss.rds")
+df_ss <- DRpower::df_ss
 
 function(input, output, session) {
   
@@ -135,7 +135,7 @@ function(input, output, session) {
     df_ss %>% 
     filter(ICC == icc) %>% 
     filter(prev_thresh == prev) %>% 
-    # filter(prior_ICC_shape2==9) %>% # fixed at 9 once we have the new table
+    filter(prior_ICC_shape2==9) %>% # fixed at 9 (check this when final final table is ready)
     select(n_clust, prevalence, N_opt) %>% 
     pivot_wider(names_from = prevalence, values_from = N_opt) 
   })
