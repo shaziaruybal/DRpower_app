@@ -225,14 +225,7 @@ dashboardPage(#theme = "flatly",
                         ),
                         tabPanel(title = "Generate report",
                                  br(),
-                                 Callout(
-                                   title = "Download the design phase report",
-                                   "Click the button below to save your assumed parameters and results and generate a report based on the information you entered in the previous tab.",
-                                   br()
-                                 ),      
-                                 br(), 
                                  box(width = 12,
-                                     # background = "navy", #Valid colors are: blue, light-blue, navy, olive.
                                      title = "Check and save your parameters and results",
                                      p("Click the button below to display a summary of the information you entered in the previous tab. If everything looks as expected, click on the download button to download your report PDF."),
                                      br(),
@@ -327,13 +320,7 @@ dashboardPage(#theme = "flatly",
               tabPanel(
                 title = "Generate report",
                 br(),
-                Callout(
-                  title = "Download the analysis phase report",
-                  "Click the button below to generate a report based on the information you entered in the previous tabs. This creates a pdf with standardised text to minimise mistakes. ",
-                  br(), br(),
-                ),
                 box(width = 12,
-                    # background = "navy", #Valid colors are: blue, light-blue, navy, olive.
                     title = "Check and save your parameters and results",
                     p("Click the button below to display a summary of the information you entered in the previous tab. If everything looks as expected, click on the download button to download your report PDF."),
                     br(),
