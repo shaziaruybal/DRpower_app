@@ -161,13 +161,6 @@ dashboardPage(#theme = "flatly",
                                        helpText(em("If you update these values, make sure you remember to recalculate your final sample sizes and estimate power below"))
                                    ),
                                    uiOutput("final_sizes_results"),
-                                   # box(width = 5, 
-                                   #     background = "purple",
-                                   #     title = textOutput("title_finalsizesbox"),
-                                   #     p(textOutput("text_finalsizesbox")),
-                                   #     br(),
-                                   #     DTOutput("final_sizes_table")
-                                   #     ),
                                  ),
                                  fluidRow(
                                    box(
@@ -201,21 +194,12 @@ dashboardPage(#theme = "flatly",
                                      ),
                                      helpText(em("A larger number of simulations will produce more accurate estimates of the power but will take longer to compute. We recommend 100 simulations for exploration and 1000 simulations for final analysis.")),
                                      br(),
+                                     bsAlert("error_nosizes"), # this creates an error message if user clicks estimate power without entering sample sizes
                                      actionButton(inputId = "est_pow",
                                                   label = "Estimate power",
                                                   icon = icon("clipboard-check"))
                                    ),
-                                   
-                                   box(width = 5, 
-                                       background = "purple",
-                                       bsAlert("error_nosizes"), # this creates an error message if user clicks estimate power without entering sample sizes
-                                       title = textOutput("title_powbox"),
-                                       p(textOutput("text_powbox")),
-                                       br(),
-                                       tableOutput("est_power_table"),
-                                       br(),
-                                       plotOutput("est_power_plot")
-                                   ),
+                                   uiOutput("est_power_results"),
                                  )
                         ),
                         tabPanel(title = "Generate report",

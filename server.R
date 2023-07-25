@@ -315,7 +315,7 @@ function(input, output, session) {
      }
    })     
      
-   # The results box, text and plots are displayed once the estimate prevalence button is clicked 
+   # The results box, text and plots are displayed once the calculate final sample sizes button is clicked 
    output$final_sizes_results <- renderUI({
      
      # require n clusters to be defined and calculate sizes button to be clicked
@@ -377,7 +377,7 @@ function(input, output, session) {
       print("Estimate power button has been clicked")
       
       # error message pops up if the user has not entered the sample sizes (check that calculate sizes button has been clicked)
-      if(input$calc_sizes==0){
+      if(input$calc_sizes==0 || is.null(df_sizes_final())){
         # TODO debugging
         print("calculate sizes is NULL")
         print("error should have popped up")
@@ -394,51 +394,27 @@ function(input, output, session) {
       }
     })
     
-  # Display title text once estimate power is clicked and power_output() has been created
-  output$title_powbox <- renderText({
-    
-    # require estiamte power button click
-    req(input$est_pow)
-    
-    # check if power_output() has been created, which means the results have been calculated and can be displayed
-    if(!is.null(power_output())){
-      return("Estimated power ")
-    }
-    # if it hasn't been created yet then return nothing (note error message will pop-up based on other reactivity vals)
-    else{
-      return(NULL)
-    }
-  })
-    
-  # Display results text once estimate power is clicked and power_output() has been created
-  output$text_powbox <- renderText({
-    
-    # require estimate power to have been clicked
-    req(input$est_pow)
-    
-    # check if power_output() has been created, which means the results have been calculated and can be displayed
-    if(!is.null(power_output())){
-      paste0("The plot shows the mean and lower and upper 95% confidence interval based on cluster sizes and parameters chosen above.  ")
-      
-    }
-    # if it hasn't been created yet then return nothing
-    else{
-      return(NULL)     
-    }
-  })
   
-  output$est_power_table <- renderTable({
+  # The results box, text and plots are displayed once the estimate power button is clicked 
+  output$est_power_results <- renderUI({
     
-    # require prev_output() to exist
-    req(power_output())
+    # require estimate power button click
+    req(input$est_pow, power_output())
     
-    power_output() %>% 
-      rename("Power" = power, "Lower 95%CI" = lower, "Upper 95%CI" = upper)
-  }, colnames = T
-  )
+    box(width = 5, 
+        background = "purple",
+        title = "Estimated power",
+        p("The plot shows the mean and lower and upper 95% confidence interval based on cluster sizes and parameters chosen above."),
+        br(),
+        renderTable(power_output() %>% 
+                      rename("Power" = power, "Lower 95%CI" = lower, "Upper 95%CI" = upper), colnames = T),
+        br(),
+        plotOutput("est_power_plot")
+    )
+  })
   
   # TODO seems like the plot is not re-loading when params are changed, but working for button click
-  est_power_plot <- reactive({
+  output$est_power_plot <- renderPlot({
     
     # require power_output() to exist
     req(power_output())
@@ -459,9 +435,6 @@ function(input, output, session) {
       theme_light() +
       theme(text = element_text(size = 16))
   })
-  
-output$est_power_plot <- renderPlot(est_power_plot())
-  
   
   # ----------------------------------
   #  Save results and render downloadable design report
