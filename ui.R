@@ -155,7 +155,9 @@ dashboardPage(#theme = "flatly",
                                        br(),
                                        actionButton(
                                          inputId = "calc_sizes",
-                                         label = "Calculate final sample sizes")
+                                         label = "Calculate final sample sizes",
+                                         icon = icon("clipboard-check")),
+                                       helpText(em("If you update these values, make sure you remember to recalculate your final sample sizes and estimate power below"))
                                    ),
                                    box(width = 5, 
                                        background = "purple",
