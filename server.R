@@ -384,7 +384,7 @@ function(input, output, session) {
     on.exit(removeNotification(id), add = TRUE)
       
     DRpower::get_power_threshold(N = df_sizes_final()$sample_size, 
-                                 prevalence = as.numeric(input$param_prev),
+                                 prevalence = as.numeric(input$param_prev)/100, # make sure to convert to proportion for appropriate calculation
                                  ICC = as.numeric(input$param_icc),
                                  reps = as.numeric(input$param_n_sims))
   })
@@ -536,7 +536,7 @@ output$est_power_plot <- renderPlot(est_power_plot())
           br(), br(),
           h4("Parameters for power calculation:"),
           p("ICC: ", input$param_icc),
-          p("Prevalence: ", ceiling(as.numeric(input$param_prev)*100), "%"), 
+          p("Prevalence: ", ceiling(as.numeric(input$param_prev)), "%"), 
           p("Number of simulations: ", input$param_n_sims),
           br(), br(),
           h4("Power estimates:"),
