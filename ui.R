@@ -273,9 +273,9 @@ dashboardPage(#theme = "flatly",
                       br(),
                       selectInput(
                         inputId = "analysis_prevthresh",
-                        label = strong("Select prevalence threshold: "),
+                        label = strong("Select prevalence threshold (%): "),
                         width = "auto",
-                        choices = c("", 0.05, 0.08, 0.10),
+                        choices = c("", 5, 8, 10),
                         selected = NULL
                       ),
                       selectInput(

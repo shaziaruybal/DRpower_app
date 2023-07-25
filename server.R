@@ -696,7 +696,7 @@ output$est_power_plot <- renderPlot(est_power_plot())
 
       DRpower::get_prevalence(n = df$n_deletions,
                               N = df$sample_size,
-                              prev_thresh = as.numeric(input$analysis_prevthresh))
+                              prev_thresh = as.numeric(input$analysis_prevthresh)/100) # make sure we convert input prev_thresh to proportion for calculation
     }
     else {
       print(str(df))
@@ -751,14 +751,14 @@ output$est_power_plot <- renderPlot(est_power_plot())
   
   output$text_prevbox <- renderText({
     
-    # require estimate pevalence button click
+    # require estimate prevalence button click
     req(input$est_prev)
     
     # check if prev_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(prev_output())){
       paste0("The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. ",
              "The table also gives the probability of being above the threshold. ",
-             # "The table also gives the probability of being above the threshold ", "( ", ceiling(prev_output()$prob_above_threshold*100), "% probability that the pfhrp2 prevalence is above the ", ceiling(input$analysis_prevthresh*100), "% threshold).", 
+             # "The table also gives the probability of being above the threshold ", "( ", ceiling(prev_output()$prob_above_threshold*100), "% probability that the pfhrp2 prevalence is above the ", ceiling(input$analysis_prevthresh), "% threshold).", 
              "As mentioned above, if you are using this value in a hypothesis test then we recommend accepting that prevalence is above the threshold if probability is 0.95 or higher.")
              
     }
@@ -791,18 +791,18 @@ output$est_power_plot <- renderPlot(est_power_plot())
                    shape = 21,
                    fill = "skyblue3") +
         # use the user-entered prev_thresh to plot threshold line
-        geom_hline(aes(yintercept = as.numeric(input$analysis_prevthresh)),
+        geom_hline(aes(yintercept = as.numeric(input$analysis_prevthresh)/100), # make sure we convert back to proportion here
                    color = "darkgrey",
                    linetype = "dashed") +
         # use the user-entered prev_thresh to plot threshold line
         geom_text(aes(x= " ", 
-                      y = as.numeric(input$analysis_prevthresh)+0.02, 
-                      label = paste0(ceiling(as.numeric(input$analysis_prevthresh)*100),"% threshold")), 
+                      y = (as.numeric(input$analysis_prevthresh)/100)+0.02, 
+                      label = paste0(ceiling(as.numeric(input$analysis_prevthresh)),"% threshold")), 
                       color = "darkgrey") +
         scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
         labs(x = "",
              y = "Estimated prevalence",
-             caption = paste0("Result: there is a ", ceiling(prev_output()$prob_above_threshold*100), "% probability that pfhrp2/3 prevalence is above ", ceiling(as.numeric(input$analysis_prevthresh)*100), "%")) +
+             caption = paste0("Result: there is a ", ceiling(prev_output()$prob_above_threshold*100), "% probability that pfhrp2/3 prevalence is above ", ceiling(as.numeric(input$analysis_prevthresh)), "%")) +
         theme_light() +
         theme(text = element_text(size = 16))
     })
@@ -972,7 +972,7 @@ output$est_power_plot <- renderPlot(est_power_plot())
           renderTable(analysis_rv$df_analysis_update),
           br(), br(),
           h4("Parameters for calculations:"),
-          p("Prevalence threshold: ", ceiling(as.numeric(input$analysis_prevthresh)*100), "%"), 
+          p("Prevalence threshold: ", ceiling(as.numeric(input$analysis_prevthresh)), "%"), 
           br(), br(),
           h4("Prevalence estimates:"),
           renderTable(prev_output()),
