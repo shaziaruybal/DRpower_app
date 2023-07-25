@@ -167,7 +167,7 @@ function(input, output, session) {
               # caption = paste0("This table shows target sample sizes assuming an intra-cluster correlation of: ", input$ss_icc, " \n and a prevalence threshold of: ", input$ss_prev)
               ) %>% 
       formatStyle("0.1",
-                  backgroundColor = "green",
+                  backgroundColor = "lavender", # thistle, lavender
                   fontWeight = 'bold'
       )
     })
