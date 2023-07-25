@@ -34,7 +34,8 @@ dashboardPage(#theme = "flatly",
                              text = " FAQ",
                              icon = icon("info-circle")
                     )
-  )),
+                   )
+  ),
   dashboardBody(
    
     tabItems(
@@ -51,9 +52,13 @@ dashboardPage(#theme = "flatly",
       tabItem(
         tabName = "about",
         fluidRow(
-          column(width = 12, style='padding:20px;',
+          column(width = 12, 
+                 style='padding:20px;',
                  Callout(
-                   title = "How to use this tool",
+                   title = "How to use this tool",  
+                   # intent = "primary",
+                   # icon = "info-sign",
+                   html = TRUE,
                    br(),
                    "This tool is designed to help researchers conducting ", em("Plasmodium pfhrp"), "2/3 gene deletion studies. It can be used in two ways:",
                    br(), br(),
@@ -61,14 +66,18 @@ dashboardPage(#theme = "flatly",
                    br(),
                    "2.	In the analysis phase (once data are available) to estimate prevalence of deletions and determine if they are above a set threshold.",
                    br(), br(),
-                   "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see [FAQs](LINK)).",
+                   "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",
+                   # TODO faq hyperlink not working
+                   a("FAQs).", href='#faq/'),
                    br(), br(), 
-                   "For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the [DRpower R package](LINK) that underpins this app.",
+                   "For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the ",
+                   a("DRpower R package ", href='https://github.com/mrc-ide/drpower'),
+                   "that underpins this app.",
                    br(), br(),
                    "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the World Health Organisation (WHO).",
                    br(), br(), br(),
                    em("Most recent update X August 2023.")
-                 )
+                 ),
           )
         )
       ),
@@ -84,6 +93,7 @@ dashboardPage(#theme = "flatly",
                                  br(),
                                  Callout(
                                    title = "Step 1. Consult sample size tables",
+                                   html = TRUE,
                                    # br(),
                                    "The table below gives the number of confirmed malaria positive samples required ", em("per cluster "), "in order for study power to be 80% or higher. You can use these numbers as a general guide when scoping out a study plan, before moving to more tailored sample sizes in the next step.",
                                    br(), br(),
@@ -92,7 +102,9 @@ dashboardPage(#theme = "flatly",
                                  br(),
                                  box(width = 12, 
                                      title = "Sample sizes required to achieve a target power of 80%", 
-                                     "Minimum sample size depends on many factors including the degree of intra-cluster correlation, the prevalence threshold that we are testing against, and the true prevalence in the province. For help choosing these values, see [here](LINK TO FAQs).",
+                                     "Minimum sample size depends on many factors including the degree of intra-cluster correlation, the prevalence threshold that we are testing against, and the true prevalence in the province. For help choosing these values, see ",
+                                     # TODO FAQ hyperlink not working?
+                                     a("here. ", href= '#faq/'),
                                      br(),
                                      # TooltipHost(content = "A high value implies a high variation in the prevalence of deletions between clusters. A value of 5% is suggested by default based on an analysis of historical studies.",
                                      #             delay = 0,
@@ -176,7 +188,10 @@ dashboardPage(#theme = "flatly",
                                                  selected = "0.06",
                                                  width = "200px",
                                      ),
-                                     helpText(em("This is the assumed true prevalence of pfhrp2/3 deletions in the province. A value of 10% is used by default (see [here](LINK) for help choosing this value).")),
+                                     helpText(em("This is the assumed true prevalence of pfhrp2/3 deletions in the province. A value of 10% is used by default (see "),
+                                              # TODO faq hyperlink
+                                              em(a("here", href = "#faq/")), 
+                                              em("for help choosing this value).")),
                                      br(),
                                      selectInput("param_icc", 
                                                  label = "Select the intra-cluster correlation",
@@ -226,8 +241,6 @@ dashboardPage(#theme = "flatly",
                                      br(),
                                      actionButton("save_design_data", " Save results", icon("floppy-disk"))
                                  ),
-                                 # box(width = 12, 
-                                 #     background = "purple"),
                                  uiOutput("text_design_summary"),
                                  uiOutput("design_download"),
                         )
