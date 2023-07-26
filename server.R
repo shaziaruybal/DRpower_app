@@ -906,7 +906,7 @@ function(input, output, session) {
           collapsible = TRUE,
           title = "Data summary",
           h4("Final study values:"),
-          renderTable(analysis_rv$df_analysis_update),
+          renderTable(analysis_rv$df_analysis_update, digits = 0),
           br(), br(),
           h4("Parameters for calculations:"),
           p("Prevalence threshold: ", ceiling(as.numeric(input$analysis_prevthresh)), "%"), 
