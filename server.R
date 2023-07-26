@@ -266,12 +266,16 @@ function(input, output, session) {
   #  Calculate final sample sizes
   # ----------------------------------
   
+  # Create a reactiveVal that counts how many times the calculate final sample sizes button has been clicked
+  # - this is useful if the user clicks the button without having selected n_clust, because error message will pop-up and the counter can be reset to 0
+  design_rv <- reactiveValues(calc_sizes_click = NULL)
+  
   # When 'calculate sample sizes' button is clicked:
   # update the data frame with the user-entered values, calculate the adjusted sample size, and create a final df that is reactive
   df_sizes_final <- eventReactive(input$calc_sizes, {
     
-    # require n clusters to be defined
-    req(input$design_nclust)
+    # require n clusters to be defined and the button click to be > 0 (if 0 then the user has clicked without select n_clust)
+    req(input$design_nclust, design_rv$calc_sizes_click > 0)
     
     # get the stored (and edited) data frame with sample sizes
     df <- design_rv$df_sizes_update
@@ -309,16 +313,24 @@ function(input, output, session) {
          text = "You have not chosen the number of clusters. Please go back to Step 1 and choose the number of clusters and enter the values in the table.",
          type = "error"
        )
+       
+       # Reset the button click count to 0 so that a new click (with no error - ie the user has chosen n_clust) will trigger the results box to render
+       design_rv$calc_sizes_click <- input$calc_sizes
+       design_rv$calc_sizes_click <- 0
+       print(design_rv$calc_sizes_click)
      }
      else{
-       return(NULL)
+       # return(NULL)
+       # Save the current number of clicks to a reactiveVal, we can use clicks>0 to ensure that the results box only renders when the user clicks again
+       design_rv$calc_sizes_click <- input$calc_sizes
+       print(design_rv$calc_sizes_click)
      }
    })     
      
    # The results box, text and plots are displayed once the calculate final sample sizes button is clicked 
    output$final_sizes_results <- renderUI({
      
-     # require n clusters to be defined and calculate sizes button to be clicked
+     # require n clusters to be defined, calculate sizes button to be clicked and df_sizes_final() to be created
      req(input$design_nclust, input$calc_sizes, df_sizes_final())
      
      box(width = 5, 
