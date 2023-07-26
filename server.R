@@ -496,12 +496,12 @@ function(input, output, session) {
       print("text design summary should print")
       
       box(width = 12, 
-          # solidHeader = "purple",
-          # background = "purple", 
+          solidHeader = T,
+          # background = "purple",
           collapsible = TRUE,
           title = "Data summary",
           h4("Final cluster sizes:"),
-          renderTable(df_sizes_final()),
+          renderTable(df_sizes_final(), digits = 0),
           br(), br(),
           h4("Parameters for power calculation:"),
           p("ICC: ", input$param_icc),
