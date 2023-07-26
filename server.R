@@ -711,8 +711,8 @@ function(input, output, session) {
         title = "Prevalence estimates",
         p("The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. "),
         br(),
-        renderTable(prev_output() %>% 
-                      rename("Mean prevalence" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper, "Probability above threshold" = prob_above_threshold), colnames = T),
+        renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100) %>% 
+                      rename("Mean prevalence (%)" = MAP, "Lower CrI (%)" = CrI_lower, "Upper CrI (%)" = CrI_upper, "Probability above threshold (%)" = prob_above_threshold), colnames = T),
         br(),
         h4(textOutput("est_prev_resulttext")),
         br(),
@@ -739,28 +739,27 @@ function(input, output, session) {
   })
   
   # TODO: make sure plot re-renders (or fades out) when recalculating - power plot does this! 
-    # NOTE need to divide by 100 to convert to proportion
   output$est_prev_plot <- renderPlot({
       # require prev_output() to exist
       req(prev_output())
       
       ggplot(prev_output()) +
-        geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100),
+        geom_segment(aes(x = " ", xend = " ", y = CrI_lower, yend = CrI_upper),
                      color = "black", linewidth = 1) +
-        geom_point(aes(x = " ", y = MAP/100),
+        geom_point(aes(x = " ", y = MAP),
                    size = 3,
                    shape = 21,
                    fill = "skyblue3") +
         # use the user-entered prev_thresh to plot threshold line
-        geom_hline(aes(yintercept = as.numeric(input$analysis_prevthresh)/100), # make sure we convert back to proportion here
+        geom_hline(aes(yintercept = as.numeric(input$analysis_prevthresh)), # make sure we convert back to proportion here
                    color = "darkgrey",
                    linetype = "dashed") +
         # use the user-entered prev_thresh to plot threshold line
         geom_text(aes(x= " ", 
-                      y = (as.numeric(input$analysis_prevthresh)/100)+0.02, 
+                      y = (as.numeric(input$analysis_prevthresh))+2, 
                       label = paste0(ceiling(as.numeric(input$analysis_prevthresh)),"% threshold")), 
                       color = "darkgrey") +
-        scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
+        scale_y_continuous(labels = scales::percent_format(1, scale = 1), limits = c(0,100)) +
         labs(x = "",
              y = "Estimated prevalence",
              caption = paste0("Result: there is a ", ceiling(prev_output()$prob_above_threshold*100), "% probability that pfhrp2/3 prevalence is above ", ceiling(as.numeric(input$analysis_prevthresh)), "%")) +
