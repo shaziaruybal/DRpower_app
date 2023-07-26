@@ -437,9 +437,9 @@ function(input, output, session) {
                  size = 4,
                  shape = 21,
                  fill = "skyblue3") +
-      geom_hline(yintercept = 0.8, color = "darkgrey", linetype = "dashed") +
-      geom_text(aes(x= " ", y = 0.825, label = "80% threshold"), color = "darkgrey") +
-      scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
+      geom_hline(yintercept = 80, color = "darkgrey", linetype = "dashed") +
+      geom_text(aes(x= " ", y = 82.5, label = "80% threshold"), color = "darkgrey") +
+      scale_y_continuous(labels = scales::percent_format(1, scale = 1), limits = c(0, 100)) +
       labs(x = "",
            y = "Estimated power" # ,
            # caption = paste0("Parameters: prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims)
