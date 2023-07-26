@@ -227,12 +227,12 @@ function(input, output, session) {
     datatable(df_sizes(), 
               editable = list(
                 target = 'cell',
-                numeric = c(2,3),
+                numeric = c(1,2),
                 disable = list(
-                  columns = c(1)
+                  columns = c(0)
                 )
               ),
-              # rownames = FALSE, # remove rownames so that indexing is accurate
+              rownames = FALSE, 
               colnames = c("Cluster", "Target sample size", "% drop-out"),
               options = list(dom = 'rt',
                              autoWidth = TRUE,
@@ -249,7 +249,7 @@ function(input, output, session) {
     # iterate over each cell edit event, make sure the values are numeric
     for (i in seq_along(input$editable_clusttab_cell_edit$row)) {
       row <- input$editable_clusttab_cell_edit$row[i]
-      col <- input$editable_clusttab_cell_edit$col[i]
+      col <- input$editable_clusttab_cell_edit$col[i]+1
       value <- as.numeric(input$editable_clusttab_cell_edit$value[i])
 
       # update the corresponding cell in the new data frame
@@ -348,13 +348,14 @@ function(input, output, session) {
     datatable(df_sizes_final(), 
               colnames = c("Cluster", "Target sample size", "% drop-out", "Final adjusted sample size"),
               extensions = c("FixedHeader", "FixedColumns"),
+              rownames = F,
               options = list(dom = 'rt',
                              width=4,
                              pageLength=20,
                              fixedHeader = T,
                              columnDefs = list(list(className = "dt-center",
                                                     targets = "_all")),
-                             fixedColumns = list(leftColumns = c(2)),
+                             fixedColumns = list(leftColumns = c(1)),
                              scrollX = '400px'
                              )
               )
