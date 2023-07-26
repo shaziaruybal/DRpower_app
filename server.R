@@ -602,12 +602,12 @@ function(input, output, session) {
     datatable(df_deletions(), 
               editable = list(
                 target = 'cell',
-                numeric = c(2,3),
+                numeric = c(1,2),
                 disable = list(
-                  columns = c(1)
+                  columns = c(0)
                 )
               ),
-              # rownames = FALSE,
+              rownames = FALSE,
               colnames = c("Number of clusters", "Number of deletions", "Sample size"), 
               options = list(dom = 'rt',
                              autoWidth = TRUE, pageLength = 20)) 
@@ -623,7 +623,7 @@ function(input, output, session) {
     # iterate over each cell edit event
     for (i in seq_along(input$editable_deltab_cell_edit$row)) {
       row <- input$editable_deltab_cell_edit$row[i]
-      col <- input$editable_deltab_cell_edit$col[i]
+      col <- input$editable_deltab_cell_edit$col[i]+1
       # make sure edited value is numeric
       value <- as.numeric(input$editable_deltab_cell_edit$value[i])
       
@@ -660,6 +660,7 @@ function(input, output, session) {
     # check that values are numeric and that no value is NA (and if so show pop-up error message)
     if(is.numeric(df$n_deletions) && !any(is.na(df$n_deletions)) && is.numeric(df$sample_size) && !any(is.na(df$sample_size))){
       print(str(df))
+      print(df)
 
       DRpower::get_prevalence(n = df$n_deletions,
                               N = df$sample_size,
