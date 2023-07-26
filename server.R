@@ -135,7 +135,7 @@ function(input, output, session) {
     df_ss %>% 
     filter(ICC == icc) %>% 
     filter(prev_thresh == prev) %>% 
-    filter(prior_ICC_shape2==9) %>% # fixed at 9 (check this when final final table is ready)
+    filter(prior_ICC_shape2==9) %>% # TODO fixed at 9 (check this when final final table is ready)
     select(n_clust, prevalence, N_opt) %>% 
     pivot_wider(names_from = prevalence, values_from = N_opt) 
   })
@@ -187,12 +187,12 @@ function(input, output, session) {
     df_targets <- df_ss %>% 
         filter(ICC == 0.05) %>% 
         filter(prev_thresh == 0.05) %>% 
-        # filter(prior_ICC_shape2==9) %>% # fixed at 9 once we have the new table
+        filter(prior_ICC_shape2==9) %>% # TODO fixed at 9 (check this when final final table is ready)
         select(n_clust, prevalence, N_opt) %>% 
         pivot_wider(names_from = prevalence, values_from = N_opt) 
     
     # get the target sample sizes from table with fixed prev of 10%, fix it at 500 if nclust is 2 or 3 (because NA)
-    if(input$design_nclust==2 | input$design_nclust==3){
+    if(input$design_nclust==2 | input$design_nclust==3 | input$design_nclust==4){
       target_size <- 500
     }
     else{
