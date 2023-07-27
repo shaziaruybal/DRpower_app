@@ -227,7 +227,7 @@ function(input, output, session) {
     datatable(df_sizes(), 
               editable = list(
                 target = 'cell',
-                numeric = c(1,2),
+                numeric = c(2,3),
                 disable = list(
                   columns = c(0)
                 )
@@ -237,7 +237,7 @@ function(input, output, session) {
               options = list(dom = 'rt',
                              autoWidth = TRUE,
                              pageLength=20,
-                             fixedHeader = T,
+                             # fixedHeader = T,
                              columnDefs = list(list(className = "dt-center",
                                                     targets = "_all")),
                              fixedColumns = list(leftColumns = c(1)),
