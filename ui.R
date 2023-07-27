@@ -197,7 +197,8 @@ dashboardPage(#theme = "flatly",
                                      bsAlert("error_nosizes"), # this creates an error message if user clicks estimate power without entering sample sizes
                                      actionButton(inputId = "est_pow",
                                                   label = "Estimate power",
-                                                  icon = icon("clipboard-check"))
+                                                  icon = icon("clipboard-check")),
+                                     helpText(em("If you update any of the values in Step 1, make sure you remember to recalculate power"))
                                    ),
                                    uiOutput("est_power_results"),
                                  )
