@@ -66,7 +66,7 @@ dashboardPage(#theme = "flatly",
                    br(),
                    "2.	In the analysis phase (once data are available) to estimate prevalence of deletions and determine if they are above a set threshold.",
                    br(), br(),
-                   "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",
+                   "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose target sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",
                    # TODO faq hyperlink not working
                    a("FAQs).", href='#faq/'),
                    br(), br(), 
@@ -109,7 +109,7 @@ dashboardPage(#theme = "flatly",
                                      br(),
                                      selectInput(
                                        inputId = "ss_icc",
-                                       label = strong("Select the intra-cluster correlation: "),
+                                       label = strong("Select the intra-cluster correlation (ICC): "),
                                        width = "40%",
                                        choices = c("", 0.00, 0.01, 0.02, 0.05, 0.10, 0.20), 
                                        selected = 0.05,
@@ -126,7 +126,7 @@ dashboardPage(#theme = "flatly",
                                      ),
                                      helpText(em("The prevalence value that we are comparing against in our hypothesis test (5% by default).")),
                                      br(),
-                                     textOutput("text_ss"),
+                                     tagAppendAttributes(textOutput("text_ss"), style="white-space:pre-wrap;"),
                                      DTOutput("sample_size_table")
                                  )
                         ),
@@ -137,7 +137,7 @@ dashboardPage(#theme = "flatly",
                                    # br(),
                                    "Sample size tables assume you will collect the same number of samples in every cluster, but this may not be possible in practice. Here, you can enter your final target sample size in each cluster and then estimate power directly.",
                                    br(), br(),
-                                   "When choosing sample sizes, remember this is the number of ", em("confirmed malaria positive "), "individuals. Check with local teams to see how many cases can realistically be recruited within the study period based on local incidence trends. You can also use this table to account for drop-out, which can occur for many reasons from failure of lab samples to participants withdrawing consent. Local staff and technicians may be able to advise on sensible values for assumed drop-out."
+                                   "When choosing sample sizes, remember this is the number of ", em("confirmed malaria positive "), "individuals. Check with local teams to see how many cases can realistically be recruited within the study period based on local incidence trends. You can also use this table to account for drop-out, which can occur for many reasons from participants withdrawing consent to failure of lab samples. Local staff and technicians may be able to advise on sensible values for assumed drop-out."
                                  ),
                                  br(),
                                  fluidRow(
