@@ -371,8 +371,6 @@ function(input, output, session) {
   # Store a reactive value that checks whether the summary data is complete or not (T/F)
   design_rv <- reactiveValues(design_data_ready = FALSE)
   
-  # TODO I think we should save all the outputs as a list to feed into the report?! 
-  
   # The save button allows the user to cross-check the assumed parameters entered and check the numbers that will be printed in the report
   # - if the user has not entered the values correctly in the previous tab, an error message will pop-up and the design_data_ready reactive val will be set to FALSE
   # - if it passes all validation checks (ie user has entered everything), design_data_ready will be set to TRUE 
@@ -794,8 +792,6 @@ function(input, output, session) {
 
   # Store a reactive value that checks whether the summary data is complete or not (T/F)
   analysis_rv <- reactiveValues(analysis_data_ready = FALSE)
-  
-  # TODO I think we should save all the outputs as a list to feed into the report?! 
   
   # The save button allows the user to cross-check the assumed parameters entered and check the numbers that will be printed in the report
   # - if the user has not entered the values correctly in the previous tabs, an error message will pop-up and the analysis_data_ready reactive val will be set to FALSE
