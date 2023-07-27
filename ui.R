@@ -4,7 +4,6 @@
 
 library(shiny)
 library(DT)
-library(shiny.fluent)
 library(shiny.blueprint)
 library(shinydashboard)
 library(shinyWidgets)
