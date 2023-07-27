@@ -116,7 +116,7 @@ dashboardPage(#theme = "flatly",
                                      ),
                                      helpText(em("A high ICC value implies a high variation in the prevalence of deletions between clusters. A value of 0.05 is suggested by default based on an "),
                                               em(a("analysis of historical studies.", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html"))),
-                                     br(),
+                                     br(), 
                                      selectInput(
                                        inputId = "ss_prev",
                                        label = strong("Select the prevalence threshold (%): "),

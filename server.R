@@ -747,7 +747,6 @@ function(input, output, session) {
     }
   })
   
-  # TODO: make sure plot re-renders (or fades out) when recalculating - power plot does this! 
   output$est_prev_plot <- renderPlot({
       # require prev_output() to exist
       req(prev_output())
