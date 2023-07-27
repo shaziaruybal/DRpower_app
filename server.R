@@ -763,8 +763,7 @@ function(input, output, session) {
                       color = "darkgrey") +
         scale_y_continuous(labels = scales::percent_format(1, scale = 1), limits = c(0,100)) +
         labs(x = "",
-             y = "Estimated prevalence",
-             caption = paste0("Result: there is a ", ceiling(prev_output()$prob_above_threshold*100), "% probability that pfhrp2/3 prevalence is above ", ceiling(as.numeric(input$analysis_prevthresh)), "%")) +
+             y = "Estimated prevalence") +
         theme_light() +
         theme(text = element_text(size = 16))
     })
