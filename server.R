@@ -304,7 +304,7 @@ function(input, output, session) {
       print("Estimate power button has been clicked")
       
       # error message pops up if the user has not entered the sample sizes (check that calculate sizes button has been clicked)
-      if(input$calc_sizes==0 || is.null(df_sizes_final())){
+      if(input$calc_sizes || is.null(df_sizes_final())){
         # TODO debugging
         print("calculate sizes is NULL")
         print("error should have popped up")
