@@ -608,13 +608,14 @@ function(input, output, session) {
     datatable(df_deletions(), 
               editable = list(
                 target = 'cell',
-                numeric = c(1,2),
+                numeric = c(2,3),
                 disable = list(
                   columns = c(0)
                 )
               ),
               rownames = FALSE,
               colnames = c("Number of clusters", "Number of deletions", "Sample size"), 
+              caption = "Double-click to edit each cell in the table below and enter your study values.",
               options = list(dom = 'rt',
                              autoWidth = TRUE, pageLength = 20)) 
   })
