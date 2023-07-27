@@ -146,7 +146,7 @@ function(input, output, session) {
     # require the user inputs to render the text
     req(input$ss_icc, input$ss_prev)
     
-    "Columns give the assumed true prevalence of pfhrp2/3 deletions in the province. 10% is highlighted as the suggested default. Rows give the number of clusters (e.g., health facilities) within the province. Scroll the table to view all suggested values."
+    "Columns give the assumed true prevalence of pfhrp2/3 deletions in the province. 10% is highlighted as the suggested default. Rows give the number of clusters (e.g., health facilities) within the province. Scroll the table to view all suggested values. Note that if a particular cell is blank, the target sample size is >2000."
     
   })
   
@@ -165,7 +165,6 @@ function(input, output, session) {
                              dom = 'tB',
                              buttons = c('copy', 'csv', 'excel')
               ), 
-              # caption = paste0("This table shows target sample sizes assuming an intra-cluster correlation of: ", input$ss_icc, " \n and a prevalence threshold of: ", input$ss_prev)
               ) %>% 
       formatStyle("0.1",
                   backgroundColor = "lavender", # thistle, lavender
@@ -731,23 +730,23 @@ function(input, output, session) {
   output$est_prev_resulttext <- renderUI({
     # require estimate prevalence button click
     req(prev_output(), input$analysis_prevthresh)
-    
+
     # check if prev_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(prev_output()) && prev_output()$prob_above_threshold >= 0.95){
       line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", ceiling(as.numeric(prev_output()$MAP)), "% (95% CrI: ", ceiling(as.numeric(prev_output()$CrI_lower)), "- ", ceiling(as.numeric(prev_output()$CrI_upper)), "%).")
       line2 <- paste("We reject the hypothesis that the ", em("pfhrp2/3"), "deletion prevalence is below the ", ceiling(as.numeric(input$analysis_prevthresh)), "% threshold. We conclude that prevalence is above the threshold.")
-      
+
       HTML(paste(line1, line2, sep = "<br/><br/>"))
-      
+
     }
-    
+
     else if(!is.null(prev_output()) && prev_output()$prob_above_threshold < 0.95){
       line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", ceiling(as.numeric(prev_output()$MAP)), "% (95% CrI: ", ceiling(as.numeric(prev_output()$CrI_lower)), "- ", ceiling(as.numeric(prev_output()$CrI_upper)), "%).")
       line2 <- paste("We accept the hypothesis that the ", em("pfhrp2/3"), "deletion prevalence is below the ", ceiling(as.numeric(input$analysis_prevthresh)), "% threshold. We conclude that prevalence is below the threshold.")
-      
+
       HTML(paste(line1, line2, sep = "<br/><br/>"))
     }
-    
+
     else {
       return(NULL)
     }
