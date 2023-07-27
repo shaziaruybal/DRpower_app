@@ -769,7 +769,6 @@ function(input, output, session) {
     )
   })
   
-  # TODO: make sure plot re-renders (or fades out) when recalculating - power plot does this! 
   # NOTE need to divide by 100 to convert to proportion
   output$est_icc_plot <- renderPlot({
     ggplot(icc_output()) +
@@ -831,7 +830,6 @@ function(input, output, session) {
       print("text analysis summary should print")
       
       box(width = 12, 
-          # solidHeader = "purple",
           # background = "purple", 
           collapsible = TRUE,
           title = "Data summary",
@@ -868,7 +866,7 @@ function(input, output, session) {
   
   # The downloadHandler() for the design report will be triggered if the downloadButton() is clicked 
   output$analysis_report <- downloadHandler(
-    filename = paste0("PfHRP2_Planner_Analysis_Report_", Sys.Date(), ".html"),
+    filename = paste0("PfHRP2_Planner_Analysis_Report_", Sys.Date(), ".pdf"),
     content = function(file) {
       # create a progress notification pop-up telling the user that the report is rendering
       id <- showNotification(paste0("Preparing report..."), 
@@ -878,10 +876,11 @@ function(input, output, session) {
       # remove notification when calculation finishes
       on.exit(removeNotification(id), add = TRUE)
       
-      tempReport <- file.path(tempdir(), "template_analysis_report.Rmd")
-      file.copy("template_analysis_report.Rmd", tempReport, overwrite = TRUE)
+      tempReport <- file.path(tempdir(), "template_analysis_report_pdf.Rmd")
+      file.copy("template_analysis_report_pdf.Rmd", tempReport, overwrite = TRUE)
       
-      params <- list(analysis_nclusters = input$analysis_nclust,
+      params <- list(analysis_prevthresh = input$analysis_prevthresh,
+                     analysis_nclusters = input$analysis_nclust,
                      analysis_study_data = analysis_rv$df_analysis_update,
                      analysis_prevoutput = prev_output(),
                      analysis_iccoutput = icc_output()
