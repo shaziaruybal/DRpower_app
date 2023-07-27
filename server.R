@@ -20,9 +20,9 @@ function(input, output, session) {
   # TESTING
   ################################################## 
   
-  output$test_table <- renderTable({
-    head(df_ss)
-  })
+  # output$test_table <- renderTable({
+  #   head(df_ss)
+  # })
   
   ##################################################
   # DESIGN

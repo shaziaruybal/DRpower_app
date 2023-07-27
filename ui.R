@@ -17,8 +17,8 @@ dashboardPage(#theme = "flatly",
   dashboardSidebar(width = 150,
                    # size = "thin",
                    sidebarMenu(
-                    menuItem(tabName = "test_tab",
-                             text = "TESTING"),
+                    # menuItem(tabName = "test_tab",
+                    #          text = "TESTING"),
                     menuItem(tabName = "about", 
                              text = " About",
                              icon = icon("home")
