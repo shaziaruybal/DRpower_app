@@ -235,11 +235,11 @@ function(input, output, session) {
               rownames = FALSE, 
               colnames = c("Cluster", "Target sample size", "% drop-out"),
               options = list(dom = 'rt',
-                             autoWidth = TRUE,
+                             # autoWidth = TRUE,
                              pageLength=20,
                              # fixedHeader = T,
-                             columnDefs = list(list(className = "dt-center",
-                                                    targets = "_all")),
+                             # columnDefs = list(list(className = "dt-center",
+                             #                        targets = "_all")),
                              fixedColumns = list(leftColumns = c(1)),
                              scrollX = '400px'))
   })
@@ -617,7 +617,12 @@ function(input, output, session) {
               colnames = c("Number of clusters", "Number of deletions", "Sample size"), 
               caption = "Double-click to edit each cell in the table below and enter your study values.",
               options = list(dom = 'rt',
-                             autoWidth = TRUE, pageLength = 20)) 
+                             # autoWidth = TRUE, 
+                             pageLength = 20,
+                             # columnDefs = list(list(className = "dt-center",
+                             #                        targets = "_all")),
+                             fixedColumns = list(leftColumns = c(1)),
+                             scrollX = '400px')) 
   })
   
   # observe when table is edited and update the data frame with the user entered values
@@ -720,7 +725,8 @@ function(input, output, session) {
         p("The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. "),
         br(),
         renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100) %>% 
-                      rename("Mean prevalence (%)" = MAP, "Lower CrI (%)" = CrI_lower, "Upper CrI (%)" = CrI_upper, "Probability above threshold (%)" = prob_above_threshold), colnames = T),
+                      rename("MAP prevalence estimate (%)" = MAP, "Lower CrI (%)" = CrI_lower, "Upper CrI (%)" = CrI_upper, "Probability above threshold (%)" = prob_above_threshold), 
+                    colnames = T),
         br(),
         h4(htmlOutput("est_prev_resulttext")),
         br(),
