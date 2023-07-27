@@ -20,101 +20,9 @@ function(input, output, session) {
   # TESTING
   ################################################## 
   
-  # shiny::observeEvent(input$design_nclust, {
-  #   print("Test button clicked")
-  # 
-  #   plot_data <- data.frame(
-  #     cluster = c(rep(1:input$design_nclust)),
-  #     sample_size = c(rep(100, input$design_nclust)),
-  #     prop_dropout = c(rep(0.1, input$design_nclust))
-  #   )
-  # 
-  #   output$test_plot <- renderPlot({
-  #     ggplot(plot_data, aes(x = cluster, y = sample_size)) +
-  #       geom_point()
-  #   })
-  # })
-  
-  shiny::observeEvent(input$test_button, {
-    plot_data <- rnorm(100)
-    print("Test button clicked")
-
-    output$test_plot <- renderPlot({
-      hist(plot_data, main = "Histogram of Random Data")
-    })
-# 
-#     session$sendCustomMessage(type = "testmessage",
-#                               message = "Thanks for clicking")
+  output$test_table <- renderTable({
+    head(df_ss)
   })
-  
-  # output$design_report <- downloadHandler(
-  #   filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".html"),
-  #   content = function(file) {
-  #     tempReport <- file.path(tempdir(), "test_design_report.Rmd")
-  #     file.copy("test_design_report.Rmd", tempReport, overwrite = TRUE)
-  #     
-  #     params <- list(
-  #       design_final_sizes = input$test_button
-  #     )
-  #     
-  #     rmarkdown::render(tempReport,
-  #                       output_file = file,
-  #                       params = params,
-  #                       envir = new.env(parent = globalenv()),
-  #     )
-  #   }
-  # )
-  
-  # TESTING: user-editable table and storing user-entered values
-  
-  # make sure data and original_data are reactive
-  # values <- reactiveValues(data = NULL, original_data = NULL)
-  # 
-  # df <- data.frame(
-  #   cluster = c(rep(1:5)),
-  #   sample_size = c(rep(100, 5)),
-  #   prop_dropout = c(rep(0.1, 5))
-  # )
-  # 
-  # # render editable tab
-  # output$editable_table <- renderDT({
-  #   datatable(df, editable = TRUE)
-  # })
-  # 
-  # # observe when table is edited
-  # observeEvent(input$editable_table_cell_edit, {
-  #   print("Design table has been edited")
-  #   # Update the data frame with edited values
-  #   df <<- editData(df, input$editable_table_cell_edit)
-  # })
-  # 
-  # # observe when test button is clicked
-  # observeEvent(input$test_button, {
-  #   # check if data has been edited
-  #   if (!identical(df, values$original_data)) {
-  #     # update the reactiveValues object with new data
-  #     values$data <- df
-  # 
-  #     # update the original_data with the latest changes
-  #     values$original_data <- df
-  #   }
-  # })
-  # 
-  # # render updated table and reactive object
-  # observe({
-  #   # get reactive object
-  #   reactive_data <- values$data
-  # 
-  #   # render the edited table
-  #   output$editable_table <- renderDT({
-  #     datatable(reactive_data, editable = TRUE)
-  #   })
-  # 
-  #   # print the reactive object
-  #   output$reactive_values <- renderPrint({
-  #     reactive_data
-  #   })
-  # })
   
   ##################################################
   # DESIGN
@@ -123,49 +31,49 @@ function(input, output, session) {
   # ----------------------------------
   # Sample size table
   # ----------------------------------
-  
+
   # When user selects and ICC value and prevalence threshold, create a reactive data frame df_sample_sizes() filtered on these values
-  df_sample_sizes <- reactive({ 
-    
+  df_sample_sizes <- reactive({
+
     # require the user inputs to create the table
     req(input$ss_icc, input$ss_prev)
-    
-    icc <- as.numeric(input$ss_icc)
-    prev <- as.numeric(input$ss_prev)/100
-    
-    df_ss %>% 
-    filter(ICC == icc) %>% 
-    filter(prev_thresh == prev) %>% 
-    filter(prior_ICC_shape2==9) %>% # TODO fixed at 9 (check this when final final table is ready)
-    select(n_clust, prevalence, N_opt) %>% 
-    pivot_wider(names_from = prevalence, values_from = N_opt) 
+
+    # icc <- as.numeric(input$ss_icc)
+    # prev <- as.numeric(input$ss_prev)/100
+
+    df_ss %>%
+    filter(ICC == as.numeric(input$ss_icc)) %>%
+    filter(prev_thresh == as.numeric(input$ss_prev)/100) %>%
+    filter(prior_ICC_shape2 == 9) %>% # TODO fixed at 9 (check this when final final table is ready)
+    select(n_clust, prevalence, N_opt) %>%
+    pivot_wider(names_from = prevalence, values_from = N_opt)
   })
-  
+
   # render explanatory text for the sample sizes table that should appear when the user selects ICC and prev
   output$text_ss <- renderText({
     # require the user inputs to render the text
     req(input$ss_icc, input$ss_prev)
-    
+
     "Columns give the assumed true prevalence of pfhrp2/3 deletions in the province. 10% is highlighted as the suggested default. Rows give the number of clusters (e.g., health facilities) within the province. Scroll the table to view all suggested values. Note that if a particular cell is blank, the target sample size is >2000."
-    
+
   })
-  
+
   output$sample_size_table <- renderDT({
-    datatable(df_sample_sizes(), 
+    datatable(df_sample_sizes(),
               colnames = c("Number of clusters", "1%", "2%", "3%", "4%", "5%", "6%", "7%", "8%", "9", "10%", "11%", "12%", "13%", "14%", "15%", "16%", "17%", "18%", "19%", "20%"),
               rownames = FALSE,
-              extensions = c("Buttons", "FixedHeader", "FixedColumns"),
+              extensions = c("Buttons", "FixedHeader"),
+              # extensions = c("Buttons", "FixedHeader", "FixedColumns"),
               options = list(# autoWidth = T,
                              pageLength = 20,
                              fixedHeader = TRUE,
                              columnDefs = list(list(className = "dt-center",
                                                     targets = "_all")),
-                             fixedColumns = list(leftColumns = 1),
+                             # fixedColumns = list(leftColumns = 1),
                              scrollX = '500px',
                              dom = 'tB',
                              buttons = c('copy', 'csv', 'excel')
-              ), 
-              ) %>% 
+              )) %>%
       formatStyle("0.1",
                   backgroundColor = "lavender", # thistle, lavender
                   fontWeight = 'bold'
