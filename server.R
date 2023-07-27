@@ -142,13 +142,15 @@ function(input, output, session) {
               ),
               rownames = FALSE, 
               colnames = c("Cluster", "Target sample size", "% drop-out"),
+              extensions = c("FixedHeader"),
+              # extensions = c("FixedHeader", "FixedColumns"),
               options = list(dom = 'rt',
                              # autoWidth = TRUE,
                              pageLength=20,
                              # fixedHeader = T,
                              # columnDefs = list(list(className = "dt-center",
                              #                        targets = "_all")),
-                             fixedColumns = list(leftColumns = c(1)),
+                             # fixedColumns = list(leftColumns = c(1)),
                              scrollX = '400px'))
   })
 
@@ -247,7 +249,6 @@ function(input, output, session) {
      req(input$design_nclust, input$calc_sizes, df_sizes_final())
      
      box(width = 5, 
-         # height = "auto",
          background = "purple",
          title = "Adjusted sample sizes",
          p("Based on the values you entered for sample size (n) and taking into account the proportion drop-out (d), the adjusted sample size is calculated using the formula n_adj = n/(1-d). This still refers to confirmed malaria positive cases. Scroll the table to view."),
@@ -260,15 +261,16 @@ function(input, output, session) {
   output$final_sizes_table <- renderDT({
     datatable(df_sizes_final(), 
               colnames = c("Cluster", "Target sample size", "% drop-out", "Adjusted sample size"),
-              extensions = c("FixedHeader", "FixedColumns"),
+              extensions = c("FixedHeader"),
+              # extensions = c("FixedHeader", "FixedColumns"),
               rownames = F,
               options = list(dom = 'rt',
-                             width=4,
+                             # width=4,
                              pageLength=20,
                              fixedHeader = T,
                              columnDefs = list(list(className = "dt-center",
                                                     targets = "_all")),
-                             fixedColumns = list(leftColumns = c(1)),
+                             # fixedColumns = list(leftColumns = c(1)),
                              scrollX = '400px'
                              )
               )
@@ -332,14 +334,16 @@ function(input, output, session) {
         title = "Estimated power",
         p("The plot shows the mean and lower and upper 95% confidence interval based on cluster sizes and parameters chosen above."),
         br(),
-        renderTable(power_output() %>% 
-                      rename("Power" = power, "Lower 95%CI" = lower, "Upper 95%CI" = upper), colnames = T),
+        renderTable(power_output() %>%
+                      rename("Power" = power, "Lower 95%CI" = lower, "Upper 95%CI" = upper),
+                    digits = 1,
+                    colnames = T,
+                    align = "c"),
         br(),
         plotOutput("est_power_plot")
     )
   })
-  
-  # TODO seems like the plot is not re-loading when params are changed, but working for button click
+
   output$est_power_plot <- renderPlot({
     
     # require power_output() to exist
@@ -355,9 +359,7 @@ function(input, output, session) {
       geom_text(aes(x= " ", y = 82.5, label = "80% threshold"), color = "darkgrey") +
       scale_y_continuous(labels = scales::percent_format(1, scale = 1), limits = c(0, 100)) +
       labs(x = "",
-           y = "Estimated power" # ,
-           # caption = paste0("Parameters: prev=", input$param_prev, ", ICC=", input$param_icc, ", sims=", input$param_n_sims)
-           ) +
+           y = "Estimated power") +
       theme_light() +
       theme(text = element_text(size = 16))
   })
@@ -523,13 +525,15 @@ function(input, output, session) {
               ),
               rownames = FALSE,
               colnames = c("Number of clusters", "Number of deletions", "Sample size"), 
+              extensions = c("FixedHeader"),
+              # extensions = c("FixedHeader", "FixedColumns"),
               caption = "Double-click to edit each cell in the table below and enter your study values.",
               options = list(dom = 'rt',
                              # autoWidth = TRUE, 
                              pageLength = 20,
                              # columnDefs = list(list(className = "dt-center",
                              #                        targets = "_all")),
-                             fixedColumns = list(leftColumns = c(1)),
+                             # fixedColumns = list(leftColumns = c(1)),
                              scrollX = '400px')) 
   })
   
@@ -634,7 +638,9 @@ function(input, output, session) {
         br(),
         renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100) %>% 
                       rename("MAP prevalence estimate (%)" = MAP, "Lower CrI (%)" = CrI_lower, "Upper CrI (%)" = CrI_upper, "Probability above threshold (%)" = prob_above_threshold), 
-                    colnames = T),
+                    digits = 1,
+                    colnames = T,
+                    align = "c"),
         br(),
         h4(htmlOutput("est_prev_resulttext")),
         br(),
@@ -756,7 +762,10 @@ function(input, output, session) {
         p("The table and the plot below show the maximum a posteriori (MAP) estimate of the ICC, along with a 95% credible interval (CrI). For context, an ICC of 0.05 is used by default in the Design tab based on an ", a("analysis of historical studies.", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html")),
         br(),
         renderTable(icc_output() %>% 
-                      rename("MAP estimate of ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper), colnames = T),
+                      rename("MAP estimate of ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper), 
+                    digits = 1,
+                    colnames = T, 
+                    align = "c"),
         br(),
         plotOutput("est_icc_plot")
     )
