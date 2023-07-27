@@ -202,7 +202,7 @@ function(input, output, session) {
     # create the data frame with fixed columns and rows based on user input and target sample sizes as defaults
     data.frame(
       cluster = rep(1:input$design_nclust),
-      sample_size = rep(target_size, input$design_nclust),
+      target_sample_size = rep(target_size, input$design_nclust),
       percent_dropout = rep(10, input$design_nclust)
     )
   })
@@ -281,10 +281,10 @@ function(input, output, session) {
     df <- design_rv$df_sizes_update
     
     # check that sample size values are numeric and that no value is NA (and if so show pop-up error message)
-    if(is.numeric(df$sample_size) && !any(is.na(df$sample_size))){
+    if(is.numeric(df$target_sample_size) && !any(is.na(df$target_sample_size))){
       
       # calculate adjusted sample size
-      df <- df %>% mutate(final_sample_size = ceiling(sample_size/(1-(percent_dropout/100))))
+      df <- df %>% mutate(adj_sample_size = ceiling(target_sample_size/(1-(percent_dropout/100))))
     
       return(df)
     }
@@ -346,7 +346,7 @@ function(input, output, session) {
   # render the edited table
   output$final_sizes_table <- renderDT({
     datatable(df_sizes_final(), 
-              colnames = c("Cluster", "Target sample size", "% drop-out", "Final adjusted sample size"),
+              colnames = c("Cluster", "Target sample size", "% drop-out", "Adjusted sample size"),
               extensions = c("FixedHeader", "FixedColumns"),
               rownames = F,
               options = list(dom = 'rt',
@@ -379,7 +379,7 @@ function(input, output, session) {
     # remove notification when calculation finishes
     on.exit(removeNotification(id), add = TRUE)
       
-    DRpower::get_power_threshold(N = df_sizes_final()$sample_size, 
+    DRpower::get_power_threshold(N = df_sizes_final()$target_sample_size, 
                                  prevalence = as.numeric(input$param_prev)/100, # make sure to convert to proportion for appropriate calculation
                                  ICC = as.numeric(input$param_icc),
                                  reps = as.numeric(input$param_n_sims))
