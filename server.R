@@ -8,6 +8,7 @@ library(shiny.fluent)
 library(shinyWidgets)
 library(shinyBS)
 library(DRpower)
+library(kableExtra)
 
 set.seed(10)
 
@@ -236,7 +237,12 @@ function(input, output, session) {
               colnames = c("Cluster", "Target sample size", "% drop-out"),
               options = list(dom = 'rt',
                              autoWidth = TRUE,
-                             pageLength=20))
+                             pageLength=20,
+                             fixedHeader = T,
+                             columnDefs = list(list(className = "dt-center",
+                                                    targets = "_all")),
+                             fixedColumns = list(leftColumns = c(1)),
+                             scrollX = '400px'))
   })
 
   # observe when table is edited and update the data frame with the user entered values
