@@ -716,23 +716,30 @@ function(input, output, session) {
         renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100) %>% 
                       rename("Mean prevalence (%)" = MAP, "Lower CrI (%)" = CrI_lower, "Upper CrI (%)" = CrI_upper, "Probability above threshold (%)" = prob_above_threshold), colnames = T),
         br(),
-        h4(textOutput("est_prev_resulttext")),
+        h4(htmlOutput("est_prev_resulttext")),
         br(),
         plotOutput("est_prev_plot")
     )
   })
 
-  output$est_prev_resulttext <- renderText({
+  output$est_prev_resulttext <- renderUI({
     # require estimate prevalence button click
-    req(prev_output())
+    req(prev_output(), input$analysis_prevthresh)
     
     # check if prev_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(prev_output()) && prev_output()$prob_above_threshold >= 0.95){
-      paste0("RESULT: We accept the null hypothesis that the pfhrp2/3 deletion prevalence is above the ", ceiling(as.numeric(input$analysis_prevthresh)), "% threshold (", ceiling(prev_output()$prob_above_threshold*100), "% probability).")
+      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", ceiling(as.numeric(prev_output()$MAP)), "% (95% CrI: ", ceiling(as.numeric(prev_output()$CrI_lower)), "- ", ceiling(as.numeric(prev_output()$CrI_upper)), "%).")
+      line2 <- paste("We reject the hypothesis that the ", em("pfhrp2/3"), "deletion prevalence is below the ", ceiling(as.numeric(input$analysis_prevthresh)), "% threshold. We conclude that prevalence is above the threshold.")
+      
+      HTML(paste(line1, line2, sep = "<br/><br/>"))
+      
     }
     
     else if(!is.null(prev_output()) && prev_output()$prob_above_threshold < 0.95){
-      paste0("RESULT: We reject the null hypothesis that the pfhrp2/3 deletion prevalence is above the ", ceiling(as.numeric(input$analysis_prevthresh)), "% threshold (", ceiling(prev_output()$prob_above_threshold*100), "% probability).")
+      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", ceiling(as.numeric(prev_output()$MAP)), "% (95% CrI: ", ceiling(as.numeric(prev_output()$CrI_lower)), "- ", ceiling(as.numeric(prev_output()$CrI_upper)), "%).")
+      line2 <- paste("We accept the hypothesis that the ", em("pfhrp2/3"), "deletion prevalence is below the ", ceiling(as.numeric(input$analysis_prevthresh)), "% threshold. We conclude that prevalence is below the threshold.")
+      
+      HTML(paste(line1, line2, sep = "<br/><br/>"))
     }
     
     else {
