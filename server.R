@@ -864,7 +864,7 @@ function(input, output, session) {
                  size = 4, 
                  shape = 21,
                  fill = "skyblue3") +
-      scale_y_continuous(labels = scales::percent_format(1), limits = c(0,1)) +
+      scale_y_continuous(limits = c(0,1)) +
       labs(x = "",
            y = "Estimated ICC") +
       theme_light() +
