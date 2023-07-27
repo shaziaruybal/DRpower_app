@@ -12,7 +12,7 @@ library(shinyBS)
 
 dashboardPage(#theme = "flatly",
   skin = "purple",
-  dashboardHeader(title = "pfhrp2 Planner"),
+  dashboardHeader(title = HTML(paste(em("pfhrp2/3"), " Planner"))),
   dashboardSidebar(width = 150,
                    # size = "thin",
                    sidebarMenu(
