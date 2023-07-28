@@ -1,6 +1,6 @@
 ---
 title: "*pfhrp2/3* Planner: Analysis report"
-subtitle: "*Downloaded on: `r Sys.Date()`*"
+subtitle: "*Downloaded on: `r Sys.Date()`| DRpower interactive app v1.0.0*"
 output: 
   pdf_document:
     fig_caption: yes
