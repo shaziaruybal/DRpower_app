@@ -178,7 +178,7 @@ function(input, output, session) {
   
   
   # ----------------------------------
-  #  Calculate final sample sizes
+  #  Calculate adjusted sample sizes
   # ----------------------------------
   
   # Create a reactiveVal that counts how many times the calculate final sample sizes button has been clicked
