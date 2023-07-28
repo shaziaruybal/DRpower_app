@@ -118,7 +118,7 @@ function(input, output, session) {
   observeEvent(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     print("Number of clusters selected")
 
-    output$text_edit_clusttab <- renderText("The table below now has rows corresponding to the number of clusters in your study.
+    output$text_edit_clusttab <- renderText("The table below has rows corresponding to the number of clusters in your study.
                                             Please edit the target sample size and expected proportion of participant drop-out for each cluster by double-clicking
                                             and editing each cell in the table below. When you are finished click the 'Calculate final sample sizes' button. ")
     
