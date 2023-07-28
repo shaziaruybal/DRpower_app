@@ -120,7 +120,7 @@ function(input, output, session) {
 
     output$text_edit_clusttab <- renderText("The table below has rows corresponding to the number of clusters in your study.
                                             Please edit the target sample size and expected proportion of participant drop-out for each cluster by double-clicking
-                                            and editing each cell in the table below. When you are finished click the 'Calculate final sample sizes' button. ")
+                                            and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate final sample sizes' button. ")
     
     print("After user selects N clusters, this is the df:")
     print(df_sizes())
@@ -134,10 +134,10 @@ function(input, output, session) {
     datatable(df_sizes(), 
               editable = list(
                 target = 'cell',
-                numeric = c(2,3),
-                disable = list(
-                  columns = c(0)
-                )
+                numeric = c(2,3) #,
+                # disable = list(
+                #   columns = c(0)
+                # )
               ),
               rownames = FALSE, 
               colnames = c("Cluster", "Target sample size", "% drop-out"),
@@ -163,10 +163,35 @@ function(input, output, session) {
 
     # iterate over each cell edit event, make sure the values are numeric
     for (i in seq_along(input$editable_clusttab_cell_edit$row)) {
+      
+      print("original col index:")
+      print(input$editable_deltab_cell_edit$col[i])
+      
       row <- input$editable_clusttab_cell_edit$row[i]
       col <- input$editable_clusttab_cell_edit$col[i]+1
-      value <- as.numeric(input$editable_clusttab_cell_edit$value[i])
+      
+      print("col index + 1:")
+      print(col)
+      
+      value <- input$editable_clusttab_cell_edit$value[i]
 
+      # make sure edited value for sample_size (col index 2) and dropout (col index 3) is numeric
+      if (col==2 || col==3){
+        print("Value:")
+        print(value)
+        print(str(value))
+        
+        value <- as.numeric(value)
+      }
+      
+      else {
+        print("Value:")
+        print(value)
+        print(str(value))
+        
+        value <- value
+      }
+      
       # update the corresponding cell in the new data frame
       df[row, col] <- value
     }
