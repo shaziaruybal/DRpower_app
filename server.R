@@ -353,7 +353,7 @@ function(input, output, session) {
       geom_point(aes(x = " ", y = power),
                  size = 4,
                  shape = 21,
-                 fill = "skyblue3") +
+                 fill = "mediumpurple") +
       geom_hline(yintercept = 80, color = "darkgrey", linetype = "dashed") +
       geom_text(aes(x= " ", y = 82.5, label = "80% threshold"), color = "darkgrey") +
       scale_y_continuous(labels = scales::percent_format(1, scale = 1), limits = c(0, 100)) +
@@ -679,9 +679,9 @@ function(input, output, session) {
         geom_segment(aes(x = " ", xend = " ", y = CrI_lower, yend = CrI_upper),
                      color = "black", linewidth = 1) +
         geom_point(aes(x = " ", y = MAP),
-                   size = 3,
+                   size = 4,
                    shape = 21,
-                   fill = "skyblue3") +
+                   fill = "mediumpurple") +
         # use the user-entered prev_thresh to plot threshold line
         geom_hline(aes(yintercept = as.numeric(input$analysis_prevthresh)), # make sure we convert back to proportion here
                    color = "darkgrey",
@@ -779,7 +779,7 @@ function(input, output, session) {
       geom_point(aes(x = " ", y = MAP/100), 
                  size = 4, 
                  shape = 21,
-                 fill = "skyblue3") +
+                 fill = "mediumpurple") +
       scale_y_continuous(limits = c(0,1)) +
       labs(x = "",
            y = "Estimated ICC") +
