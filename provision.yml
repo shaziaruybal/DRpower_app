@@ -7,4 +7,7 @@ packages:
   - shinydashboard
   - shinyWidgets
   - shinyBS
-  - tidyverse 
+  - tidyverse
+package_sources:
+  github:
+  - mrc-ide/drpower
