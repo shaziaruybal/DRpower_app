@@ -521,7 +521,7 @@ function(input, output, session) {
                 )
               ),
               rownames = FALSE,
-              colnames = c("Number of clusters", "Number of deletions", "Sample size"), 
+              colnames = c("Cluster", "Number of deletions", "Sample size"), 
               selection = "none",
               # extensions = c("FixedHeader"),
               # extensions = c("FixedHeader", "FixedColumns"),
