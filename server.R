@@ -493,7 +493,7 @@ function(input, output, session) {
   # Make the editable data frame reactive and dependent on the deletion and sample sizes entered by the user
   df_deletions <- eventReactive(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
     
-    print("number of analysis clusters selected")
+    print("number of analysis clusters selected and initial df created")
     
     # create the data frame with fixed columns and rows based on user input
     data.frame(
@@ -505,7 +505,7 @@ function(input, output, session) {
   
   # When the user selects the number of clusters, we store the initial values in df_sizes_update() so we can keep track of any user edits to the table
   observeEvent(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
-    print("Number of final clusters selected")
+    print("Number of final clusters selected - saving initial df as reactiveVal")
     
     analysis_rv$df_analysis_update <- df_deletions()
   }) 
@@ -647,7 +647,7 @@ function(input, output, session) {
 
   output$est_prev_resulttext <- renderUI({
     # require estimate prevalence button click
-    req(prev_output(), input$analysis_prevthresh)
+    req(prev_output())
 
     # check if prev_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(prev_output()) && prev_output()$prob_above_threshold >= 0.95){
@@ -706,7 +706,7 @@ function(input, output, session) {
     icc_output <- eventReactive(input$est_icc, {
       
       # require the updated data frame to have been created to make sure there is a data frame to get values from
-      req(analysis_rv$df_analysis_update)
+      req(analysis_rv$df_analysis_update, prev_output())
       
       # create a progress notification pop-up telling the user that ICC is being estimated
       id <- showNotification(paste0("Estimating intra-cluster correlation..."), 
@@ -723,26 +723,28 @@ function(input, output, session) {
       
     })
     
-  # If user clicks 'estimate ICC' button before selecting clusters and entering sample sizes, an error message will pop-up
+  # If user clicks 'estimate ICC' button before selecting clusters and entering sample sizes in step 1, an error message will pop-up
   observeEvent(input$est_icc, {
     print("Estimate ICC button clicked")
-    
-    # display error message if the user has not entered the deletions and sample sizes, require the reactiveVal 'df_analysis_update' to have been created
-    if(is.null(analysis_rv$df_analysis_update)){
+
+    # To make sure the error message pops up as expected, don't show it if est_prev button has been clicked AND power_output() has been created, otherwise show error message 
+    if(input$est_prev && !is.null(prev_output())){
+      # debugging, remove later
+      print("After user clicks the estimate ICC button, this is the edited df and prev_output() (no pop-up error msg needed): ")
+      print(analysis_rv$df_analysis_update)
+      print(prev_output())
+      return(NULL)
+      
+    }
+    else{
       # TODO debugging
-      print("error should have popped up")
+      print("ICC error should have popped up")
       
       show_alert(
         title = "Error!",
         text = "You have not selected the number of clusters or entered the values for your study. Please go back to the previous section ('Estimate prevalence') and select the number of clusters from the drop-down menu and enter the values in the table.",
         type = "error"
       )
-    }
-    else{
-      # debugging, remove later
-      print("After user clicks the estimate ICC button, this is the edited df (no pop-up error msg needed): ")
-      print(analysis_rv$df_analysis_update)
-      return(NULL)
     }
     
   })
