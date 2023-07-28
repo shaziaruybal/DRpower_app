@@ -157,9 +157,9 @@ dashboardPage(#theme = "flatly",
                                        bsAlert("error_noclusters"), # this creates an error message if user clicks calculate without choosing number of clusters
                                        actionButton(
                                          inputId = "calc_sizes",
-                                         label = "Calculate final sample sizes",
+                                         label = "Calculate adjusted sample sizes",
                                          icon = icon("clipboard-check")),
-                                       helpText(em("If you update these values, make sure you remember to recalculate your final sample sizes and estimate power below"))
+                                       helpText(em("If you update these values, make sure you remember to recalculate your adjusted sample sizes and estimate power below"))
                                    ),
                                    uiOutput("final_sizes_results"),
                                  ),
@@ -167,7 +167,7 @@ dashboardPage(#theme = "flatly",
                                    box(
                                      width = 7,
                                      title = "2. Estimate power", 
-                                     p("Using the sample sizes above, you can estimate the power of your study by simulation."),
+                                     p("Using the target sample sizes above, you can estimate the power of your study by simulation."),
                                      selectInput("param_prev",
                                                  label = "Select the prevalence (%)",
                                                  choices = c(6, 7, 8, 9, 10), 
@@ -262,6 +262,7 @@ dashboardPage(#theme = "flatly",
                       actionButton(inputId = "est_prev", 
                                    label = "Estimate prevalence", 
                                    icon("clipboard-check")),
+                      helpText(em("If you update these values, make sure you remember to recalculate prevalence"))
                   )
                 ),
                 uiOutput("est_prev_results"),
@@ -279,7 +280,8 @@ dashboardPage(#theme = "flatly",
                          br(), br(),
                          actionButton(inputId = "est_icc",
                                       label = " Estimate ICC",
-                                      icon("clipboard-check"))
+                                      icon("clipboard-check")),
+                         helpText(em("If you update any of the values in Step 1, make sure you remember to recalculate ICC"))
                        )
                 ),
                 ),
