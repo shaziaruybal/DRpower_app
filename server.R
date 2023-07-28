@@ -515,10 +515,10 @@ function(input, output, session) {
     datatable(df_deletions(), 
               editable = list(
                 target = 'cell',
-                numeric = c(2,3),
-                disable = list(
-                  columns = c(0)
-                )
+                numeric = c(2,3) #,
+                # disable = list(
+                #   columns = c(0)
+                # )
               ),
               rownames = FALSE,
               colnames = c("Cluster", "Number of deletions", "Sample size"), 
@@ -544,10 +544,33 @@ function(input, output, session) {
     
     # iterate over each cell edit event
     for (i in seq_along(input$editable_deltab_cell_edit$row)) {
+      print("original col index:")
+      print(input$editable_deltab_cell_edit$col[i])
+      
       row <- input$editable_deltab_cell_edit$row[i]
       col <- input$editable_deltab_cell_edit$col[i]+1
-      # make sure edited value is numeric
-      value <- as.numeric(input$editable_deltab_cell_edit$value[i])
+      
+      print("col index + 1:")
+      print(col)
+      
+      value <- input$editable_deltab_cell_edit$value[i]
+      
+      # make sure edited value for n_del (col index 2) and sample_size (col index 3) is numeric
+      if (col==2 || col==3){
+        print("Value:")
+        print(value)
+        print(str(value))
+        
+        value <- as.numeric(value)
+      }
+
+      else {
+        print("Value:")
+        print(value)
+        print(str(value))
+     
+        value <- value
+      }
       
       # update the corresponding cell in the new data frame
       df[row, col] <- value
