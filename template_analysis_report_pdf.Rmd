@@ -103,9 +103,9 @@ We estimate that the intra-cluster correlation is `r round(as.numeric(icc_output
 ```{r fig.height=3, fig.width=3, echo=F}
 icc_output %>% 
   ggplot() +
-        geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100), 
+        geom_segment(aes(x = " ", xend = " ", y = CrI_lower, yend = CrI_upper), 
                      color = "gray20", linewidth = 1) +
-        geom_point(aes(x = " ", y = MAP/100), 
+        geom_point(aes(x = " ", y = MAP), 
                    size = 2, 
                    shape = 21,
                    fill = "mediumpurple") +

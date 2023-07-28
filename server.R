@@ -755,6 +755,7 @@ function(input, output, session) {
     req(input$est_icc, icc_output())
     
     print("est_icc results should print")
+    print(icc_output())
     
     box(width = 12, 
         background = "purple",
@@ -771,12 +772,11 @@ function(input, output, session) {
     )
   })
   
-  # NOTE need to divide by 100 to convert to proportion
   output$est_icc_plot <- renderPlot({
     ggplot(icc_output()) +
-      geom_segment(aes(x = " ", xend = " ", y = CrI_lower/100, yend = CrI_upper/100), 
+      geom_segment(aes(x = " ", xend = " ", y = CrI_lower, yend = CrI_upper), 
                    color = "black", linewidth = 1) +
-      geom_point(aes(x = " ", y = MAP/100), 
+      geom_point(aes(x = " ", y = MAP), 
                  size = 4, 
                  shape = 21,
                  fill = "mediumpurple") +
