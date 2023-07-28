@@ -303,26 +303,25 @@ function(input, output, session) {
   # If user clicks 'estimate power' button before entering sample sizes, an error message will pop-up
   observeEvent(input$est_pow, {
       print("Estimate power button has been clicked")
-      
-      # error message pops up if the user has not entered the sample sizes (check that calculate sizes button has been clicked)
-      if(input$calc_sizes || is.null(df_sizes_final())){
-        # TODO debugging
-        print("calculate sizes is NULL")
-        print("error should have popped up")
-        show_alert(
-          title = "Error!",
-          text = "You have not entered the sample sizes correctly. Please go back to Step 1 and choose the number of clusters and enter the values in the table, and then click the 'Calculate final sample sizes' button.",
-          type = "error"
-        )
-      }
-      else{
-        print("button has been clicked and df_sizes_final has been calculated (so no pop-up error needed):")
-        print(df_sizes_final())
-        return(NULL)
-      }
+    
+    # To make sure the error message pops up as expected, don't show it if calc_sizes button has been clicked AND df_sizes_final() has been created, otherwise show error message 
+    if(input$calc_sizes && !is.null(df_sizes_final())){
+      print("button has been clicked and df_sizes_final() has been calculated (so no pop-up error needed):")
+      print(df_sizes_final())
+      return(NULL)
+    }
+    else{
+      # TODO debugging
+      print("calculate sizes is NULL")
+      print("error should have popped up")
+      show_alert(
+        title = "Error!",
+        text = "You have not entered the sample sizes correctly. Please go back to Step 1 and choose the number of clusters and enter the values in the table, and then click the 'Calculate final sample sizes' button.",
+        type = "error"
+      )
+    }
     })
     
-  
   # The results box, text and plots are displayed once the estimate power button is clicked 
   output$est_power_results <- renderUI({
     
