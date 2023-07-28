@@ -1,0 +1,10 @@
+packages:
+  - DRpower # repo link: https://github.com/mrc-ide/drpower
+  - DT
+  - kableExtra
+  - shiny
+  - shiny.blueprint
+  - shinydashboard
+  - shinyWidgets
+  - shinyBS
+  - tidyverse 
