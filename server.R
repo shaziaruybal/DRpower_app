@@ -335,7 +335,7 @@ function(input, output, session) {
         br(),
         renderTable(power_output() %>%
                       rename("Power" = power, "Lower 95%CI" = lower, "Upper 95%CI" = upper),
-                    digits = 1,
+                    digits = 2,
                     colnames = T,
                     align = "c"),
         br(),
@@ -421,7 +421,7 @@ function(input, output, session) {
           p("Number of simulations: ", input$param_n_sims),
           br(), br(),
           h4("Power estimates:"),
-          renderTable(power_output())
+          renderTable(power_output(), digits = 2)
       )
     }
   })
@@ -636,7 +636,7 @@ function(input, output, session) {
         br(),
         renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100) %>% 
                       rename("MAP prevalence estimate (%)" = MAP, "Lower CrI (%)" = CrI_lower, "Upper CrI (%)" = CrI_upper, "Probability above threshold (%)" = prob_above_threshold), 
-                    digits = 1,
+                    digits = 2,
                     colnames = T,
                     align = "c"),
         br(),
@@ -764,7 +764,7 @@ function(input, output, session) {
         br(),
         renderTable(icc_output() %>% 
                       rename("MAP estimate of ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper), 
-                    digits = 1,
+                    digits = 2,
                     colnames = T, 
                     align = "c"),
         br(),
@@ -842,10 +842,10 @@ function(input, output, session) {
           p("Prevalence threshold: ", ceiling(as.numeric(input$analysis_prevthresh)), "%"), 
           br(), br(),
           h4("Prevalence estimates:"),
-          renderTable(prev_output()),
+          renderTable(prev_output(), digits = 2),
           br(), br(),
           h4("ICC estimates:"),
-          renderTable(icc_output())
+          renderTable(icc_output(), digits = 2)
       )
     }
   })

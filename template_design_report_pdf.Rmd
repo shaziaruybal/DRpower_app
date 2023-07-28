@@ -60,7 +60,8 @@ The adjusted sample sizes based on the expected drop-out proportion in each of t
 ```{r echo=F}
 kable(df_final_sizes, 
       format = "latex",
-      booktabs = T) %>%
+      booktabs = T,
+      digits = 2) %>%
   kable_styling(
     bootstrap_options = "striped",
     position = "left",

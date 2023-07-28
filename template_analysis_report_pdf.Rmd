@@ -69,7 +69,7 @@ kable(study_data,
 
 To estimate the prevalence of *pfhrp2/3* deletions in this study we used the [DRpower R package](https://mrc-ide.github.io/DRpower) to test whether the observed prevalence in this study was above or below a prevalence threshold of `r params$analysis_prevthresh`%. 
 
-We estimate that the prevalence of *pfhrp2/3* deletions is `r round(as.numeric(prev_output$MAP),1)`% (95% CrI: `r round(as.numeric(prev_output$CrI_lower),1)`-`r round(as.numeric(prev_output$CrI_upper),1)`%).
+We estimate that the prevalence of *pfhrp2/3* deletions is `r round(as.numeric(prev_output$MAP),2)`% (95% CrI: `r round(as.numeric(prev_output$CrI_lower),2)`-`r round(as.numeric(prev_output$CrI_upper),2)`%).
 
 ```{r fig.height=3, fig.width=3, echo=F}
 prev_output %>% 
