@@ -652,16 +652,16 @@ function(input, output, session) {
 
     # check if prev_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(prev_output()) && prev_output()$prob_above_threshold >= 0.95){
-      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", ceiling(as.numeric(prev_output()$MAP)), "% (95% CrI: ", ceiling(as.numeric(prev_output()$CrI_lower)), "- ", ceiling(as.numeric(prev_output()$CrI_upper)), "%).")
-      line2 <- paste("We reject the hypothesis that the ", em("pfhrp2/3"), "deletion prevalence is below the ", ceiling(as.numeric(input$analysis_prevthresh)), "% threshold. We conclude that prevalence is above the threshold.")
+      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%).")
+      line2 <- paste("We conclude that the ", em("pfhrp2/3"), "deletion prevalence is above the ", round(as.numeric(input$analysis_prevthresh), 2), "% threshold (", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "% probability).")
 
       HTML(paste(line1, line2, sep = "<br/><br/>"))
 
     }
 
     else if(!is.null(prev_output()) && prev_output()$prob_above_threshold < 0.95){
-      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", ceiling(as.numeric(prev_output()$MAP)), "% (95% CrI: ", ceiling(as.numeric(prev_output()$CrI_lower)), "- ", ceiling(as.numeric(prev_output()$CrI_upper)), "%).")
-      line2 <- paste("We accept the hypothesis that the ", em("pfhrp2/3"), "deletion prevalence is below the ", ceiling(as.numeric(input$analysis_prevthresh)), "% threshold. We conclude that prevalence is below the threshold.")
+      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%).")
+      line2 <- paste("We conclude that the ", em("pfhrp2/3"), "deletion prevalence is below the ", round(as.numeric(input$analysis_prevthresh), 2), "% threshold (", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "% probability).")
 
       HTML(paste(line1, line2, sep = "<br/><br/>"))
     }
@@ -842,7 +842,8 @@ function(input, output, session) {
           p("Prevalence threshold: ", ceiling(as.numeric(input$analysis_prevthresh)), "%"), 
           br(), br(),
           h4("Prevalence estimates:"),
-          renderTable(prev_output(), digits = 2),
+          renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100), 
+                      digits = 2),
           br(), br(),
           h4("ICC estimates:"),
           renderTable(icc_output(), digits = 2)

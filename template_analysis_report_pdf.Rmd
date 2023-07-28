@@ -71,6 +71,8 @@ To estimate the prevalence of *pfhrp2/3* deletions in this study we used the [DR
 
 We estimate that the prevalence of *pfhrp2/3* deletions is `r round(as.numeric(prev_output$MAP),2)`% (95% CrI: `r round(as.numeric(prev_output$CrI_lower),2)`-`r round(as.numeric(prev_output$CrI_upper),2)`%).
 
+<!-- Add here the rendering of the conclusion text if prob is > or < 95% -->
+
 ```{r fig.height=3, fig.width=3, echo=F}
 prev_output %>% 
   ggplot() +
