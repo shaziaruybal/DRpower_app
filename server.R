@@ -470,8 +470,8 @@ function(input, output, session) {
   # The downloadHandler() for the design report will be triggered if the downloadButton() is clicked 
   output$design_report <- downloadHandler(
     
-      filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".pdf"),
-      # filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".html"),
+      # filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".pdf"),
+      filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".html"),
       content = function(file) {
         # create a progress notification pop-up telling the user that the report is rendering
         id <- showNotification(paste0("Preparing report..."), 
@@ -481,8 +481,8 @@ function(input, output, session) {
         # remove notification when calculation finishes
         on.exit(removeNotification(id), add = TRUE)
         
-        tempReport <- file.path(tempdir(), "template_design_report_pdf.Rmd")
-        file.copy("template_design_report_pdf.Rmd", tempReport, overwrite = TRUE)
+        tempReport <- file.path(tempdir(), "template_design_report.Rmd")
+        file.copy("template_design_report.Rmd", tempReport, overwrite = TRUE)
         
         params <- list(
           design_ss_icc = input$ss_icc,
@@ -917,7 +917,8 @@ function(input, output, session) {
   
   # The downloadHandler() for the design report will be triggered if the downloadButton() is clicked 
   output$analysis_report <- downloadHandler(
-    filename = paste0("PfHRP2_Planner_Analysis_Report_", Sys.Date(), ".pdf"),
+    # filename = paste0("PfHRP2_Planner_Analysis_Report_", Sys.Date(), ".pdf"),
+    filename = paste0("PfHRP2_Planner_Analysis_Report_", Sys.Date(), ".html"),
     content = function(file) {
       # create a progress notification pop-up telling the user that the report is rendering
       id <- showNotification(paste0("Preparing report..."), 
@@ -927,8 +928,8 @@ function(input, output, session) {
       # remove notification when calculation finishes
       on.exit(removeNotification(id), add = TRUE)
       
-      tempReport <- file.path(tempdir(), "template_analysis_report_pdf.Rmd")
-      file.copy("template_analysis_report_pdf.Rmd", tempReport, overwrite = TRUE)
+      tempReport <- file.path(tempdir(), "template_analysis_report.Rmd")
+      file.copy("template_analysis_report.Rmd", tempReport, overwrite = TRUE)
       
       params <- list(analysis_prevthresh = input$analysis_prevthresh,
                      analysis_nclusters = input$analysis_nclust,
