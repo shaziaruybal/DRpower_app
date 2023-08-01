@@ -221,7 +221,7 @@ function(input, output, session) {
     df <- design_rv$df_sizes_update
     
     # check that sample size values are numeric and that no value is NA (and if so show pop-up error message)
-    if(is.numeric(df$target_sample_size) && !any(is.na(df$target_sample_size))){
+    if(!any(is.na(df$cluster)) && is.numeric(df$percent_dropout) && !any(is.na(df$percent_dropout)) && is.numeric(df$target_sample_size) && !any(is.na(df$target_sample_size))){
       
       # calculate adjusted sample size
       df <- df %>% mutate(adj_sample_size = ceiling(target_sample_size/(1-(percent_dropout/100))))
