@@ -777,7 +777,7 @@ function(input, output, session) {
     print("Estimate ICC button clicked")
 
     # To make sure the error message pops up as expected, don't show it if est_prev button has been clicked AND power_output() has been created, otherwise show error message 
-    if(input$est_prev && !is.null(prev_output())){
+    if(input$est_prev && !is.null(analysis_rv$df_analysis_update) && !is.null(prev_output())){
       # debugging, remove later
       print("After user clicks the estimate ICC button, this is the edited df and prev_output() (no pop-up error msg needed): ")
       print(analysis_rv$df_analysis_update)
