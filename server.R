@@ -318,11 +318,20 @@ function(input, output, session) {
     
     # remove notification when calculation finishes
     on.exit(removeNotification(id), add = TRUE)
-      
-    DRpower::get_power_threshold(N = df_sizes_final()$target_sample_size, 
-                                 prevalence = as.numeric(input$param_prev)/100, # make sure to convert to proportion for appropriate calculation
-                                 ICC = as.numeric(input$param_icc),
-                                 reps = as.numeric(input$param_n_sims))
+    
+    # this tryCatch will make sure an error message pops up if there is an error in the power calculation (eg the user enters negative values)  
+    tryCatch({
+      DRpower::get_power_threshold(N = df_sizes_final()$target_sample_size, 
+                                   prevalence = as.numeric(input$param_prev)/100, # make sure to convert to proportion for appropriate calculation
+                                   ICC = as.numeric(input$param_icc),
+                                   reps = as.numeric(input$param_n_sims))
+    }, error = function(err){
+      show_alert(
+        title = "Error!",
+        text = "Power cannot be estimated because there is an error in the values you entered. Please make sure you have entered only positive integers.",
+        type = "error"
+      )
+    })
   })
   
   # If user clicks 'estimate power' button before entering sample sizes, an error message will pop-up
@@ -632,9 +641,18 @@ function(input, output, session) {
       print(str(df))
       print(df)
 
+      # this tryCatch will make sure an error message pops up if there is an error in the power calculation (eg the user enters negative values, or number of deletions is larger than sample size)  
+      tryCatch({
       DRpower::get_prevalence(n = df$n_deletions,
                               N = df$sample_size,
                               prev_thresh = as.numeric(input$analysis_prevthresh)/100) # make sure we convert input prev_thresh to proportion for calculation
+      }, error = function(err){
+        show_alert(
+          title = "Error!",
+          text = "Prevalence cannot be estimated because there is an error in the values you entered. Please make sure you have entered only positive integers. The number of deletions should always be less than or equal to the total sample size.",
+          type = "error"
+        )
+      })
     }
     else {
       print(str(df))
