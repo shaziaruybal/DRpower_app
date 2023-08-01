@@ -221,7 +221,7 @@ function(input, output, session) {
     df <- design_rv$df_sizes_update
     
     # check that sample size values are numeric and that no value is NA (and if so show pop-up error message)
-    if(is.numeric(df$target_sample_size) && !any(is.na(df$target_sample_size))){
+    if(!any(is.na(df$cluster)) && is.numeric(df$percent_dropout) && !any(is.na(df$percent_dropout)) && is.numeric(df$target_sample_size) && !any(is.na(df$target_sample_size))){
       
       # calculate adjusted sample size
       df <- df %>% mutate(adj_sample_size = ceiling(target_sample_size/(1-(percent_dropout/100))))
@@ -470,8 +470,8 @@ function(input, output, session) {
   # The downloadHandler() for the design report will be triggered if the downloadButton() is clicked 
   output$design_report <- downloadHandler(
     
-      filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".pdf"),
-      # filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".html"),
+      # filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".pdf"),
+      filename = paste0("PfHRP2_Planner_Design_Report_", Sys.Date(), ".html"),
       content = function(file) {
         # create a progress notification pop-up telling the user that the report is rendering
         id <- showNotification(paste0("Preparing report..."), 
@@ -481,8 +481,8 @@ function(input, output, session) {
         # remove notification when calculation finishes
         on.exit(removeNotification(id), add = TRUE)
         
-        tempReport <- file.path(tempdir(), "template_design_report_pdf.Rmd")
-        file.copy("template_design_report_pdf.Rmd", tempReport, overwrite = TRUE)
+        tempReport <- file.path(tempdir(), "template_design_report.Rmd")
+        file.copy("template_design_report.Rmd", tempReport, overwrite = TRUE)
         
         params <- list(
           design_ss_icc = input$ss_icc,
@@ -777,7 +777,7 @@ function(input, output, session) {
     print("Estimate ICC button clicked")
 
     # To make sure the error message pops up as expected, don't show it if est_prev button has been clicked AND power_output() has been created, otherwise show error message 
-    if(input$est_prev && !is.null(prev_output())){
+    if(input$est_prev && !is.null(analysis_rv$df_analysis_update) && !is.null(prev_output())){
       # debugging, remove later
       print("After user clicks the estimate ICC button, this is the edited df and prev_output() (no pop-up error msg needed): ")
       print(analysis_rv$df_analysis_update)
@@ -917,7 +917,8 @@ function(input, output, session) {
   
   # The downloadHandler() for the design report will be triggered if the downloadButton() is clicked 
   output$analysis_report <- downloadHandler(
-    filename = paste0("PfHRP2_Planner_Analysis_Report_", Sys.Date(), ".pdf"),
+    # filename = paste0("PfHRP2_Planner_Analysis_Report_", Sys.Date(), ".pdf"),
+    filename = paste0("PfHRP2_Planner_Analysis_Report_", Sys.Date(), ".html"),
     content = function(file) {
       # create a progress notification pop-up telling the user that the report is rendering
       id <- showNotification(paste0("Preparing report..."), 
@@ -927,8 +928,8 @@ function(input, output, session) {
       # remove notification when calculation finishes
       on.exit(removeNotification(id), add = TRUE)
       
-      tempReport <- file.path(tempdir(), "template_analysis_report_pdf.Rmd")
-      file.copy("template_analysis_report_pdf.Rmd", tempReport, overwrite = TRUE)
+      tempReport <- file.path(tempdir(), "template_analysis_report.Rmd")
+      file.copy("template_analysis_report.Rmd", tempReport, overwrite = TRUE)
       
       params <- list(analysis_prevthresh = input$analysis_prevthresh,
                      analysis_nclusters = input$analysis_nclust,
