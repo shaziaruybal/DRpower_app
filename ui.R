@@ -52,11 +52,38 @@ dashboardPage(#theme = "flatly",
       tabItem(tabName = "test_tab",
               h2("This is a test to see if we can hyperlink to the FAQ tab!"),
               br(), br(),
+              Callout(
+                title = "Checking hyperlinks in a callout",
+                html = TRUE,
+                br(),
+                div(
+                  tags$a("Go to FAQ page", href = "#", onclick = "goToTab('faq')")
+                ),
+                div(
+                  tags$a("Go to Design page", href = "#", onclick = "goToTab('design')")
+                ),
+                div(
+                  tags$a("Go to Analysis page", href = "#", onclick = "goToTab('analysis')")
+                ),
+                div(
+                  tags$a("Go back to Home", href = "#", onclick = "goToTab('about')")
+                )
+              ),
               box("This is a test box to see if the link works here",
                   div(
                     tags$a("Go to FAQ page", href = "#", onclick = "goToTab('faq')")
+                  ),
+                  div(
+                    tags$a("Go to Design page", href = "#", onclick = "goToTab('design')")
+                  ),
+                  div(
+                    tags$a("Go to Analysis page", href = "#", onclick = "goToTab('analysis')")
+                  ),
+                  div(
+                    tags$a("Go back to About", href = "#", onclick = "goToTab('about')")
                   )
               ),
+              
               # fluidRow(
               #   shinydashboard::box(width = 12,
               #       background = "purple",
