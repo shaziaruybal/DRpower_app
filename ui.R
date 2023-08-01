@@ -16,8 +16,8 @@ dashboardPage(#theme = "flatly",
   dashboardSidebar(width = 150,
                    # size = "thin",
                    sidebarMenu(
-                    # menuItem(tabName = "test_tab",
-                    #          text = "TESTING"),
+                    menuItem(tabName = "test_tab",
+                             text = "TESTING"),
                     menuItem(tabName = "about", 
                              text = " About",
                              icon = icon("home")
@@ -37,17 +37,27 @@ dashboardPage(#theme = "flatly",
                    )
   ),
   dashboardBody(
-   
+    tags$script("
+      $(document).ready(function() {
+        $('#faqLink').on('click', function() {
+          $('a[data-value=\"faq\"]').click();
+        });
+      });
+    "),
     tabItems(
       # ----------------------------------
       # TESTING
-      # tabItem(tabName = "test_tab",
-      #         fluidRow(
-      #           shinydashboard::box(width = 12,
-      #               background = "purple",
-      #               tableOutput("test_table"))
-      #         ),
-      # ),
+      tabItem(tabName = "test_tab",
+              h2("This is a test to see if we can hyperlink to the FAQ tab!"),
+              div(
+                tags$a("Go to FAQ page", href = "#", id = "faqLink")
+              ),
+              # fluidRow(
+              #   shinydashboard::box(width = 12,
+              #       background = "purple",
+              #       tableOutput("test_table"))
+              # ),
+      ),
       # ----------------------------------
       # Tab 1 - About
       tabItem(
@@ -69,7 +79,7 @@ dashboardPage(#theme = "flatly",
                    br(), br(),
                    "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose target sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",
                    # TODO faq hyperlink not working
-                   a("FAQs).", href='#faq/'),
+                   tags$a("FAQs).", href='#faq'),
                    br(), br(), 
                    "For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the ",
                    a("DRpower R package ", href='https://mrc-ide.github.io/DRpower/'),
@@ -308,7 +318,7 @@ dashboardPage(#theme = "flatly",
       tabItem(
         tabName = "faq",
         fluidRow(
-          column(width = 12, style='padding:20px;',
+          column(width = 12, style='padding:20px;', 
                  Callout(
                    title = "Frequently Asked Questions",
                    br(),
