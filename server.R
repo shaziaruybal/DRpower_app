@@ -23,21 +23,6 @@ function(input, output, session) {
   #   head(df_ss)
   # })
   
-  runjs("
-    function navigateToFaq() {
-      // Get the FAQ tab and click it
-      var faqTab = $('a[data-value=\"faq\"]');
-      faqTab.click();
-
-      // Prevent the default link behavior
-      return false;
-    }
-  ")
-  
-  ##################################################
-  # UI HYPERLINKS
-  ##################################################
-  
   ##################################################
   # DESIGN
   ##################################################

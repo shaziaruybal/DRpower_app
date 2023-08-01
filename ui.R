@@ -37,20 +37,25 @@ dashboardPage(#theme = "flatly",
                    )
   ),
   dashboardBody(
-    tags$script("
-      $(document).ready(function() {
-        $('#faqLink').on('click', function() {
-          $('a[data-value=\"faq\"]').click();
-        });
-      });
-    "),
+    # The JavaScript code below runs the function that triggers a click "event" switching to the FAQ tab when the link is clicked
+    tags$script('
+      function goToTab(tabName) {
+        var tab = document.querySelector("a[data-value=" + tabName + "]");
+        if (tab) {
+          tab.click();
+        }
+      }
+    '),
     tabItems(
       # ----------------------------------
       # TESTING
       tabItem(tabName = "test_tab",
               h2("This is a test to see if we can hyperlink to the FAQ tab!"),
-              div(
-                tags$a("Go to FAQ page", href = "#", id = "faqLink")
+              br(), br(),
+              box("This is a test box to see if the link works here",
+                  div(
+                    tags$a("Go to FAQ page", href = "#", onclick = "goToTab('faq')")
+                  )
               ),
               # fluidRow(
               #   shinydashboard::box(width = 12,
