@@ -53,7 +53,7 @@ dashboardPage(#theme = "flatly",
               h2("This is a test to see if we can hyperlink to the FAQ tab!"),
               br(), br(),
               Callout(
-                title = "Checking hyperlinks in a callout",
+                title = "This is a test shiny.blueprint::callout box to check JS hyperlinks work (not working)",
                 html = TRUE,
                 br(),
                 div(
@@ -69,7 +69,8 @@ dashboardPage(#theme = "flatly",
                   tags$a("Go back to Home", href = "#", onclick = "goToTab('about')")
                 )
               ),
-              box("This is a test box to see if the link works here",
+              br(),
+              box("This is a test shinydashboard::box to see if the JS hyperlinks work (working)",
                   div(
                     tags$a("Go to FAQ page", href = "#", onclick = "goToTab('faq')")
                   ),
