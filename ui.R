@@ -148,7 +148,7 @@ dashboardPage(#theme = "flatly",
                                      title = "Sample sizes required to achieve a target power of 80%", 
                                      "Minimum sample size depends on many factors including the degree of intra-cluster correlation, the prevalence threshold that we are testing against, and the true prevalence in the province. For help choosing these values, see ",
                                      # TODO FAQ hyperlink not working?
-                                     a("here. ", href= '#faq/'),
+                                     a("here. ", href= '#', onclick = "goToTab('faq')"), 
                                      br(),
                                      br(),
                                      selectInput(
@@ -219,7 +219,7 @@ dashboardPage(#theme = "flatly",
                                      ),
                                      helpText(em("This is the assumed true prevalence of pfhrp2/3 deletions in the province. A value of 10% is used by default (see "),
                                               # TODO faq hyperlink
-                                              em(a("here", href = "#faq/")), 
+                                              em(a("here", href = "#", onclick = "goToTab('faq')")), 
                                               em("for help choosing this value).")),
                                      br(),
                                      selectInput("param_icc", 
