@@ -203,12 +203,11 @@ dashboardPage(#theme = "flatly",
                         ),
                         tabPanel("Final cluster sizes",
                                  br(),
-                                 Callout(
-                                   title = "Step 2. Refine your cluster sizes",
-                                   # br(),
-                                   "Sample size tables assume you will collect the same number of samples in every cluster, but this may not be possible in practice. Here, you can enter your final target sample size in each cluster and then estimate power directly.",
-                                   br(), br(),
-                                   "When choosing sample sizes, remember this is the number of ", em("confirmed malaria positive "), "individuals. Check with local teams to see how many cases can realistically be recruited within the study period based on local incidence trends. You can also use this table to account for drop-out, which can occur for many reasons from participants withdrawing consent to failure of lab samples. Local staff and technicians may be able to advise on sensible values for assumed drop-out."
+                                 div(class = "custom-callout",
+                                     p(class = "callout-title", "Step 2. Refine your cluster sizes"),
+                                     "Sample size tables assume you will collect the same number of samples in every cluster, but this may not be possible in practice. Here, you can enter your final target sample size in each cluster and then estimate power directly.",
+                                     br(), br(),
+                                     "When choosing sample sizes, remember this is the number of ", em("confirmed malaria positive "), "individuals. Check with local teams to see how many cases can realistically be recruited within the study period based on local incidence trends. You can also use this table to account for drop-out, which can occur for many reasons from participants withdrawing consent to failure of lab samples. Local staff and technicians may be able to advise on sensible values for assumed drop-out."
                                  ),
                                  br(),
                                  fluidRow(
