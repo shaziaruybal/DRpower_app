@@ -150,7 +150,7 @@ dashboardPage(#theme = "flatly",
                      br(), br(),
                      "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the World Health Organisation (WHO).",
                      br(), br(), br(),
-                     em("Most recent update X August 2023.")
+                     em("Most recent update 18 August 2023.")
                  ),
           )
         )
