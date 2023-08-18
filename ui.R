@@ -59,6 +59,12 @@ dashboardPage(#theme = "flatly",
           padding: 10px;
           margin-bottom: 10px;
         }
+        .callout-title{
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 10px;
+        }
+        
         .inline-link {
           display: inline;
           margin-right: 0px; /* Add spacing between inline links */
