@@ -80,23 +80,25 @@ dashboardPage(#theme = "flatly",
       tabItem(tabName = "test_tab",
               h2("This is a test to see if we can hyperlink to the FAQ tab!"),
               br(), br(),
-              Callout(
-                title = "This is a test shiny.blueprint::callout box to check JS hyperlinks work (not working)",
-                html = TRUE,
-                br(),
-                div(
-                  tags$a("Go to FAQ page", href = "#", onclick = "goToTab('faq')")
-                ),
-                div(
-                  tags$a("Go to Design page", href = "#", onclick = "goToTab('design')")
-                ),
-                div(
-                  tags$a("Go to Analysis page", href = "#", onclick = "goToTab('analysis')")
-                ),
-                div(
-                  tags$a("Go back to Home", href = "#", onclick = "goToTab('about')")
-                )
+              # Custom Shiny Dashboard box with callout styling
+              div(class = "custom-callout", 
+                  "This tool is designed to help researchers conducting ", em("Plasmodium pfhrp2/3"), " gene deletion studies. It can be used in two ways:",
+                  br(), br(),
+                  "1.	In the ", shinyLink(to = "design", label = "design phase"), "(before data have been collected) to help guide the appropriate number of clusters and a sample size per cluster.",
+                  br(),
+                  "2.	In the ", shinyLink(to = "analysis", label = "analysis phase"), "(once data are available) to estimate prevalence of deletions and determine if they are above a set threshold.",
+                  br(), br(),
+                  "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose target sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",shinyLink(to = "faq", label = "FAQs)"),
+                  br(), br(), 
+                  "For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the ",
+                  a("DRpower R package ", href='https://mrc-ide.github.io/DRpower/'),
+                  "that underpins this app.",
+                  br(), br(),
+                  "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the World Health Organisation (WHO).",
+                  br(), br(), br(),
+                  em("Most recent update X August 2023.")
               ),
+              br(),
               br(),
               box("This is a test shinydashboard::box to see if the JS hyperlinks work (working)",
                   div(
