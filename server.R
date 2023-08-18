@@ -826,7 +826,7 @@ function(input, output, session) {
     box(width = 12, 
         background = "purple",
         title = "ICC estimates",
-        p("The table and the plot below show the maximum a posteriori (MAP) estimate of the ICC, along with a 95% credible interval (CrI). For context, an ICC of 0.05 is used by default in the Design tab based on an ", a("analysis of historical studies.", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html")),
+        p("The table and the plot below show the maximum a posteriori (MAP) estimate of the ICC, along with a 95% credible interval (CrI). For context, an ICC of 0.05 is used by default in the Design tab based on an ", a("analysis of historical studies.", target = "_blank", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html")),
         br(),
         renderTable(icc_output() %>% 
                       rename("MAP estimate of ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper), 
