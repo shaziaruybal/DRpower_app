@@ -56,7 +56,7 @@ dashboardPage(#theme = "flatly",
         .custom-callout {
           border: 1px solid #f0f0f0;
           background-color: rgb(218, 224, 231);
-          padding: 10px;
+          padding: 15px;
           margin-bottom: 10px;
         }
         .callout-title{
