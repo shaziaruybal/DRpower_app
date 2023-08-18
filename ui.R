@@ -8,16 +8,25 @@ library(shiny.blueprint)
 library(shinydashboard)
 library(shinyWidgets)
 library(shinyBS)
+library(shinyjs)
 
-dashboardPage(#theme = "flatly",
+shinyLink <- function(to, label) {
+  tags$a(
+    class = "shiny__link",
+    href = to,
+    label
+  )
+}
+
+dashboardPage(
   skin = "purple",
   # dashboardHeader(title = HTML(paste(em("pfhrp2/3"), " Planner"))),
   dashboardHeader(title = "pfhrp2/3 Planner"),
   dashboardSidebar(width = 150,
                    # size = "thin",
                    sidebarMenu(
-                    # menuItem(tabName = "test_tab",
-                    #          text = "TESTING"),
+                    menuItem(tabName = "test_tab",
+                             text = "TESTING"),
                     menuItem(tabName = "about", 
                              text = " About",
                              icon = icon("home")
