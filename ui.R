@@ -60,7 +60,7 @@ dashboardPage(#theme = "flatly",
           margin-bottom: 10px;
         }
         .callout-title{
-          font-size: 18px;
+          font-size: 17px;
           font-weight: 600;
           margin-bottom: 10px;
         }
