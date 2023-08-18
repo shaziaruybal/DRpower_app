@@ -296,9 +296,14 @@ function(input, output, session) {
                              columnDefs = list(list(className = "dt-center",
                                                     targets = "_all")),
                              # fixedColumns = list(leftColumns = c(1)),
+                             # Custom JS code to edit the header background and text color, see: https://stackoverflow.com/questions/63119369/background-color-in-datatable-rowname-header-top-left-area
+                             initComplete = JS(
+                               "function(settings, json) {",
+                               "$(this.api().table().header()).css({'background-color': '#f9f9f9', 'color': '#55529e'});",
+                               "}"),
                              scrollX = '400px'
                              )
-              )
+              ) %>% DT::formatStyle(columns = names(df_sizes_final()), backgroundColor = "#f9f9f9") 
   })
 
   # ----------------------------------
