@@ -339,18 +339,18 @@ dashboardPage(#theme = "flatly",
               tabPanel(
                 title= "Estimate ICC",
                 fluidRow(
-                column(width = 12, style='padding:20px;',
-                       Callout(
-                         title = "Step 2. Analysis of intra-cluster correlation (ICC)",
-                         html = TRUE,
-                         "Although the prevalence of ", em("pfhrp2/3"), " deletions is usually the main focus of our analysis, the intra-cluster correlation is an extremely valuable supplementary analysis. Reporting this value not only contextualises the prevalence estimates, but it also provides valuable information to assist with the design of future studies.",
-                         br(), br(),
-                         em("The raw data for this analysis are taken from the previous tab, and there are no additional parameters needed."),
-                         br(), br(),
-                         actionButton(inputId = "est_icc",
-                                      label = " Estimate ICC",
-                                      icon("clipboard-check")),
-                         helpText(em("If you update any of the values in Step 1, make sure you remember to recalculate ICC"))
+                column(width = 12, 
+                       style='padding:20px;',
+                       div(class = "custom-callout",
+                           p(class = "callout-title", "Step 2. Analysis of intra-cluster correlation (ICC)"),
+                           "Although the prevalence of ", em("pfhrp2/3"), " deletions is usually the main focus of our analysis, the intra-cluster correlation is an extremely valuable supplementary analysis. Reporting this value not only contextualises the prevalence estimates, but it also provides valuable information to assist with the design of future studies.",
+                           br(), br(),
+                           em("The raw data for this analysis are taken from the previous tab, and there are no additional parameters needed."),
+                           br(), br(),
+                           actionButton(inputId = "est_icc",
+                                        label = " Estimate ICC",
+                                        icon("clipboard-check")),
+                           helpText(em("If you update any of the values in Step 1, make sure you remember to recalculate ICC"))
                        )
                 ),
                 ),
