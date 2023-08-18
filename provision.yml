@@ -5,6 +5,7 @@ packages:
   - shiny
   - shiny.blueprint
   - shinydashboard
+  - shinyjs
   - shinyWidgets
   - shinyBS
   - tidyverse
