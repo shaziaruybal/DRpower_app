@@ -49,7 +49,23 @@ dashboardPage(#theme = "flatly",
                    )
   ),
   dashboardBody(
-    # The JavaScript code below runs the function that triggers a click "event" switching to the FAQ tab when the link is clicked
+    useShinyjs(),
+    # The CSS code below creates a custom callout box with the same styling as the shiny.blueprint::Callout box but without funcitonality JS/HTML issues
+    tags$style(
+      HTML("
+        .custom-callout {
+          border: 1px solid #f0f0f0;
+          background-color: rgb(218, 224, 231);
+          padding: 10px;
+          margin-bottom: 10px;
+        }
+        .inline-link {
+          display: inline;
+          margin-right: 0px; /* Add spacing between inline links */
+        }
+      ")
+    ),
+    # The JavaScript code below runs the function that triggers a click "event" switching to the resepctive tabName when the link is clicked
     tags$script('
       function goToTab(tabName) {
         var tab = document.querySelector("a[data-value=" + tabName + "]");
