@@ -165,13 +165,11 @@ dashboardPage(#theme = "flatly",
             tabsetPanel(type = "tabs",
                         tabPanel("Sample size tables",
                                  br(),
-                                 Callout(
-                                   title = "Step 1. Consult sample size tables",
-                                   html = TRUE,
-                                   # br(),
-                                   "The table below gives the number of confirmed malaria positive samples required ", em("per cluster "), "in order for study power to be 80% or higher. You can use these numbers as a general guide when scoping out a study plan, before moving to more tailored sample sizes in the next step.",
-                                   br(), br(),
-                                   "In general, it is recommended to focus efforts on recruiting more clusters, rather than obtaining large numbers of samples from just a few clusters. Not only will the overall study sample size be lower, but this will also make results more robust to variation within a province. "
+                                 div(class = "custom-callout",
+                                    p(class = "callout-title", "Step 1. Consult sample size tables"),
+                                    "The table below gives the number of confirmed malaria positive samples required ", em("per cluster "), "in order for study power to be 80% or higher. You can use these numbers as a general guide when scoping out a study plan, before moving to more tailored sample sizes in the next step.",
+                                    br(), br(),
+                                    "In general, it is recommended to focus efforts on recruiting more clusters, rather than obtaining large numbers of samples from just a few clusters. Not only will the overall study sample size be lower, but this will also make results more robust to variation within a province."
                                  ),
                                  br(),
                                  box(width = 12, 
