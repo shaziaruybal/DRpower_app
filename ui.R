@@ -46,17 +46,45 @@ dashboardPage(
                    )
   ),
   dashboardBody(
-   
+    useShinyjs(),
+    includeScript("www/shinyLink.js"),
     tabItems(
       # ----------------------------------
       # TESTING
-      # tabItem(tabName = "test_tab",
-      #         fluidRow(
-      #           shinydashboard::box(width = 12,
-      #               background = "purple",
-      #               tableOutput("test_table"))
-      #         ),
-      # ),
+      tabItem(tabName = "test_tab",
+              h2("This is a test to see if the shinyLink to the FAQ tab works!"),
+              br(), br(),
+              Callout(
+                title = "This is a test shiny.blueprint::callout box to check if shinyLink works (not working)",
+                html = TRUE,
+                shinyLink(to = "faq", label = "Go to FAQ page"), 
+                br(),
+                shinyLink(to = "design", label = "Go to Design page"), 
+                br(), 
+                shinyLink(to = "analysis", label = "Go to Analysis page"), 
+                br(), 
+                shinyLink(to = "about", label = "Go back to Home"), 
+                br(),
+              ),
+              br(),
+              box("This is a test shinydashboard::box to check if shinyLink works (working)",
+                  br(),
+                  shinyLink(to = "faq", label = "Go to FAQ page"), 
+                  br(),
+                  shinyLink(to = "design", label = "Go to Design page"), 
+                  br(), 
+                  shinyLink(to = "analysis", label = "Go to Analysis page"), 
+                  br(), 
+                  shinyLink(to = "about", label = "Go back to Home"), 
+                  br(),
+              ),
+              
+              # fluidRow(
+              #   shinydashboard::box(width = 12,
+              #       background = "purple",
+              #       tableOutput("test_table"))
+              # ),
+      ),
       # ----------------------------------
       # Tab 1 - About
       tabItem(
