@@ -8,6 +8,18 @@ library(shiny.blueprint)
 library(shinydashboard)
 library(shinyWidgets)
 library(shinyBS)
+library(shinyjs)
+
+# This is a custom function that calls upon the goToTab JS code to navigate to a tab by its 'tabname'
+shinyLink <- function(to, label) {
+  tags$a(
+    class = c("shiny__link", "inline-link"), 
+    href = "#",
+    onclick = sprintf("goToTab('%s'); return false;", to),
+    label
+  )
+}
+
 
 dashboardPage(#theme = "flatly",
   skin = "purple",
@@ -37,16 +49,83 @@ dashboardPage(#theme = "flatly",
                    )
   ),
   dashboardBody(
-   
+    useShinyjs(),
+    # The CSS code below creates a custom callout box with the same styling as the shiny.blueprint::Callout box but without funcitonality JS/HTML issues
+    tags$style(
+      HTML("
+        .custom-callout {
+          border: 1px solid #f0f0f0;
+          background-color: rgb(218, 224, 231);
+          padding: 15px;
+          margin-bottom: 10px;
+        }
+        .callout-title{
+          font-size: 17px;
+          font-weight: 600;
+          margin-bottom: 10px;
+        }
+        
+        .inline-link {
+          display: inline;
+          margin-right: 0px; /* Add spacing between inline links */
+        }
+      ")
+    ),
+    # The JavaScript code below runs the function that triggers a click "event" switching to the resepctive tabName when the link is clicked
+    tags$script('
+      function goToTab(tabName) {
+        var tab = document.querySelector("a[data-value=" + tabName + "]");
+        if (tab) {
+          tab.click();
+        }
+      }
+    '),
     tabItems(
       # ----------------------------------
       # TESTING
       # tabItem(tabName = "test_tab",
-      #         fluidRow(
-      #           shinydashboard::box(width = 12,
-      #               background = "purple",
-      #               tableOutput("test_table"))
+      #         h2("This is a test to see if we can hyperlink to the FAQ tab!"),
+      #         br(), br(),
+      #         # Custom Shiny Dashboard box with callout styling
+              # div(class = "custom-callout",
+              #     "This tool is designed to help researchers conducting ", em("Plasmodium pfhrp2/3"), " gene deletion studies. It can be used in two ways:",
+              #     br(), br(),
+              #     "1.	In the ", shinyLink(to = "design", label = "design phase"), "(before data have been collected) to help guide the appropriate number of clusters and a sample size per cluster.",
+              #     br(),
+              #     "2.	In the ", shinyLink(to = "analysis", label = "analysis phase"), "(once data are available) to estimate prevalence of deletions and determine if they are above a set threshold.",
+              #     br(), br(),
+              #     "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose target sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",shinyLink(to = "faq", label = "FAQs)"),
+              #     br(), br(),
+              #     "For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the ",
+              #     a("DRpower R package ", href='https://mrc-ide.github.io/DRpower/'),
+              #     "that underpins this app.",
+              #     br(), br(),
+              #     "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the World Health Organisation (WHO).",
+              #     br(), br(), br(),
+              #     em("Most recent update X August 2023.")
+              # ),
+      #         br(),
+      #         br(),
+      #         box("This is a test shinydashboard::box to see if the JS hyperlinks work (working)",
+      #             div(
+      #               tags$a("Go to FAQ page", href = "#", onclick = "goToTab('faq')")
+      #             ),
+      #             div(
+      #               tags$a("Go to Design page", href = "#", onclick = "goToTab('design')")
+      #             ),
+      #             div(
+      #               tags$a("Go to Analysis page", href = "#", onclick = "goToTab('analysis')")
+      #             ),
+      #             div(
+      #               tags$a("Go back to About", href = "#", onclick = "goToTab('about')")
+      #             )
       #         ),
+              
+              # fluidRow(
+              #   shinydashboard::box(width = 12,
+              #       background = "purple",
+              #       tableOutput("test_table"))
+              # ),
       # ),
       # ----------------------------------
       # Tab 1 - About
@@ -55,29 +134,23 @@ dashboardPage(#theme = "flatly",
         fluidRow(
           column(width = 12, 
                  style='padding:20px;',
-                 Callout(
-                   title = "How to use this tool",  
-                   # intent = "primary",
-                   # icon = "info-sign",
-                   html = TRUE,
-                   br(),
-                   "This tool is designed to help researchers conducting ", em("Plasmodium pfhrp2/3"), " gene deletion studies. It can be used in two ways:",
-                   br(), br(),
-                   "1.	In the design phase (before data have been collected) to help guide the appropriate number of clusters and a sample size per cluster.",
-                   br(),
-                   "2.	In the analysis phase (once data are available) to estimate prevalence of deletions and determine if they are above a set threshold.",
-                   br(), br(),
-                   "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose target sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",
-                   # TODO faq hyperlink not working
-                   a("FAQs).", href='#faq/'),
-                   br(), br(), 
-                   "For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the ",
-                   a("DRpower R package ", href='https://mrc-ide.github.io/DRpower/'),
-                   "that underpins this app.",
-                   br(), br(),
-                   "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the World Health Organisation (WHO).",
-                   br(), br(), br(),
-                   em("Most recent update X August 2023.")
+                 div(class = "custom-callout",
+                     p(class = "callout-title", "How to use this tool"),
+                     "This tool is designed to help researchers conducting ", em("Plasmodium pfhrp2/3"), " gene deletion studies. It can be used in two ways:",
+                     br(), br(),
+                     "1.	In the ", shinyLink(to = "design", label = "design phase"), "(before data have been collected) to help guide the appropriate number of clusters and a sample size per cluster.",
+                     br(),
+                     "2.	In the ", shinyLink(to = "analysis", label = "analysis phase"), "(once data are available) to estimate prevalence of deletions and determine if they are above a set threshold.",
+                     br(), br(),
+                     "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose target sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",shinyLink(to = "faq", label = "FAQs"), ").",
+                     br(), br(),
+                     "For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the ",
+                     a("DRpower R package ", target = "_blank", href='https://mrc-ide.github.io/DRpower/'),
+                     "that underpins this app.",
+                     br(), br(),
+                     "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the World Health Organisation (WHO).",
+                     br(), br(), br(),
+                     em("Most recent update 18 August 2023.")
                  ),
           )
         )
@@ -92,20 +165,17 @@ dashboardPage(#theme = "flatly",
             tabsetPanel(type = "tabs",
                         tabPanel("Sample size tables",
                                  br(),
-                                 Callout(
-                                   title = "Step 1. Consult sample size tables",
-                                   html = TRUE,
-                                   # br(),
-                                   "The table below gives the number of confirmed malaria positive samples required ", em("per cluster "), "in order for study power to be 80% or higher. You can use these numbers as a general guide when scoping out a study plan, before moving to more tailored sample sizes in the next step.",
-                                   br(), br(),
-                                   "In general, it is recommended to focus efforts on recruiting more clusters, rather than obtaining large numbers of samples from just a few clusters. Not only will the overall study sample size be lower, but this will also make results more robust to variation within a province. "
+                                 div(class = "custom-callout",
+                                    p(class = "callout-title", "Step 1. Consult sample size tables"),
+                                    "The table below gives the number of confirmed malaria positive samples required ", em("per cluster "), "in order for study power to be 80% or higher. You can use these numbers as a general guide when scoping out a study plan, before moving to more tailored sample sizes in the next step.",
+                                    br(), br(),
+                                    "In general, it is recommended to focus efforts on recruiting more clusters, rather than obtaining large numbers of samples from just a few clusters. Not only will the overall study sample size be lower, but this will also make results more robust to variation within a province."
                                  ),
                                  br(),
                                  box(width = 12, 
                                      title = "Sample sizes required to achieve a target power of 80%", 
                                      "Minimum sample size depends on many factors including the degree of intra-cluster correlation, the prevalence threshold that we are testing against, and the true prevalence in the province. For help choosing these values, see ",
-                                     # TODO FAQ hyperlink not working?
-                                     a("here. ", href= '#faq/'),
+                                     shinyLink(to = "faq", label = "here. "), 
                                      br(),
                                      br(),
                                      selectInput(
@@ -116,7 +186,7 @@ dashboardPage(#theme = "flatly",
                                        selected = 0.05,
                                      ),
                                      helpText(em("A high ICC value implies a high variation in the prevalence of deletions between clusters. A value of 0.05 is suggested by default based on an "),
-                                              em(a("analysis of historical studies.", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html"))),
+                                              em(a("analysis of historical studies.", target = "_blank", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html"))),
                                      br(), 
                                      selectInput(
                                        inputId = "ss_prev",
@@ -125,7 +195,7 @@ dashboardPage(#theme = "flatly",
                                        choices = c("", 5, 8, 10), 
                                        selected = 5,
                                      ),
-                                     helpText(em("The prevalence value that we are comparing against in our hypothesis test (5% by default).")),
+                                     helpText(em("The prevalence value that we are comparing against in our hypothesis test (5% by default, see ", em(shinyLink(to = "faq", label = "here")), ").")),
                                      br(),
                                      tagAppendAttributes(textOutput("text_ss"), style="white-space:pre-wrap;"),
                                      DTOutput("sample_size_table")
@@ -133,12 +203,11 @@ dashboardPage(#theme = "flatly",
                         ),
                         tabPanel("Final cluster sizes",
                                  br(),
-                                 Callout(
-                                   title = "Step 2. Refine your cluster sizes",
-                                   # br(),
-                                   "Sample size tables assume you will collect the same number of samples in every cluster, but this may not be possible in practice. Here, you can enter your final target sample size in each cluster and then estimate power directly.",
-                                   br(), br(),
-                                   "When choosing sample sizes, remember this is the number of ", em("confirmed malaria positive "), "individuals. Check with local teams to see how many cases can realistically be recruited within the study period based on local incidence trends. You can also use this table to account for drop-out, which can occur for many reasons from participants withdrawing consent to failure of lab samples. Local staff and technicians may be able to advise on sensible values for assumed drop-out."
+                                 div(class = "custom-callout",
+                                     p(class = "callout-title", "Step 2. Refine your cluster sizes"),
+                                     "Sample size tables assume you will collect the same number of samples in every cluster, but this may not be possible in practice. Here, you can enter your final target sample size in each cluster and then estimate power directly.",
+                                     br(), br(),
+                                     "When choosing sample sizes, remember this is the number of ", em("confirmed malaria positive "), "individuals. Check with local teams to see how many cases can realistically be recruited within the study period based on local incidence trends. You can also use this table to account for drop-out, which can occur for many reasons from participants withdrawing consent to failure of lab samples. Local staff and technicians may be able to advise on sensible values for assumed drop-out."
                                  ),
                                  br(),
                                  fluidRow(
@@ -175,8 +244,7 @@ dashboardPage(#theme = "flatly",
                                                  width = "40%",
                                      ),
                                      helpText(em("This is the assumed true prevalence of pfhrp2/3 deletions in the province. A value of 10% is used by default (see "),
-                                              # TODO faq hyperlink
-                                              em(a("here", href = "#faq/")), 
+                                              em(shinyLink(to = "faq", label = "here")), 
                                               em("for help choosing this value).")),
                                      br(),
                                      selectInput("param_icc", 
@@ -185,7 +253,7 @@ dashboardPage(#theme = "flatly",
                                                  selected = "0.05",
                                                  width = "40%",
                                      ),
-                                     helpText(em("A high value implies a high variation in the prevalence of deletions between clusters. A value of 0.05 is suggested by default based on an analysis of historical studies.")),
+                                     helpText(em("A high value implies a high variation in the prevalence of deletions between clusters. A value of 0.05 is suggested by default based on an ", em(a("analysis of historical studies.", target = "_blank", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html")))),
                                      br(),
                                      selectInput("param_n_sims", 
                                                  label = "Select the number of simulations",
@@ -230,12 +298,13 @@ dashboardPage(#theme = "flatly",
               tabPanel(
                 title = "Estimate prevalence",
                 fluidRow(
-                  column(width = 12, style='padding:20px;',
-                         Callout(
-                           title = "Step 1. Estimate prevalence and compare against a threshold",
-                           "Here, you can enter your observed counts of ", em("pfhrp2/3"), " deletions in each cluster and use the DRpower model to estimate the prevalence of deletions along with a 95% credible interval (CrI). You can also compare prevalence against a threshold to work out the probability of being above this threshold.",
-                           br(), br(),
-                           "If your intention is to make a binary decision as to whether prevalence is above or below the threshold (i.e., a hypothesis test) then it is worth being clear about your analysis plan ", strong("before "), "you see the result. For example, we recommend accepting that prevalence is above the threshold if the probability of this outcome is 0.95 or higher (the power calculations in the Design tab assume this value). You should not change your criteria for accepting/rejecting a hypothesis once you have seen the result, as this introduces bias. "
+                  column(width = 12, 
+                         style='padding:20px;',
+                         div(class = "custom-callout",
+                             p(class = "callout-title", "Step 1. Estimate prevalence and compare against a threshold"),
+                             "Here, you can enter your observed counts of ", em("pfhrp2/3"), " deletions in each cluster and use the DRpower model to estimate the prevalence of deletions along with a 95% credible interval (CrI). You can also compare prevalence against a threshold to work out the probability of being above this threshold.",
+                             br(), br(),
+                             "If your intention is to make a binary decision as to whether prevalence is above or below the threshold (i.e., a hypothesis test) then it is worth being clear about your analysis plan ", strong("before "), "you see the result. For example, we recommend accepting that prevalence is above the threshold if the probability of this outcome is 0.95 or higher (the power calculations in the Design tab assume this value). You should not change your criteria for accepting/rejecting a hypothesis once you have seen the result, as this introduces bias. "
                          )
                   ),
                   box(width = 12,
@@ -270,18 +339,18 @@ dashboardPage(#theme = "flatly",
               tabPanel(
                 title= "Estimate ICC",
                 fluidRow(
-                column(width = 12, style='padding:20px;',
-                       Callout(
-                         title = "Step 2. Analysis of intra-cluster correlation (ICC)",
-                         html = TRUE,
-                         "Although the prevalence of ", em("pfhrp2/3"), " deletions is usually the main focus of our analysis, the intra-cluster correlation is an extremely valuable supplementary analysis. Reporting this value not only contextualises the prevalence estimates, but it also provides valuable information to assist with the design of future studies.",
-                         br(), br(),
-                         em("The raw data for this analysis are taken from the previous tab, and there are no additional parameters needed."),
-                         br(), br(),
-                         actionButton(inputId = "est_icc",
-                                      label = " Estimate ICC",
-                                      icon("clipboard-check")),
-                         helpText(em("If you update any of the values in Step 1, make sure you remember to recalculate ICC"))
+                column(width = 12, 
+                       style='padding:20px;',
+                       div(class = "custom-callout",
+                           p(class = "callout-title", "Step 2. Analysis of intra-cluster correlation (ICC)"),
+                           "Although the prevalence of ", em("pfhrp2/3"), " deletions is usually the main focus of our analysis, the intra-cluster correlation is an extremely valuable supplementary analysis. Reporting this value not only contextualises the prevalence estimates, but it also provides valuable information to assist with the design of future studies.",
+                           br(), br(),
+                           em("The raw data for this analysis are taken from the previous tab, and there are no additional parameters needed."),
+                           br(), br(),
+                           actionButton(inputId = "est_icc",
+                                        label = " Estimate ICC",
+                                        icon("clipboard-check")),
+                           helpText(em("If you update any of the values in Step 1, make sure you remember to recalculate ICC"))
                        )
                 ),
                 ),
@@ -308,7 +377,7 @@ dashboardPage(#theme = "flatly",
       tabItem(
         tabName = "faq",
         fluidRow(
-          column(width = 12, style='padding:20px;',
+          column(width = 12, style='padding:20px;', 
                  Callout(
                    title = "Frequently Asked Questions",
                    br(),
@@ -340,7 +409,7 @@ dashboardPage(#theme = "flatly",
                    "the level at which missed cases due to deletions match missed cases due to loss of sensitivity in alternative RDTs. We should treat this number as a useful guide, not a value to slavishly follow. We should also keep in mind that the closer our assumed prevalence is to the 5% threshold, the larger our sample size will need to be, up to values that are completely unrealistic for any control programme. There is a balance to be struck between sensitivity to detect a given effect size, and pragmatic arguments based on logistics, budget, and ethical considerations. Here, we opt for an assumed 10% prevalence as the default, as this gives a reasonable level of sensitivity while also leading to realistic sample sizes.",
                    br(), br(),
                    em("For more information on the statical methods used in the back-end of this app or if you want to do more advanced analyses, please visit the "),
-                   em(a("DRpower R package website.", href='https://mrc-ide.github.io/DRpower/'))
+                   em(a("DRpower R package website.", target = "_blank", href='https://mrc-ide.github.io/DRpower/'))
                  )
           )
         )
