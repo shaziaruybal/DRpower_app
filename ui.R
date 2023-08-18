@@ -8,6 +8,18 @@ library(shiny.blueprint)
 library(shinydashboard)
 library(shinyWidgets)
 library(shinyBS)
+library(shinyjs)
+
+# This is a custom function that calls upon the goToTab JS code to navigate to a tab by its 'tabname'
+shinyLink <- function(to, label) {
+  tags$a(
+    class = c("shiny__link", "inline-link"), 
+    href = "#",
+    onclick = sprintf("goToTab('%s'); return false;", to),
+    label
+  )
+}
+
 
 dashboardPage(#theme = "flatly",
   skin = "purple",
