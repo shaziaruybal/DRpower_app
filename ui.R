@@ -145,7 +145,7 @@ dashboardPage(#theme = "flatly",
                      "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose target sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",shinyLink(to = "faq", label = "FAQs"), ").",
                      br(), br(),
                      "For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the ",
-                     a("DRpower R package ", href='https://mrc-ide.github.io/DRpower/'),
+                     a("DRpower R package ", target = "_blank", href='https://mrc-ide.github.io/DRpower/'),
                      "that underpins this app.",
                      br(), br(),
                      "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the World Health Organisation (WHO).",
@@ -186,7 +186,7 @@ dashboardPage(#theme = "flatly",
                                        selected = 0.05,
                                      ),
                                      helpText(em("A high ICC value implies a high variation in the prevalence of deletions between clusters. A value of 0.05 is suggested by default based on an "),
-                                              em(a("analysis of historical studies.", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html"))),
+                                              em(a("analysis of historical studies.", target = "_blank", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html"))),
                                      br(), 
                                      selectInput(
                                        inputId = "ss_prev",
@@ -409,7 +409,7 @@ dashboardPage(#theme = "flatly",
                    "the level at which missed cases due to deletions match missed cases due to loss of sensitivity in alternative RDTs. We should treat this number as a useful guide, not a value to slavishly follow. We should also keep in mind that the closer our assumed prevalence is to the 5% threshold, the larger our sample size will need to be, up to values that are completely unrealistic for any control programme. There is a balance to be struck between sensitivity to detect a given effect size, and pragmatic arguments based on logistics, budget, and ethical considerations. Here, we opt for an assumed 10% prevalence as the default, as this gives a reasonable level of sensitivity while also leading to realistic sample sizes.",
                    br(), br(),
                    em("For more information on the statical methods used in the back-end of this app or if you want to do more advanced analyses, please visit the "),
-                   em(a("DRpower R package website.", href='https://mrc-ide.github.io/DRpower/'))
+                   em(a("DRpower R package website.", target = "_blank", href='https://mrc-ide.github.io/DRpower/'))
                  )
           )
         )
