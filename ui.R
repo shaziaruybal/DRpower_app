@@ -83,50 +83,50 @@ dashboardPage(#theme = "flatly",
     tabItems(
       # ----------------------------------
       # TESTING
-      tabItem(tabName = "test_tab",
-              h2("This is a test to see if we can hyperlink to the FAQ tab!"),
-              br(), br(),
-              # Custom Shiny Dashboard box with callout styling
-              div(class = "custom-callout", 
-                  "This tool is designed to help researchers conducting ", em("Plasmodium pfhrp2/3"), " gene deletion studies. It can be used in two ways:",
-                  br(), br(),
-                  "1.	In the ", shinyLink(to = "design", label = "design phase"), "(before data have been collected) to help guide the appropriate number of clusters and a sample size per cluster.",
-                  br(),
-                  "2.	In the ", shinyLink(to = "analysis", label = "analysis phase"), "(once data are available) to estimate prevalence of deletions and determine if they are above a set threshold.",
-                  br(), br(),
-                  "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose target sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",shinyLink(to = "faq", label = "FAQs)"),
-                  br(), br(), 
-                  "For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the ",
-                  a("DRpower R package ", href='https://mrc-ide.github.io/DRpower/'),
-                  "that underpins this app.",
-                  br(), br(),
-                  "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the World Health Organisation (WHO).",
-                  br(), br(), br(),
-                  em("Most recent update X August 2023.")
-              ),
-              br(),
-              br(),
-              box("This is a test shinydashboard::box to see if the JS hyperlinks work (working)",
-                  div(
-                    tags$a("Go to FAQ page", href = "#", onclick = "goToTab('faq')")
-                  ),
-                  div(
-                    tags$a("Go to Design page", href = "#", onclick = "goToTab('design')")
-                  ),
-                  div(
-                    tags$a("Go to Analysis page", href = "#", onclick = "goToTab('analysis')")
-                  ),
-                  div(
-                    tags$a("Go back to About", href = "#", onclick = "goToTab('about')")
-                  )
-              ),
+      # tabItem(tabName = "test_tab",
+      #         h2("This is a test to see if we can hyperlink to the FAQ tab!"),
+      #         br(), br(),
+      #         # Custom Shiny Dashboard box with callout styling
+              # div(class = "custom-callout",
+              #     "This tool is designed to help researchers conducting ", em("Plasmodium pfhrp2/3"), " gene deletion studies. It can be used in two ways:",
+              #     br(), br(),
+              #     "1.	In the ", shinyLink(to = "design", label = "design phase"), "(before data have been collected) to help guide the appropriate number of clusters and a sample size per cluster.",
+              #     br(),
+              #     "2.	In the ", shinyLink(to = "analysis", label = "analysis phase"), "(once data are available) to estimate prevalence of deletions and determine if they are above a set threshold.",
+              #     br(), br(),
+              #     "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose target sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",shinyLink(to = "faq", label = "FAQs)"),
+              #     br(), br(),
+              #     "For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the ",
+              #     a("DRpower R package ", href='https://mrc-ide.github.io/DRpower/'),
+              #     "that underpins this app.",
+              #     br(), br(),
+              #     "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the World Health Organisation (WHO).",
+              #     br(), br(), br(),
+              #     em("Most recent update X August 2023.")
+              # ),
+      #         br(),
+      #         br(),
+      #         box("This is a test shinydashboard::box to see if the JS hyperlinks work (working)",
+      #             div(
+      #               tags$a("Go to FAQ page", href = "#", onclick = "goToTab('faq')")
+      #             ),
+      #             div(
+      #               tags$a("Go to Design page", href = "#", onclick = "goToTab('design')")
+      #             ),
+      #             div(
+      #               tags$a("Go to Analysis page", href = "#", onclick = "goToTab('analysis')")
+      #             ),
+      #             div(
+      #               tags$a("Go back to About", href = "#", onclick = "goToTab('about')")
+      #             )
+      #         ),
               
               # fluidRow(
               #   shinydashboard::box(width = 12,
               #       background = "purple",
               #       tableOutput("test_table"))
               # ),
-      ),
+      # ),
       # ----------------------------------
       # Tab 1 - About
       tabItem(
@@ -134,29 +134,23 @@ dashboardPage(#theme = "flatly",
         fluidRow(
           column(width = 12, 
                  style='padding:20px;',
-                 Callout(
-                   title = "How to use this tool",  
-                   # intent = "primary",
-                   # icon = "info-sign",
-                   html = TRUE,
-                   br(),
-                   "This tool is designed to help researchers conducting ", em("Plasmodium pfhrp2/3"), " gene deletion studies. It can be used in two ways:",
-                   br(), br(),
-                   "1.	In the ", strong("design phase "), "(before data have been collected) to help guide the appropriate number of clusters and a sample size per cluster.",
-                   br(),
-                   "2.	In the ", strong("analysis phase "), "(once data are available) to estimate prevalence of deletions and determine if they are above a set threshold.",
-                   br(), br(),
-                   "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose target sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",
-                   # TODO faq hyperlink not working
-                   tags$a("FAQs).", href='#faq'),
-                   br(), br(), 
-                   "For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the ",
-                   a("DRpower R package ", href='https://mrc-ide.github.io/DRpower/'),
-                   "that underpins this app.",
-                   br(), br(),
-                   "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the World Health Organisation (WHO).",
-                   br(), br(), br(),
-                   em("Most recent update X August 2023.")
+                 div(class = "custom-callout",
+                     p(class = "callout-title", "How to use this tool"),
+                     "This tool is designed to help researchers conducting ", em("Plasmodium pfhrp2/3"), " gene deletion studies. It can be used in two ways:",
+                     br(), br(),
+                     "1.	In the ", shinyLink(to = "design", label = "design phase"), "(before data have been collected) to help guide the appropriate number of clusters and a sample size per cluster.",
+                     br(),
+                     "2.	In the ", shinyLink(to = "analysis", label = "analysis phase"), "(once data are available) to estimate prevalence of deletions and determine if they are above a set threshold.",
+                     br(), br(),
+                     "The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose target sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see ",shinyLink(to = "faq", label = "FAQs"), ").",
+                     br(), br(),
+                     "For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the ",
+                     a("DRpower R package ", href='https://mrc-ide.github.io/DRpower/'),
+                     "that underpins this app.",
+                     br(), br(),
+                     "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the World Health Organisation (WHO).",
+                     br(), br(), br(),
+                     em("Most recent update X August 2023.")
                  ),
           )
         )
