@@ -474,7 +474,7 @@ function(input, output, session) {
       
       box(width = 12,
           title = "Click below to download your design report.",
-          em("This creates a pdf summary of the assumed parameters and your results, with standardised text to minimise mistakes."),
+          em("This creates am html summary of the assumed parameters and your results with standardised text to minimise mistakes. Note that you can convert this to a pdf if preferred by going to file/print."),
           br(), br(),
           downloadButton("design_report", "Download design report", icon("download")))
     }
@@ -724,7 +724,7 @@ function(input, output, session) {
     # check if prev_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(prev_output()) && prev_output()$prob_above_threshold >= 0.95){
       line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%).")
-      line2 <- paste("We conclude that the ", em("pfhrp2/3"), "deletion prevalence is above the ", round(as.numeric(input$analysis_prevthresh), 2), "% threshold (", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "% probability).")
+      line2 <- paste("We conclude that the ", em("pfhrp2/3"), "deletion prevalence is above the ", round(as.numeric(input$analysis_prevthresh), 2), "% threshold (probability above threshold = ", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "%).")
 
       HTML(paste(line1, line2, sep = "<br/><br/>"))
 
@@ -732,7 +732,7 @@ function(input, output, session) {
 
     else if(!is.null(prev_output()) && prev_output()$prob_above_threshold < 0.95){
       line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%).")
-      line2 <- paste("We conclude that the ", em("pfhrp2/3"), "deletion prevalence is below the ", round(as.numeric(input$analysis_prevthresh), 2), "% threshold (", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "% probability).")
+      line2 <- paste("We conclude that the ", em("pfhrp2/3"), "deletion prevalence is below the ", round(as.numeric(input$analysis_prevthresh), 2), "% threshold (probability above threshold = ", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "%).")
 
       HTML(paste(line1, line2, sep = "<br/><br/>"))
     }
@@ -931,7 +931,7 @@ function(input, output, session) {
       
       box(width = 12,
           title = "Click below to download your analysis report.",
-          em("This creates a pdf summary of the assumed parameters and your results, with standardised text to minimise mistakes."),
+          em("This creates an html summary of the assumed parameters and your results with standardised text to minimise mistakes. Note that you can convert this to a pdf if preferred by going to file/print."),
           br(), br(),
           downloadButton("analysis_report", "Download analysis report", icon("download")))
     }
