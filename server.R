@@ -474,7 +474,7 @@ function(input, output, session) {
       
       box(width = 12,
           title = "Click below to download your design report.",
-          em("This creates am html summary of the assumed parameters and your results with standardised text to minimise mistakes. Note that you can convert this to a pdf if preferred by going to file/print."),
+          em("This creates an html summary of the assumed parameters and your results with standardised text to minimise mistakes. Note that you can convert this to a pdf if preferred by going to file/print."),
           br(), br(),
           downloadButton("design_report", "Download design report", icon("download")))
     }
