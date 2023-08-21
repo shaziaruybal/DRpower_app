@@ -3,13 +3,13 @@ title: "*pfhrp2/3* Planner: Analysis report"
 date: "*Downloaded on: `r Sys.Date()` | DRpower interactive app v1.0.0*"
 output: 
   html_document:
-    theme: flatly
-      # version: 5
-      # bg: "#F9F9F9"
-      # fg: "#5e5ea3"
-      # primary: "#5e5ea3"
-      # base_font: !expr bslib::font_google("Lato")
-      # code_font: !expr bslib::font_google("JetBrains Mono")
+    # theme: flatly
+      version: 5
+      bg: "#F9F9F9"
+      fg: "#5e5ea3"
+      primary: "#5e5ea3"
+      base_font: !expr bslib::font_google("Lato")
+      code_font: !expr bslib::font_google("JetBrains Mono")
 params:
   analysis_prevthresh: NA
   analysis_nclusters: NA
@@ -30,23 +30,23 @@ set.seed(10)
 
 ```{css, echo=F}
 .title{
-  color: #57b99d;
+  color: #605ca3;
 }
 
 .date{
-  color: #57b99d;
+  color: #605ca3;
   text-align: right; 
   font-size: 14px;
 }
 
 /* Styles for the h3 headers */
 h3 {
-  color: #57b99d !important;
+  color: #605ca3 !important;
 }
 
 hr {
   opacity: 1; 
-  border-top: 2.5px solid #57b99d;
+  border-top: 2.5px solid #605ca3;
 }
 ```
 
