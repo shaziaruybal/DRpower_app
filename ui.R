@@ -148,7 +148,7 @@ dashboardPage(#theme = "flatly",
                      a("DRpower R package ", target = "_blank", href='https://mrc-ide.github.io/DRpower/'),
                      "that underpins this app.",
                      br(), br(),
-                     "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the World Health Organisation (WHO).",
+                     "This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the Global Malaria Programme, World Health Organisation (WHO).",
                      br(), br(), br(),
                      em("Most recent update 18 August 2023.")
                  ),
