@@ -311,7 +311,7 @@ dashboardPage(#theme = "flatly",
             tabsetPanel(
               type = "tabs",
               tabPanel(
-                title = "Estimate prevalence",
+                title = "Estimate prevalence and ICC",
                 fluidRow(
                   column(width = 12, 
                          style='padding:20px;',
@@ -350,9 +350,6 @@ dashboardPage(#theme = "flatly",
                   )
                 ),
                 uiOutput("est_prev_results"),
-              ),
-              tabPanel(
-                title= "Estimate ICC",
                 fluidRow(
                 column(width = 12, 
                        style='padding:20px;',
@@ -360,7 +357,7 @@ dashboardPage(#theme = "flatly",
                            p(class = "callout-title", "Step 2. Analysis of intra-cluster correlation (ICC)"),
                            "Although the prevalence of ", em("pfhrp2/3"), " deletions is usually the main focus of our analysis, the intra-cluster correlation is an extremely valuable supplementary analysis. Reporting this value not only contextualises the prevalence estimates, but it also provides valuable information to assist with the design of future studies.",
                            br(), br(),
-                           em("The raw data for this analysis are taken from the previous tab, and there are no additional parameters needed."),
+                           em("The raw data for this analysis are taken from Step 1 above, and there are no additional parameters needed."),
                            br(), br(),
                            actionButton(inputId = "est_icc",
                                         label = " Estimate ICC",
