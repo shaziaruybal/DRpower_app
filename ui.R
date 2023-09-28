@@ -34,6 +34,10 @@ dashboardPage(#theme = "flatly",
                              text = " Home",
                              icon = icon("home")
                     ),
+                    menuItem(tabName = "explore", 
+                             text = " Explore", 
+                             icon = icon("table")
+                    ),
                     menuItem(tabName = "design", 
                              text = " Design", 
                              icon = icon("paintbrush")
@@ -71,7 +75,7 @@ dashboardPage(#theme = "flatly",
         }
       ")
     ),
-    # The JavaScript code below runs the function that triggers a click "event" switching to the resepctive tabName when the link is clicked 
+    # The JavaScript code below runs the function that triggers a click "event" switching to the resepctive tabName when the link is clicked
     tags$script('
       function goToTab(tabName) {
         var tab = document.querySelector("a[data-value=" + tabName + "]");
@@ -158,51 +162,60 @@ dashboardPage(#theme = "flatly",
         )
       ),
       # ----------------------------------
-      # Tab 2 - Design
+      # Tab 2 - Explore
+      tabItem(
+        tabName = "explore",
+        fluidRow(
+            column(width = 12, 
+                   style='padding:20px;', 
+                   br(),
+                   div(class = "custom-callout",
+                       p(class = "callout-title", "Consult sample size tables"),
+                       "The table below gives the number of confirmed malaria positive samples required ", em("per cluster "), "in order for study power to be 80% or higher. You can use these numbers as a general guide when scoping out a study plan, before moving to more tailored sample sizes in the next step.",
+                       br(), br(),
+                       "In general, it is recommended to focus efforts on recruiting more clusters, rather than obtaining large numbers of samples from just a few clusters. Not only will the overall study sample size be lower, but this will also make results more robust to variation within a province."
+                   ),
+                   br(),
+                   box(width = 12,
+                       title = "Sample sizes required to achieve a target power of 80%",
+                       "Minimum sample size depends on many factors including the degree of intra-cluster correlation, the prevalence threshold that we are testing against, and the true prevalence in the province. For help choosing these values, see ",
+                       shinyLink(to = "faq", label = "here. "),
+                       br(),
+                       br(),
+                       selectInput(
+                         inputId = "ss_icc",
+                         label = strong("Select the intra-cluster correlation (ICC): "),
+                         width = "40%",
+                         choices = c("", 0.00, 0.01, 0.02, 0.05, 0.10, 0.20),
+                         selected = 0.05,
+                       ),
+                       helpText(em("A high ICC value implies a high variation in the prevalence of deletions between clusters. A value of 0.05 is suggested by default based on an "),
+                                em(a("analysis of historical studies.", target = "_blank", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html"))),
+                       br(),
+                       selectInput(
+                         inputId = "ss_prev",
+                         label = strong("Select the prevalence threshold (%): "),
+                         width = "40%",
+                         choices = c("", 5, 8, 10),
+                         selected = 5,
+                       ),
+                       helpText(em("The prevalence value that we are comparing against in our hypothesis test (5% by default, see ", em(shinyLink(to = "faq", label = "here")), ").")),
+                       br(),
+                       tagAppendAttributes(textOutput("text_ss"), style="white-space:pre-wrap;"),
+                       DTOutput("sample_size_table")
+                   )
+            ),
+        )
+      ),
+      # ----------------------------------
+      # Tab 3 - Design
       tabItem(
         tabName = "design",
         fluidRow(
-          mainPanel(
+          column(width = 12,
+                 style='padding:20px;', 
             br(),
             tabsetPanel(type = "tabs",
-                        tabPanel("Sample size tables",
-                                 br(),
-                                 div(class = "custom-callout",
-                                    p(class = "callout-title", "Step 1. Consult sample size tables"),
-                                    "The table below gives the number of confirmed malaria positive samples required ", em("per cluster "), "in order for study power to be 80% or higher. You can use these numbers as a general guide when scoping out a study plan, before moving to more tailored sample sizes in the next step.",
-                                    br(), br(),
-                                    "In general, it is recommended to focus efforts on recruiting more clusters, rather than obtaining large numbers of samples from just a few clusters. Not only will the overall study sample size be lower, but this will also make results more robust to variation within a province."
-                                 ),
-                                 br(),
-                                 box(width = 12, 
-                                     title = "Sample sizes required to achieve a target power of 80%", 
-                                     "Minimum sample size depends on many factors including the degree of intra-cluster correlation, the prevalence threshold that we are testing against, and the true prevalence in the province. For help choosing these values, see ",
-                                     shinyLink(to = "faq", label = "here. "), 
-                                     br(),
-                                     br(),
-                                     selectInput(
-                                       inputId = "ss_icc",
-                                       label = strong("Select the intra-cluster correlation (ICC): "),
-                                       width = "40%",
-                                       choices = c("", 0.00, 0.01, 0.02, 0.05, 0.10, 0.20), 
-                                       selected = 0.05,
-                                     ),
-                                     helpText(em("A high ICC value implies a high variation in the prevalence of deletions between clusters. A value of 0.05 is suggested by default based on an "),
-                                              em(a("analysis of historical studies.", target = "_blank", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html"))),
-                                     br(), 
-                                     selectInput(
-                                       inputId = "ss_prev",
-                                       label = strong("Select the prevalence threshold (%): "),
-                                       width = "40%",
-                                       choices = c("", 5, 8, 10), 
-                                       selected = 5,
-                                     ),
-                                     helpText(em("The prevalence value that we are comparing against in our hypothesis test (5% by default, see ", em(shinyLink(to = "faq", label = "here")), ").")),
-                                     br(),
-                                     tagAppendAttributes(textOutput("text_ss"), style="white-space:pre-wrap;"),
-                                     DTOutput("sample_size_table")
-                                 )
-                        ),
                         tabPanel("Final cluster sizes",
                                  br(),
                                  div(class = "custom-callout",
@@ -290,7 +303,7 @@ dashboardPage(#theme = "flatly",
         )
       ),
       # ----------------------------------
-      # Tab 3 - Analysis
+      # Tab 4 - Analysis
       tabItem(
         tabName = "analysis",
         fluidRow(
@@ -375,7 +388,7 @@ dashboardPage(#theme = "flatly",
         )
       ),
       # ----------------------------------
-      # Tab 4 - FAQ
+      # Tab 5 - FAQ
       tabItem(
         tabName = "faq",
         fluidRow(
