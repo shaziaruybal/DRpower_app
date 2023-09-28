@@ -10,7 +10,7 @@ library(shinyWidgets)
 library(shinyBS)
 library(shinyjs)
 
-# This is a custom function that calls upon the goToTab JS code to navigate to a tab by its 'tabname'
+# This is a custom function that calls upon the goToTab JS code (lines 79-88) to navigate to a tab by its 'tabname'
 shinyLink <- function(to, label) {
   tags$a(
     class = c("shiny__link", "inline-link"), 
