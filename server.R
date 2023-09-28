@@ -95,7 +95,7 @@ function(input, output, session) {
         filter(ICC == 0.05) %>% 
         filter(prev_thresh == 0.05) %>% 
         filter(prior_ICC_shape2==9) %>% # TODO fixed at 9 (check this when final final table is ready)
-        select(n_clust, prevalence, N_opt) %>% 
+        select(n_clust, prevalence, N_opt) %>%
         pivot_wider(names_from = prevalence, values_from = N_opt) 
     
     # get the target sample sizes from table with fixed prev of 10%, fix it at 500 if nclust is 2 or 3 (because NA)
@@ -117,10 +117,10 @@ function(input, output, session) {
   # observe when the user specifies n clusters
   observeEvent(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     print("Number of clusters selected")
-
-    output$text_edit_clusttab <- renderText("The table below has rows corresponding to the number of clusters in your study.
+    #TODO it would be ideal if this could hyperlink to the explore tab but given it doesn't open in a new tab, have opted to not hyperlink here so that the user doesn't have to start over when navigating to link
+    output$text_edit_clusttab <- renderText("The table below has rows corresponding to the number of clusters in your study and is pre-populated based on the optimal sample size from the Explore tab.
                                             Please edit the target sample size and expected proportion of participant drop-out for each cluster by double-clicking
-                                            and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate final sample sizes' button. ")
+                                            and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate adjusted sample sizes' button. ")
     
     print("After user selects N clusters, this is the df:")
     print(df_sizes())
