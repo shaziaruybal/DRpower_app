@@ -814,7 +814,7 @@ function(input, output, session) {
       
       show_alert(
         title = "Error!",
-        text = "You have not selected the number of clusters or entered the values for your study. Please go back to the previous section ('Estimate prevalence') and select the number of clusters from the drop-down menu and enter the values in the table.",
+        text = "You have not selected the number of clusters or entered the values for your study. Please go back to Step 1 ('Enter the values specific to your study') and select the number of clusters from the drop-down menu and enter the values in the table.",
         type = "error"
       )
     }
