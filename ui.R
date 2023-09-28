@@ -30,8 +30,8 @@ dashboardPage(#theme = "flatly",
                    sidebarMenu(
                     # menuItem(tabName = "test_tab",
                     #          text = "TESTING"),
-                    menuItem(tabName = "about", 
-                             text = " About",
+                    menuItem(tabName = "home", 
+                             text = " Home",
                              icon = icon("home")
                     ),
                     menuItem(tabName = "design", 
@@ -129,9 +129,9 @@ dashboardPage(#theme = "flatly",
               # ),
       # ),
       # ----------------------------------
-      # Tab 1 - About
+      # Tab 1 - Home
       tabItem(
-        tabName = "about",
+        tabName = "home",
         fluidRow(
           column(width = 12, 
                  style='padding:20px;',
