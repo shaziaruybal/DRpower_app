@@ -148,8 +148,8 @@ function(input, output, session) {
                              # autoWidth = TRUE,
                              pageLength=20,
                              # fixedHeader = T,
-                             # columnDefs = list(list(className = "dt-center",
-                             #                        targets = "_all")),
+                             columnDefs = list(list(className = "dt-center",
+                                                    targets = "_all")),
                              # fixedColumns = list(leftColumns = c(1)),
                              scrollX = '400px'))
   })
@@ -568,8 +568,8 @@ function(input, output, session) {
               options = list(dom = 'rt',
                              # autoWidth = TRUE, 
                              pageLength = 20,
-                             # columnDefs = list(list(className = "dt-center",
-                             #                        targets = "_all")),
+                             columnDefs = list(list(className = "dt-center",
+                                                    targets = "_all")),
                              # fixedColumns = list(leftColumns = c(1)),
                              scrollX = '400px')) 
   })
