@@ -71,12 +71,13 @@ dashboardPage(#theme = "flatly",
         }
       ")
     ),
-    # The JavaScript code below runs the function that triggers a click "event" switching to the resepctive tabName when the link is clicked
+    # The JavaScript code below runs the function that triggers a click "event" switching to the resepctive tabName when the link is clicked (and opening in a new tab)
     tags$script('
       function goToTab(tabName) {
         var tab = document.querySelector("a[data-value=" + tabName + "]");
         if (tab) {
-          tab.click();
+          var tabUrl = tab.getAttribute("href");
+          window.open(tab, "_blank");
         }
       }
     '),
