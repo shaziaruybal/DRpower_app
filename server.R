@@ -88,8 +88,12 @@ function(input, output, session) {
   iv <- InputValidator$new()
   
   # 2. Add validation rules
-  iv$add_rule("param_prev", sv_between(6, 100))
-  
+  iv$add_rule("param_prev", sv_between(6, 100)) # validate within range 
+  iv$add_rule("param_prev", sv_integer()) # validate integer
+  iv$add_rule("param_icc", sv_between(0, 1)) # validate within range 
+  iv$add_rule("param_n_sims", sv_between(100, 10000)) # validate within range 
+  iv$add_rule("param_n_sims", sv_integer()) # validate integer
+
   # 3. Start displaying errors in the UI
   iv$enable()
 
