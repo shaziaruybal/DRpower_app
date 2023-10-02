@@ -420,7 +420,7 @@ function(input, output, session) {
       print("error should pop up when save results is clicked")
       show_alert(
         title = "Error!",
-        text = "The summary cannot be displayed because you haven't completed Step 2. Please go back to 'Final cluster sizes' and follow all the steps.",
+        text = "The summary cannot be displayed because you haven't completed the previous steps. Please go back to 'Final cluster sizes' and follow all the steps.",
         type = "error"
       )
       
