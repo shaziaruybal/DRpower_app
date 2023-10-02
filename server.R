@@ -8,6 +8,7 @@ library(shinyWidgets)
 library(shinyBS)
 library(DRpower)
 library(kableExtra)
+library(shinyvalidate)
 
 set.seed(10)
 
@@ -79,6 +80,23 @@ function(input, output, session) {
       )
     })
   
+  ##################################################
+  # NUMERIC INPUT VALIDATIONS
+  ##################################################
+  
+  # 1. Create an InputValidator object
+  iv <- InputValidator$new()
+  
+  # 2. Add validation rules
+  iv$add_rule("param_prev", sv_between(6, 100))
+  
+  # 3. Start displaying errors in the UI
+  iv$enable()
+
+  ##################################################
+  # DESIGN
+  ##################################################
+
   # ----------------------------------
   #  User-input table: sample size and proportion drop-out
   # ----------------------------------
