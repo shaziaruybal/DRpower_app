@@ -876,7 +876,7 @@ function(input, output, session) {
       print("error should pop up when save results is clicked")
       show_alert(
         title = "Error!",
-        text = "The summary cannot be displayed because you haven't completed Steps 1 and/or 2. Please go back to 'Estimate prevalence' and 'Estimate ICC' and follow all the steps.",
+        text = "The summary cannot be displayed because you haven't completed Steps 1 and/or 2. Please go back to 'Estimate prevalence and ICC' and follow all the steps.",
         type = "error"
       )
       
