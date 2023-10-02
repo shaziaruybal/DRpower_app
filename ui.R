@@ -202,6 +202,8 @@ dashboardPage(#theme = "flatly",
                        ),
                        helpText(em("The prevalence value that we are comparing against in our hypothesis test (5% by default, see ", em(shinyLink(to = "faq", label = "here")), ").")),
                        br(),
+                   ),
+                   box(width = 12,
                        tagAppendAttributes(textOutput("text_ss"), style="white-space:pre-wrap;"),
                        DTOutput("sample_size_table")
                    )
