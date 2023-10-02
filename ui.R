@@ -342,14 +342,14 @@ dashboardPage(#theme = "flatly",
                         inputId = "analysis_prevthresh",
                         label = strong("Select prevalence threshold (%): "),
                         width = "40%",
-                        choices = c("", 5, 8, 10),
+                        choices = c("", seq(5, 10)), # TODO check with Bob 
                         selected = 5
                       ),
                       selectInput(
                         inputId = "analysis_nclust",
                         label = strong("Select final number of clusters: "),
                         width = "40%",
-                        choices = c("", 2, 3, 4, 5, 6,7, 8, 9, 10, 15, 20), 
+                        choices = c("", seq(2, 20)), 
                         selected = NULL
                       ),
                       DTOutput("editable_deltab"),
