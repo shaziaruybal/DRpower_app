@@ -112,7 +112,8 @@ dashboardPage(#theme = "flatly",
       tabItem(
         tabName = "home",
         fluidRow(
-          column(width = 12, 
+          column(width = 12,
+                 style='padding-left:30px;padding-right:30px', 
                  img(src = "img/icl_mrc_logo.png", height = "30%", width = "30%"),
                  h1("Welcome to the ", em("pfhrp2/3"), "Planner", style = "color: #605ca3"),
                  hr(),
