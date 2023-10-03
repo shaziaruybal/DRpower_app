@@ -318,85 +318,85 @@ dashboardPage(#theme = "flatly",
       tabItem(
         tabName = "analysis",
         fluidRow(
-          mainPanel(
-            tabsetPanel(
-              type = "tabs",
-              tabPanel(
-                title = "Estimate prevalence and ICC",
-                fluidRow(
-                  column(width = 12, 
-                         style='padding:20px;',
-                         div(class = "custom-callout",
-                             p(class = "callout-title", "Estimate prevalence and compare against a threshold"),
-                             "Here, you can enter your observed counts of ", em("pfhrp2/3"), " deletions in each cluster and use the DRpower model to estimate the prevalence of deletions along with a 95% credible interval (CrI). You can also compare prevalence against a threshold to work out the probability of being above this threshold.",
-                             br(), br(),
-                             "If your intention is to make a binary decision as to whether prevalence is above or below the threshold (i.e., a hypothesis test) then it is worth being clear about your analysis plan ", strong("before "), "you see the result. For example, we recommend accepting that prevalence is above the threshold if the probability of this outcome is 0.95 or higher (the power calculations in the Design tab assume this value). You should not change your criteria for accepting/rejecting a hypothesis once you have seen the result, as this introduces bias. "
-                         )
-                  ),
-                  box(width = 12,
-                      collapsible = T,
-                      title = "Step 1. Enter the values specific to your study",
-                      p("Set the prevalence threshold against which we want to compare. Select the final number of clusters in your study and enter the raw number of observed ", em("pfhrp2/3"), " deletion counts, and the number of confirmed malaria cases per cluster."),
-                      br(),
-                      selectInput(
-                        inputId = "analysis_prevthresh",
-                        label = strong("Select prevalence threshold (%): "),
-                        width = "40%",
-                        choices = c("", seq(5, 10)), # TODO check with Bob 
-                        selected = 5
-                      ),
-                      selectInput(
-                        inputId = "analysis_nclust",
-                        label = strong("Select final number of clusters: "),
-                        width = "40%",
-                        choices = c("", seq(2, 20)), 
-                        selected = NULL
-                      ),
-                      DTOutput("editable_deltab"),
-                      br(),
-                      bsAlert("error_nodeletions"), # this creates an error message if user clicks estimate prevalence without entering deletions/sample sizes
-                      actionButton(inputId = "est_prev", 
-                                   label = "Estimate prevalence", 
-                                   icon("clipboard-check")),
-                      helpText(em("If you update these values, make sure you remember to recalculate prevalence"))
-                  )
-                ),
-                uiOutput("est_prev_results"),
-                fluidRow(
-                  box(width = 12, 
-                      collapsible = T,
-                      title = "Step 2. Analysis of intra-cluster correlation (ICC)",
-                      "Although the prevalence of ", em("pfhrp2/3"), " deletions is usually the main focus of our analysis, the intra-cluster correlation is an extremely valuable supplementary analysis. Reporting this value not only contextualises the prevalence estimates, but it also provides valuable information to assist with the design of future studies.",
-                      br(), br(),
-                      em("The raw data for this analysis are taken from Step 1 above, and there are no additional parameters needed."),
-                      br(), br(),
-                      actionButton(inputId = "est_icc",
-                                   label = " Estimate ICC",
-                                   icon("clipboard-check")),
-                      helpText(em("If you update any of the values in Step 1, make sure you remember to recalculate ICC"))
-                  ),
-                ),
-                uiOutput("est_icc_results"),
-              ),
-              tabPanel(
-                title = "Generate report",
-                br(),
-                box(width = 12,
-                    title = "Check and save your parameters and results",
-                    p("Click the button below to display a summary of the information you entered in the previous tab. If everything looks as expected, click on the download button to download your report PDF."),
-                    br(),
-                    actionButton("save_analysis_data", " Save results", icon("floppy-disk"))
-                ),
-                uiOutput("text_analysis_summary"),
-                uiOutput("analysis_download"),
-              )
-            )
+          column(width = 12,
+                 style='padding:20px;', 
+                 tabsetPanel(
+                   type = "tabs",
+                   tabPanel(
+                     title = "Estimate prevalence and ICC",
+                     br(),
+                     div(class = "custom-callout",
+                         p(class = "callout-title", "Estimate prevalence and compare against the 5% threshold"),
+                         "Here, you can enter your observed counts of ", em("pfhrp2/3"), " deletions in each cluster and use the DRpower model to estimate the prevalence of deletions along with a 95% credible interval (CrI). You can also compare prevalence against the ", a("WHO recommended 5% threshold ", target = "_blank", href = "https://iris.who.int/handle/10665/331197"), "to work out the probability of being above this threshold.",
+                         br(), br(),
+                         "If your intention is to make a binary decision as to whether prevalence is above or below the threshold (i.e., a hypothesis test) then it is worth being clear about your analysis plan ", strong("before "), "you see the result. For example, we recommend accepting that prevalence is above the 5% threshold if the probability of this outcome is 0.95 or higher (the power calculations in the Design tab assume this value). You should not change your criteria for accepting/rejecting a hypothesis once you have seen the result, as this introduces bias. "
+                     ),
+                     br(),
+                     fluidRow(
+                       box(width = 12,
+                           collapsible = T,
+                           title = "Step 1. Enter the values specific to your study",
+                           p("Select the final number of clusters in your study and enter the raw number of observed ", em("pfhrp2/3"), " deletion counts, and the number of confirmed malaria cases per cluster."),
+                           br(),
+                           # selectInput(
+                           #   inputId = "analysis_prevthresh",
+                           #   label = strong("Select prevalence threshold (%): "),
+                           #   width = "40%",
+                           #   choices = c("", 5, 8, 10), 
+                           #   selected = 5
+                           # ),
+                           selectInput(
+                             inputId = "analysis_nclust",
+                             label = strong("Select final number of clusters: "),
+                             width = "40%",
+                             choices = c("", seq(2, 20)), 
+                             selected = NULL
+                           ),
+                           DTOutput("editable_deltab"),
+                           br(),
+                           bsAlert("error_nodeletions"), # this creates an error message if user clicks estimate prevalence without entering deletions/sample sizes
+                           actionButton(inputId = "est_prev", 
+                                        label = "Estimate prevalence", 
+                                        icon("clipboard-check")),
+                           helpText(em("If you update these values, make sure you remember to recalculate prevalence"))
+                       )
+                     ),
+                     uiOutput("est_prev_results"),
+                   fluidRow(
+                     box(width = 12, 
+                         collapsible = T,
+                         title = "Step 2. Analysis of intra-cluster correlation (ICC)",
+                         "Although the prevalence of ", em("pfhrp2/3"), " deletions is usually the main focus of our analysis, the intra-cluster correlation is an extremely valuable supplementary analysis. Reporting this value not only contextualises the prevalence estimates, but it also provides valuable information to assist with the design of future studies.",
+                         br(), br(),
+                         em("The raw data for this analysis are taken from Step 1 above, and there are no additional parameters needed."),
+                         br(), br(),
+                         actionButton(inputId = "est_icc",
+                                      label = " Estimate ICC",
+                                      icon("clipboard-check")),
+                         helpText(em("If you update any of the values in Step 1, make sure you remember to recalculate ICC"))
+                     ),
+                   ),
+                   uiOutput("est_icc_results"),
+                 ),
+                 tabPanel(
+                   title = "Generate report",
+                   br(),
+                   box(width = 12,
+                       title = "Check and save your parameters and results",
+                       p("Click the button below to display a summary of the information you entered in the previous tab. If everything looks as expected, click on the download button to download your report PDF."),
+                       br(),
+                       actionButton("save_analysis_data", " Save results", icon("floppy-disk"))
+                   ),
+                   uiOutput("text_analysis_summary"),
+                   uiOutput("analysis_download"),
+                 )
+                 )
           )
         )
       ),
-      # ----------------------------------
-      # Tab 5 - FAQ
-      tabItem(
+    # ----------------------------------
+    # Tab 5 - FAQ
+    tabItem(
         tabName = "faq",
         fluidRow(
           column(width = 12, style='padding:20px;', 

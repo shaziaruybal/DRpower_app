@@ -11,7 +11,6 @@ output:
       base_font: !expr bslib::font_google("Lato")
       code_font: !expr bslib::font_google("JetBrains Mono")
 params:
-  analysis_prevthresh: NA
   analysis_nclusters: NA
   analysis_study_data: NA
   analysis_prevoutput: NA
@@ -51,7 +50,6 @@ hr {
 ```
 
 ```{r create objects from params, echo=F}
-prev_thresh <- params$analysis_prevthresh
 nclusters <- params$analysis_nclusters
 study_data <- params$analysis_study_data
 prev_output <- params$analysis_prevoutput
@@ -78,7 +76,7 @@ kable(study_data,
 
 ### Estimated prevalence 
 
-To estimate the prevalence of *pfhrp2/3* deletions in this study we used the [DRpower R package](https://mrc-ide.github.io/DRpower) to test whether the observed prevalence in this study was above or below a prevalence threshold of `r params$analysis_prevthresh`%. 
+To estimate the prevalence of *pfhrp2/3* deletions in this study we used the [DRpower R package](https://mrc-ide.github.io/DRpower) to test whether the observed prevalence in this study was above or below the [WHO recommended prevalence threshold of 5%](https://iris.who.int/handle/10665/331197). 
 
 We estimate that the prevalence of *pfhrp2/3* deletions is `r round(as.numeric(prev_output$MAP),2)`% (95% CrI: `r round(as.numeric(prev_output$CrI_lower),2)`-`r round(as.numeric(prev_output$CrI_upper),2)`%).
 
@@ -93,14 +91,12 @@ prev_output %>%
                    size = 2,
                    shape = 21,
                    fill = "mediumpurple") +
-        # use the user-entered prev_thresh to plot threshold line
-        geom_hline(aes(yintercept = as.numeric(params$analysis_prevthresh)), 
+        geom_hline(aes(yintercept = 5), 
                    color = "darkgrey",
                    linetype = "dashed") +
-        # use the user-entered prev_thresh to plot threshold line
         geom_text(aes(x= " ", 
-                      y = (as.numeric(params$analysis_prevthresh))+3, 
-                      label = paste0(ceiling(as.numeric(params$analysis_prevthresh)),"% threshold")), 
+                      y = 8, 
+                      label = "5% threshold"), 
                       color = "darkgrey", size = 3) +
         scale_y_continuous(labels = scales::percent_format(1, scale = 1), limits = c(0,100)) +
         labs(x = "",

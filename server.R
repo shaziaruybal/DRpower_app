@@ -651,7 +651,7 @@ function(input, output, session) {
   prev_output <- eventReactive(input$est_prev, {
     
     # require the updated data frame to have been created to make sure there is a data frame to get values from
-    req(input$analysis_prevthresh, analysis_rv$df_analysis_update)
+    req(analysis_rv$df_analysis_update)
 
     # create a progress notification pop-up telling the user that prevalence is being estimated
     id <- showNotification(paste0("Estimating prevalence..."), 
@@ -672,7 +672,7 @@ function(input, output, session) {
       tryCatch({
       DRpower::get_prevalence(n = df$n_deletions,
                               N = df$sample_size,
-                              prev_thresh = as.numeric(input$analysis_prevthresh)/100) # make sure we convert input prev_thresh to proportion for calculation
+                              prev_thresh = 0.05) # HARD CODING 5% THRESHOLD
       }, error = function(err){
         show_alert(
           title = "Error!",
@@ -697,14 +697,14 @@ function(input, output, session) {
     print("Estimate prevalence button clicked")
     
       # display error message if the user has not selected prev_thresh and/or entered the deletions and sample sizes, require the reactiveVal 'df_analysis_update' to have been created
-      if(input$analysis_prevthresh=="" || is.null(analysis_rv$df_analysis_update)){
+      if(is.null(analysis_rv$df_analysis_update)){
         # TODO debugging
         print("estimate prev is NULL")
         print("error should have popped up")
         
         show_alert(
           title = "Error!",
-          text = "You have not selected the prevalence threshold, number of clusters and/or entered the values for your study. Please select the prevalence threshold and number of clusters from the drop-down menu and enter the values in the table.",
+          text = "You have not selected the number of clusters and/or entered the values for your study. Please select the number of clusters from the drop-down menu and enter the values in the table.",
           type = "error"
         )
       }
@@ -746,7 +746,7 @@ function(input, output, session) {
     # check if prev_output() has been created, which means the results have been calculated and can be displayed
     if(!is.null(prev_output()) && prev_output()$prob_above_threshold >= 0.95){
       line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%).")
-      line2 <- paste("We conclude that the ", em("pfhrp2/3"), "deletion prevalence is above the ", round(as.numeric(input$analysis_prevthresh), 2), "% threshold (", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "% probability).")
+      line2 <- paste("We conclude that the ", em("pfhrp2/3"), "deletion prevalence is above the 5% threshold (", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "% probability).")
 
       HTML(paste(line1, line2, sep = "<br/><br/>"))
 
@@ -754,7 +754,7 @@ function(input, output, session) {
 
     else if(!is.null(prev_output()) && prev_output()$prob_above_threshold < 0.95){
       line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%).")
-      line2 <- paste("We conclude that the ", em("pfhrp2/3"), "deletion prevalence is below the ", round(as.numeric(input$analysis_prevthresh), 2), "% threshold (", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "% probability).")
+      line2 <- paste("We conclude that the ", em("pfhrp2/3"), "deletion prevalence is below the 5% threshold (", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "% probability).")
 
       HTML(paste(line1, line2, sep = "<br/><br/>"))
     }
@@ -775,14 +775,12 @@ function(input, output, session) {
                    size = 4,
                    shape = 21,
                    fill = "mediumpurple") +
-        # use the user-entered prev_thresh to plot threshold line
-        geom_hline(aes(yintercept = as.numeric(input$analysis_prevthresh)), # make sure we convert back to proportion here
+        geom_hline(aes(yintercept = 5), 
                    color = "darkgrey",
                    linetype = "dashed") +
-        # use the user-entered prev_thresh to plot threshold line
         geom_text(aes(x= " ", 
-                      y = (as.numeric(input$analysis_prevthresh))+2, 
-                      label = paste0(ceiling(as.numeric(input$analysis_prevthresh)),"% threshold")), 
+                      y = 7, 
+                      label = "5% threshold"), 
                       color = "darkgrey") +
         scale_y_continuous(labels = scales::percent_format(1, scale = 1), limits = c(0,100)) +
         labs(x = "",
@@ -894,7 +892,7 @@ function(input, output, session) {
     print("Save analysis data button has been clicked")
     
     # If all conditions are not met - ie the user has gone through the entire Estimate Prevalence and ICC tabs, set analysis_data_ready as FALSE
-    if (input$analysis_prevthresh=="" || input$analysis_nclust=="" || input$est_prev==0 || input$est_icc==0 || is.null(prev_output()) || is.null(icc_output())) {
+    if (input$analysis_nclust=="" || input$est_prev==0 || input$est_icc==0 || is.null(prev_output()) || is.null(icc_output())) {
       print("error should pop up when save results is clicked")
       show_alert(
         title = "Error!",
@@ -930,9 +928,6 @@ function(input, output, session) {
           title = "Data summary",
           h4("Final study values:"),
           renderTable(analysis_rv$df_analysis_update, digits = 0),
-          br(), br(),
-          h4("Parameters for calculations:"),
-          p("Prevalence threshold: ", ceiling(as.numeric(input$analysis_prevthresh)), "%"), 
           br(), br(),
           h4("Prevalence estimates:"),
           renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100), 
@@ -976,8 +971,7 @@ function(input, output, session) {
       tempReport <- file.path(tempdir(), "template_analysis_report.Rmd")
       file.copy("template_analysis_report.Rmd", tempReport, overwrite = TRUE)
       
-      params <- list(analysis_prevthresh = input$analysis_prevthresh,
-                     analysis_nclusters = input$analysis_nclust,
+      params <- list(analysis_nclusters = input$analysis_nclust,
                      analysis_study_data = analysis_rv$df_analysis_update,
                      analysis_prevoutput = prev_output(),
                      analysis_iccoutput = icc_output()
