@@ -54,9 +54,10 @@ dashboardPage(#theme = "flatly",
   ),
   dashboardBody(
     useShinyjs(),
-    # The CSS code below creates a custom callout box with the same styling as the shiny.blueprint::Callout box but without funcitonality JS/HTML issues
+    # TODO: move this CSS code into a .css file to clean up UI code 
     tags$style(
       HTML("
+        /* # The CSS code below creates a custom callout box with the same styling as the shiny.blueprint::Callout box but without funcitonality JS/HTML issues*/
         .custom-callout {
           border: 1px solid #f0f0f0;
           background-color: rgb(218, 224, 231);
