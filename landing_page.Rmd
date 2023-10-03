@@ -1,0 +1,90 @@
+---
+output: 
+  html_document:
+    # theme: flatly
+      version: 5
+      bg: "#F9F9F9"
+      fg: "#5e5ea3"
+      primary: "#5e5ea3"
+      base_font: !expr bslib::font_google("Lato")
+      code_font: !expr bslib::font_google("JetBrains Mono")
+---
+
+```{r setup, include=FALSE, echo=F}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(kableExtra)
+```
+
+```{css, echo=F}
+.title{
+  color: #605ca3;
+}
+
+.date{
+  color: #605ca3;
+  text-align: right; 
+  font-size: 14px;
+}
+
+/* Styles for the h1 headers */
+h1 {
+  color: #605ca3 !important;
+}
+/* Styles for the h3 headers */
+h3 {
+  color: #605ca3 !important;
+}
+
+hr {
+  opacity: 1; 
+  border-top: 2.5px solid #605ca3;
+}
+```
+
+```{r, echo=FALSE}
+htmltools::img(src = knitr::image_uri("~/Documents/DRpower_app/icl_mrc_logo.png"), 
+               alt = 'logo', 
+               style = '"float: right; margin: 10px; top:50px; right:10px; padding:10px;',
+               # style = 'position:absolute; top:50px; right:10px; padding:10px;',
+               width = "350px",
+               heigth = "350px")
+```
+
+# Welcome to the *pfhrp2/3* Planner
+
+-----
+
+### VIDEO PLACEHOLDER
+
+
+### How to use this tool?
+This tool is designed to help researchers conducting *Plasmodium falciparum pfhrp2/3*  gene deletion studies. 
+
+It can be used in two ways:
+
+1.	In the **design phase** (before data have been collected) to help guide the appropriate number of clusters and a sample size per cluster.
+
+2.	In the **analysis phase** (once data are available) to estimate prevalence of deletions and determine if they are above a set threshold.
+
+The ideal plan would be to perform both steps, i.e., using this app before a study has started to choose target sample sizes and then returning to the app once data are available. However, it is valid to analyse data even if sample sizes were chosen using a different method (see the FAQs page). 
+
+For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the [DRpower R package website](https://mrc-ide.github.io/DRpower) that underpins this app. 
+ 
+### Design phase
+
+![](design_phase_v1.png)
+
+### Analysis phase
+
+![](analysis_phase_v1.png)
+
+
+### Acknowledgments 
+This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the Global Malaria Programme, World Health Organisation (WHO).
+
+
+*Most recent update 2 October 2023.*
+<br>
+<br>
