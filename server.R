@@ -20,10 +20,10 @@ function(input, output, session) {
   # TESTING
   ################################################## 
   
-  # output$test_table <- renderTable({
-  #   head(df_ss)
+  # output$landing_page <- renderUI({
+  #   includeHTML("landing_page.html")
   # })
-  
+
   ##################################################
   # EXPLORE
   ##################################################
