@@ -70,15 +70,23 @@ dashboardPage(#theme = "flatly",
           margin-bottom: 10px;
         }
         
+        /* Add spacing between inline links */
         .inline-link {
           display: inline;
-          margin-right: 0px; /* Add spacing between inline links */
+          margin-right: 0px; 
         }
         
+        /* Change the color of the tooltip boxes */
         .tooltip > .tooltip-inner {
                 width: 400px;
                 color: white;
                 background-color: #666666;
+        }
+        
+        /* Change the width and color of the landing page line */
+        hr {
+          opacity: 1; 
+          border-top: 2.5px solid #605ca3;
         }
       ")
     ),
