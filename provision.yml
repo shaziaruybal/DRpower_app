@@ -8,6 +8,7 @@ packages:
   - shinyjs
   - shinyWidgets
   - shinyBS
+  - shinyvalidate
   - tidyverse
 package_sources:
   github:
