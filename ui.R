@@ -428,8 +428,15 @@ dashboardPage(#theme = "flatly",
                    em("roughly "),
                    "the level at which missed cases due to deletions match missed cases due to loss of sensitivity in alternative RDTs. We should treat this number as a useful guide, not a value to slavishly follow. We should also keep in mind that the closer our assumed prevalence is to the 5% threshold, the larger our sample size will need to be, up to values that are completely unrealistic for any control programme. There is a balance to be struck between sensitivity to detect a given effect size, and pragmatic arguments based on logistics, budget, and ethical considerations. Here, we opt for an assumed 10% prevalence as the default, as this gives a reasonable level of sensitivity while also leading to realistic sample sizes.",
                    br(), br(),
-                   em("For more information on the statical methods used in the back-end of this app or if you want to do more advanced analyses, please visit the "),
-                   em(a("DRpower R package website.", target = "_blank", href='https://mrc-ide.github.io/DRpower/'))
+                   strong("4. What do my sample size numbers actually represent?"),
+                   br(), br(),
+                   "In these calculations the sample size number represent the number of ", em("confirmed malaria cases, "), "which may be lower than the number of ", em("suspected "), "cases (see schematic below).",
+                   img(src = "img/sample_sizes_diagram.png", height = "100%", width = "100%"),
+                   br(), br(), br(),
+                   strong("5. What if I want to perform even more bespoke and/or advanced analyses?"),
+                   br(), br(),
+                   "For more information on the statical methods used in the back-end of this app or if you want to do more advanced analyses, please visit the ",
+                   a("DRpower R package website.", target = "_blank", href='https://mrc-ide.github.io/DRpower/')
                  )
           )
         )
