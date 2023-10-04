@@ -240,7 +240,6 @@ dashboardPage(#theme = "flatly",
                                      width = 7,
                                      collapsible = T,
                                      title = "2. Estimate power", 
-                                     p("Using the target sample sizes above, you can estimate the power of your study by simulation."),
                                      numericInput("param_prev",
                                                   label = "Select the prevalence (%)",
                                                   value = 10,
@@ -328,13 +327,13 @@ dashboardPage(#theme = "flatly",
                          p(class = "callout-title", "Estimate prevalence and compare against the 5% threshold"),
                          "Here, you can enter your observed counts of ", em("pfhrp2/3"), " deletions in each cluster and use the DRpower model to estimate the prevalence of deletions along with a 95% credible interval (CrI). You can also compare prevalence against the ", a("WHO recommended 5% threshold ", target = "_blank", href = "https://iris.who.int/handle/10665/331197"), "to work out the probability of being above this threshold.",
                          br(), br(),
-                         "If your intention is to make a binary decision as to whether prevalence is above or below the threshold (i.e., a hypothesis test) then it is worth being clear about your analysis plan ", strong("before "), "you see the result. For example, we recommend accepting that prevalence is above the 5% threshold if the probability of this outcome is 0.95 or higher (the power calculations in the Design tab assume this value). You should not change your criteria for accepting/rejecting a hypothesis once you have seen the result, as this introduces bias. "
+                         "If your intention is to make a binary decision as to whether prevalence is above or below the threshold (i.e., a hypothesis test) then it is worth being clear about your analysis plan ", strong("before "), "you see the result. For example, we recommend accepting that prevalence is above the 5% threshold if the probability of this outcome is 0.95 or higher (the power calculations in the Design tab assume this value). You should not change your criteria for accepting/rejecting a hypothesis once you have seen the result."
                      ),
                      br(),
                      fluidRow(
                        box(width = 12,
                            collapsible = T,
-                           title = "Step 1. Enter the values specific to your study",
+                           title = "Step 1. Analyse prevalence of deletions compared with the 5% threshold",
                            p("Select the final number of clusters in your study and enter the raw number of observed ", em("pfhrp2/3"), " deletion counts, and the number of confirmed malaria cases per cluster."),
                            br(),
                            # selectInput(
