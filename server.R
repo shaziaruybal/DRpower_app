@@ -292,6 +292,7 @@ function(input, output, session) {
      req(input$design_nclust, input$calc_sizes, df_sizes_final())
      
      box(width = 5, 
+         collapsible = T,
          background = "purple",
          title = "Adjusted sample sizes",
          p("Based on the values you entered for sample size (n) and taking into account the proportion drop-out (d), the adjusted sample size is calculated using the formula n_adj = n/(1-d). This still refers to confirmed malaria positive cases. Scroll the table to view."),
@@ -386,6 +387,7 @@ function(input, output, session) {
     req(input$est_pow, power_output())
     
     box(width = 5, 
+        collapsible = T,
         background = "purple",
         title = "Estimated power",
         p("The plot shows the mean and lower and upper 95% confidence interval based on cluster sizes and parameters chosen above."),
@@ -720,12 +722,13 @@ function(input, output, session) {
     print("est_prev results should print")
     
     box(width = 6,
+        collapsible = T,
         background = "purple",
         title = "Prevalence estimates",
         p("The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. "),
         br(),
         renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100) %>% 
-                      rename("MAP prevalence estimate (%)" = MAP, "Lower CrI (%)" = CrI_lower, "Upper CrI (%)" = CrI_upper, "Probability above threshold (%)" = prob_above_threshold), 
+                      rename("Prevalence estimate (%)" = MAP, "Lower CrI (%)" = CrI_lower, "Upper CrI (%)" = CrI_upper, "Probability above threshold (%)" = prob_above_threshold), 
                     digits = 2,
                     colnames = T,
                     align = "c"),
@@ -845,13 +848,14 @@ function(input, output, session) {
     print("est_icc results should print")
     print(icc_output())
     
-    box(width = 6, 
+    box(width = 6,
+        collapsible = T,
         background = "purple",
         title = "ICC estimates",
         p("The table and the plot below show the maximum a posteriori (MAP) estimate of the ICC, along with a 95% credible interval (CrI). For context, an ICC of 0.05 is used by default in the Design tab based on an ", a("analysis of historical studies.", target = "_blank", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html")),
         br(),
         renderTable(icc_output() %>% 
-                      rename("MAP estimate of ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper), 
+                      rename("Estimate of ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper), 
                     digits = 2,
                     colnames = T, 
                     align = "c"),
