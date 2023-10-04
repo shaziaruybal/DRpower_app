@@ -223,7 +223,7 @@ dashboardPage(#theme = "flatly",
                                          choices = c("", seq(2, 20)), 
                                          selected = NULL,
                                        ),
-                                       textOutput("text_edit_clusttab"), 
+                                       htmlOutput("text_edit_clusttab"), 
                                        DTOutput("editable_clusttab"),
                                        br(),
                                        bsAlert("error_noclusters"), # this creates an error message if user clicks calculate without choosing number of clusters

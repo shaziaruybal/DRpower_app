@@ -139,11 +139,7 @@ function(input, output, session) {
   # observe when the user specifies n clusters
   observeEvent(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     print("Number of clusters selected")
-    #TODO it would be ideal if this could hyperlink to the explore tab but given it doesn't open in a new tab, have opted to not hyperlink here so that the user doesn't have to start over when navigating to link
-    output$text_edit_clusttab <- renderText("The table below has rows corresponding to the number of clusters in your study and is pre-populated based on the optimal sample size from the Explore tab.
-                                            Please edit the target sample size and expected proportion of participant drop-out for each cluster by double-clicking
-                                            and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate adjusted sample sizes' button. ")
-    
+    output$text_edit_clusttab <- renderUI(HTML(paste("Please edit the target sample size and expected proportion of participant drop-out for each cluster by ", strong("double-clicking"), " and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate adjusted sample sizes' button. ")))
     print("After user selects N clusters, this is the df:")
     print(df_sizes())
     
@@ -586,7 +582,8 @@ function(input, output, session) {
               selection = "none",
               # extensions = c("FixedHeader"),
               # extensions = c("FixedHeader", "FixedColumns"),
-              caption = "Double-click to edit each cell in the table below and enter your study values.",
+              caption = htmltools::tags$caption(htmltools::tags$span("Double-click ", style="font-weight:bold; color:black"), htmltools::tags$span("to edit each cell in the table below and enter your study values.")),
+              # caption = "Double-click to edit each cell in the table below and enter your study values.",
               options = list(dom = 'rt',
                              # autoWidth = TRUE, 
                              pageLength = 20,
