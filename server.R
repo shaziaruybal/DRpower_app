@@ -719,7 +719,7 @@ function(input, output, session) {
 
     print("est_prev results should print")
     
-    box(width = 12,
+    box(width = 6,
         background = "purple",
         title = "Prevalence estimates",
         p("The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. "),
@@ -845,7 +845,7 @@ function(input, output, session) {
     print("est_icc results should print")
     print(icc_output())
     
-    box(width = 12, 
+    box(width = 6, 
         background = "purple",
         title = "ICC estimates",
         p("The table and the plot below show the maximum a posteriori (MAP) estimate of the ICC, along with a 95% credible interval (CrI). For context, an ICC of 0.05 is used by default in the Design tab based on an ", a("analysis of historical studies.", target = "_blank", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html")),

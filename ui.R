@@ -331,7 +331,7 @@ dashboardPage(#theme = "flatly",
                      ),
                      br(),
                      fluidRow(
-                       box(width = 12,
+                       box(width = 6,
                            collapsible = T,
                            title = "Step 1. Analyse prevalence of deletions compared with the 5% threshold",
                            p("Select the final number of clusters in your study and enter the raw number of observed ", em("pfhrp2/3"), " deletion counts, and the number of confirmed malaria cases per cluster."),
@@ -357,11 +357,11 @@ dashboardPage(#theme = "flatly",
                                         label = "Estimate prevalence", 
                                         icon("clipboard-check")),
                            helpText(em("If you update these values, make sure you remember to recalculate prevalence"))
-                       )
+                       ),
+                       uiOutput("est_prev_results"),
                      ),
-                     uiOutput("est_prev_results"),
                    fluidRow(
-                     box(width = 12, 
+                     box(width = 6, 
                          collapsible = T,
                          title = "Step 2. Analysis of intra-cluster correlation (ICC)",
                          "Although the prevalence of ", em("pfhrp2/3"), " deletions is usually the main focus of our analysis, the intra-cluster correlation is an extremely valuable supplementary analysis. Reporting this value not only contextualises the prevalence estimates, but it also provides valuable information to assist with the design of future studies.",
@@ -373,8 +373,8 @@ dashboardPage(#theme = "flatly",
                                       icon("clipboard-check")),
                          helpText(em("If you update any of the values in Step 1, make sure you remember to recalculate ICC"))
                      ),
+                     uiOutput("est_icc_results"),
                    ),
-                   uiOutput("est_icc_results"),
                  ),
                  tabPanel(
                    title = "Generate report",
