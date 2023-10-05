@@ -139,11 +139,7 @@ function(input, output, session) {
   # observe when the user specifies n clusters
   observeEvent(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     print("Number of clusters selected")
-    #TODO it would be ideal if this could hyperlink to the explore tab but given it doesn't open in a new tab, have opted to not hyperlink here so that the user doesn't have to start over when navigating to link
-    output$text_edit_clusttab <- renderText("The table below has rows corresponding to the number of clusters in your study and is pre-populated based on the optimal sample size from the Explore tab.
-                                            Please edit the target sample size and expected proportion of participant drop-out for each cluster by double-clicking
-                                            and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate adjusted sample sizes' button. ")
-    
+    output$text_edit_clusttab <- renderUI(HTML(paste("Please edit the target sample size and expected proportion of participant drop-out for each cluster by ", strong("double-clicking"), " and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate adjusted sample sizes' button. ")))
     print("After user selects N clusters, this is the df:")
     print(df_sizes())
     
@@ -296,6 +292,7 @@ function(input, output, session) {
      req(input$design_nclust, input$calc_sizes, df_sizes_final())
      
      box(width = 5, 
+         collapsible = T,
          background = "purple",
          title = "Adjusted sample sizes",
          p("Based on the values you entered for sample size (n) and taking into account the proportion drop-out (d), the adjusted sample size is calculated using the formula n_adj = n/(1-d). This still refers to confirmed malaria positive cases. Scroll the table to view."),
@@ -390,6 +387,7 @@ function(input, output, session) {
     req(input$est_pow, power_output())
     
     box(width = 5, 
+        collapsible = T,
         background = "purple",
         title = "Estimated power",
         p("The plot shows the mean and lower and upper 95% confidence interval based on cluster sizes and parameters chosen above."),
@@ -586,7 +584,8 @@ function(input, output, session) {
               selection = "none",
               # extensions = c("FixedHeader"),
               # extensions = c("FixedHeader", "FixedColumns"),
-              caption = "Double-click to edit each cell in the table below and enter your study values.",
+              caption = htmltools::tags$caption(htmltools::tags$span("Double-click ", style="font-weight:bold; color:black"), htmltools::tags$span("to edit each cell in the table below and enter your study values.")),
+              # caption = "Double-click to edit each cell in the table below and enter your study values.",
               options = list(dom = 'rt',
                              # autoWidth = TRUE, 
                              pageLength = 20,
@@ -722,13 +721,14 @@ function(input, output, session) {
 
     print("est_prev results should print")
     
-    box(width = 12,
+    box(width = 6,
+        collapsible = T,
         background = "purple",
         title = "Prevalence estimates",
         p("The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. "),
         br(),
         renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100) %>% 
-                      rename("MAP prevalence estimate (%)" = MAP, "Lower CrI (%)" = CrI_lower, "Upper CrI (%)" = CrI_upper, "Probability above threshold (%)" = prob_above_threshold), 
+                      rename("Prevalence estimate (%)" = MAP, "Lower CrI (%)" = CrI_lower, "Upper CrI (%)" = CrI_upper, "Probability above threshold (%)" = prob_above_threshold), 
                     digits = 2,
                     colnames = T,
                     align = "c"),
@@ -848,13 +848,14 @@ function(input, output, session) {
     print("est_icc results should print")
     print(icc_output())
     
-    box(width = 12, 
+    box(width = 6,
+        collapsible = T,
         background = "purple",
         title = "ICC estimates",
         p("The table and the plot below show the maximum a posteriori (MAP) estimate of the ICC, along with a 95% credible interval (CrI). For context, an ICC of 0.05 is used by default in the Design tab based on an ", a("analysis of historical studies.", target = "_blank", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html")),
         br(),
         renderTable(icc_output() %>% 
-                      rename("MAP estimate of ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper), 
+                      rename("Estimate of ICC" = MAP, "Lower CrI" = CrI_lower, "Upper CrI" = CrI_upper), 
                     digits = 2,
                     colnames = T, 
                     align = "c"),
