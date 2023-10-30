@@ -230,6 +230,9 @@ function(input, output, session) {
   
   # observe when the user specifies n clusters
   observeEvent(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
+    # require the user to have selected manual enter
+    req(input$design_table_choice=="manual")
+    
     print("Number of clusters selected")
     output$text_edit_clusttab <- renderUI(HTML(paste("Please edit the target sample size and expected proportion of participant drop-out for each cluster by ", strong("double-clicking"), " and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate adjusted sample sizes' button. ")))
     
@@ -265,6 +268,7 @@ function(input, output, session) {
   
   # render editable table
   output$editable_clusttab <- renderDT({
+    if(input$design_table_choice=="manual"){
     datatable(design_rv$df_sizes_update, 
               editable = list(
                 target = 'cell',
@@ -286,10 +290,14 @@ function(input, output, session) {
                                                     targets = "_all")),
                              # fixedColumns = list(leftColumns = c(1)),
                              scrollX = '400px'))
+    }
   })
 
   # observe when table is edited and update the data frame with the user entered values
   observeEvent(input$editable_clusttab_cell_edit, {
+    # Require user to have selected 'manual'
+    req(input$design_table_choice=="manual")
+    
     print("Editable design table has been edited")
     
     # get the latest updated data frame
@@ -337,6 +345,8 @@ function(input, output, session) {
   
   # Observe if add row button has been clicked, and if so add a row to the edited table (see: https://stackoverflow.com/questions/52427281/add-and-delete-rows-of-dt-datatable-in-r-shiny)
   observeEvent(input$add_row_design, {
+    # Require user to have selected 'manual'
+    req(input$design_table_choice=="manual")
     
     print("add row button clicked")
     
@@ -356,6 +366,8 @@ function(input, output, session) {
   
   # Observe if delete row button has been clicked, and if so add a row to the edited table
   observeEvent(input$delete_row_design, {
+    # Require user to have selected 'manual'
+    req(input$design_table_choice=="manual")
     
     print("delete row button clicked")
     
@@ -374,6 +386,7 @@ function(input, output, session) {
     design_rv$df_sizes_update <- df
   })
   
+  
   # ----------------------------------
   #  Calculate adjusted sample sizes
   # ----------------------------------
@@ -383,14 +396,19 @@ function(input, output, session) {
   design_rv <- reactiveValues(calc_sizes_click = NULL)
   
   # When 'calculate sample sizes' button is clicked:
-  # update the data frame with the user-entered values, calculate the adjusted sample size, and create a final df that is reactive
+  # update the data frame with the user-entered values or the uploaded data frame, calculate the adjusted sample size, and create a final df that is reactive
   df_sizes_final <- eventReactive(input$calc_sizes, {
     
     # require n clusters to be defined and the button click to be > 0 (if 0 then the user has clicked without select n_clust)
-    req(input$design_nclust, design_rv$calc_sizes_click > 0)
+    req(!is.na(design_rv$df_sizes_update), design_rv$calc_sizes_click > 0)
     
     # get the stored (and edited) data frame with sample sizes
-    df <- design_rv$df_sizes_update
+    if(input$design_table_choice=="manual"){
+      df <- design_rv$df_sizes_update
+    }
+    else if(input$design_table_choice=="upload"){
+      df <- df_sizes_uploaded()
+    }
     
     # check that sample size values are numeric and that no value is NA (and if so show pop-up error message)
     if(!any(is.na(df$cluster)) && is.numeric(df$percent_dropout) && !any(is.na(df$percent_dropout)) && is.numeric(df$target_sample_size) && !any(is.na(df$target_sample_size))){
@@ -404,7 +422,7 @@ function(input, output, session) {
       print(design_rv$df_sizes_update)
       show_alert(
         title = "Error!",
-        text = "Make sure you have only entered integers in your table and/or make sure you have filled in all the cells. Please go back and enter the values again.",
+        text = "Make sure you have only entered integers in your table and/or make sure you have filled in all the cells. Please go back and enter the values again or upload your file again if you selected to upload your own.",
         type = "error"
       )
     }
