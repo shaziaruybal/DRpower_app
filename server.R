@@ -548,30 +548,40 @@ function(input, output, session) {
 
   # create a reactive value for df_analysis_update
   analysis_rv <- reactiveValues(df_analysis_update = NULL)
-  
+
   # Make the editable data frame reactive and dependent on the deletion and sample sizes entered by the user
-  df_deletions <- eventReactive(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
+  # df_deletions <- eventReactive(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
+  #   
+  #   print("number of analysis clusters selected and initial df created")
+  #   
+  #   # create the data frame with fixed columns and rows based on user input
+  #   data.frame(
+  #     cluster = c(rep(1:input$analysis_nclust)),
+  #     n_deletions = c(rep(NA, input$analysis_nclust)),
+  #     sample_size = c(rep(NA, input$analysis_nclust))
+  #   )
+  # })  
+  
+  # When the user selects the number of clusters, we store the initial values in df_analysis_update() so we can keep track of any user edits to the table
+  observeEvent(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
+    print("Number of final clusters selected - saving initial df as reactiveVal")
     
     print("number of analysis clusters selected and initial df created")
     
     # create the data frame with fixed columns and rows based on user input
-    data.frame(
+    df_deletions <- data.frame(
       cluster = c(rep(1:input$analysis_nclust)),
       n_deletions = c(rep(NA, input$analysis_nclust)),
       sample_size = c(rep(NA, input$analysis_nclust))
     )
-  })  
-  
-  # When the user selects the number of clusters, we store the initial values in df_sizes_update() so we can keep track of any user edits to the table
-  observeEvent(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
-    print("Number of final clusters selected - saving initial df as reactiveVal")
     
-    analysis_rv$df_analysis_update <- df_deletions()
+    # assign the initial data frame 'df_deletions' to df_analysis_update
+    analysis_rv$df_analysis_update <- df_deletions
   }) 
   
   # Render editable table
   output$editable_deltab <- renderDT({
-    datatable(df_deletions(), 
+    datatable(analysis_rv$df_analysis_update, 
               editable = list(
                 target = 'cell',
                 numeric = c(2,3) #,
@@ -581,7 +591,7 @@ function(input, output, session) {
               ),
               rownames = FALSE,
               colnames = c("Cluster", "Number of deletions", "Sample size"), 
-              selection = "none",
+              # selection = "none", # uncomment if you want to disable row selection when clicking (it was annoying before but now we need for delete row)
               # extensions = c("FixedHeader"),
               # extensions = c("FixedHeader", "FixedColumns"),
               caption = htmltools::tags$caption(htmltools::tags$span("Double-click ", style="font-weight:bold; color:black"), htmltools::tags$span("to edit each cell in the table below and enter your study values.")),
