@@ -109,16 +109,45 @@ function(input, output, session) {
   design_rv <- reactiveValues(df_sizes_update = NULL)
 
   # Make the editable data frame reactive and dependent on the number of clusters entered by the user
-  df_sizes <- eventReactive(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
+  # df_sizes <- eventReactive(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
+  #   
+  #   # TODO: question for Bob - do we want this to populate based on df_sample_sizes() or defaults? 
+  #   # getting target sizes to pre-populate the table from fixed defaults of ICC=0.05 and prev_thresh=0.05 
+  #   df_targets <- df_ss %>% 
+  #       filter(ICC == 0.05) %>% 
+  #       filter(prev_thresh == 0.05) %>% 
+  #       filter(prior_ICC_shape2==9) %>% # TODO fixed at 9 (check this when final final table is ready)
+  #       select(n_clust, prevalence, N_opt) %>%
+  #       pivot_wider(names_from = prevalence, values_from = N_opt) 
+  #   
+  #   # get the target sample sizes from table with fixed prev of 10%, fix it at 500 if nclust is 2 or 3 (because NA)
+  #   if(input$design_nclust==2 | input$design_nclust==3 | input$design_nclust==4){
+  #     target_size <- 500
+  #   }
+  #   else{
+  #     target_size <- df_targets %>% filter(n_clust == input$design_nclust) %>% select(`0.1`) %>% as.integer()
+  #   }
+  # 
+  #   # create the data frame with fixed columns and rows based on user input and target sample sizes as defaults
+  #   data.frame(
+  #     cluster = rep(1:input$design_nclust),
+  #     target_sample_size = rep(target_size, input$design_nclust),
+  #     percent_dropout = rep(10, input$design_nclust)
+  #   )
+  # })
+  
+  # observe when the user specifies n clusters
+  observeEvent(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
+    print("Number of clusters selected")
+    output$text_edit_clusttab <- renderUI(HTML(paste("Please edit the target sample size and expected proportion of participant drop-out for each cluster by ", strong("double-clicking"), " and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate adjusted sample sizes' button. ")))
     
-    # TODO: question for Bob - do we want this to populate based on df_sample_sizes() or defaults? 
     # getting target sizes to pre-populate the table from fixed defaults of ICC=0.05 and prev_thresh=0.05 
     df_targets <- df_ss %>% 
-        filter(ICC == 0.05) %>% 
-        filter(prev_thresh == 0.05) %>% 
-        filter(prior_ICC_shape2==9) %>% # TODO fixed at 9 (check this when final final table is ready)
-        select(n_clust, prevalence, N_opt) %>%
-        pivot_wider(names_from = prevalence, values_from = N_opt) 
+      filter(ICC == 0.05) %>% 
+      filter(prev_thresh == 0.05) %>% 
+      filter(prior_ICC_shape2==9) %>% # TODO fixed at 9 (check this when final final table is ready)
+      select(n_clust, prevalence, N_opt) %>%
+      pivot_wider(names_from = prevalence, values_from = N_opt) 
     
     # get the target sample sizes from table with fixed prev of 10%, fix it at 500 if nclust is 2 or 3 (because NA)
     if(input$design_nclust==2 | input$design_nclust==3 | input$design_nclust==4){
@@ -127,29 +156,24 @@ function(input, output, session) {
     else{
       target_size <- df_targets %>% filter(n_clust == input$design_nclust) %>% select(`0.1`) %>% as.integer()
     }
-
-    # create the data frame with fixed columns and rows based on user input and target sample sizes as defaults
-    data.frame(
-      cluster = rep(1:input$design_nclust),
-      target_sample_size = rep(target_size, input$design_nclust),
-      percent_dropout = rep(10, input$design_nclust)
-    )
-  })
-  
-  # observe when the user specifies n clusters
-  observeEvent(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
-    print("Number of clusters selected")
-    output$text_edit_clusttab <- renderUI(HTML(paste("Please edit the target sample size and expected proportion of participant drop-out for each cluster by ", strong("double-clicking"), " and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate adjusted sample sizes' button. ")))
-    print("After user selects N clusters, this is the df:")
-    print(df_sizes())
     
-    # when df_sizes() is created, store the initial values in df_sizes_update()
-    design_rv$df_sizes_update <- df_sizes()
+    # create the starting data frame with fixed columns and rows based on user input and target sample sizes as defaults
+    df_sizes <- data.frame(
+                cluster = rep(1:input$design_nclust),
+                target_sample_size = rep(target_size, input$design_nclust),
+                percent_dropout = rep(10, input$design_nclust)
+                )
+    
+    print("After user selects N clusters, this is the df:")
+    print(df_sizes)
+    
+    # when df_sizes is created, store the initial values in df_sizes_update()
+    design_rv$df_sizes_update <- df_sizes
   })
   
   # render editable table
   output$editable_clusttab <- renderDT({
-    datatable(df_sizes(), 
+    datatable(design_rv$df_sizes_update, 
               editable = list(
                 target = 'cell',
                 numeric = c(2,3) #,
@@ -159,7 +183,7 @@ function(input, output, session) {
               ),
               rownames = FALSE, 
               colnames = c("Cluster", "Target sample size", "% drop-out"),
-              selection = "none",
+              # selection = "none", # uncomment if you want to disable row selection when clicking (it was annoying before but now we need for delete row)
               # extensions = c("FixedHeader"),
               # extensions = c("FixedHeader", "FixedColumns"),
               options = list(dom = 'rt',
