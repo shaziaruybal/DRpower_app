@@ -102,6 +102,98 @@ function(input, output, session) {
   ##################################################
 
   # ----------------------------------
+  #  Dynamic UI that controls how user enters sample sizes
+  # ----------------------------------
+  
+  # render the dynamic UI based on the user choice, if manual enter then the editable table is displayed, if not the user-uploaded .csv table is displayed
+  output$enter_sizes_dynamicUI <- renderUI({
+    
+    if(input$design_table_choice=="manual"){
+      fluidPage(
+        selectInput(
+          inputId = "design_nclust",
+          label = strong("Select number of clusters: "),
+          width = "40%",
+          choices = c(seq(2, 20)),
+          selected = 10, # making a selection here as default of 10 because if not, it crashes when initial input is NULL 
+        ),
+        htmlOutput("text_edit_clusttab"),
+        DTOutput("editable_clusttab"),
+        br(),
+        bsAlert("error_noclusters"), # this creates an error message if user clicks calculate without choosing number of clusters
+        actionButton(inputId = "add_row_design",
+                     label = "Add row",
+                     icon("circle-plus")),
+        actionButton(inputId = "delete_row_design",
+                     label = "Delete row",
+                     icon("circle-minus")),
+        bsTooltip(id = "delete_row_design",
+                  title = "Select the row you want to delete by clicking it once, this should highlight the row in blue. Then click button.",
+                  placement = "right"),
+        br(), br(),
+        actionButton(
+          inputId = "calc_sizes",
+          label = "Calculate adjusted sample sizes",
+          icon = icon("clipboard-check")),
+        helpText(em("If you update these values, make sure you remember to recalculate your adjusted sample sizes and estimate power below"))
+      )
+    }
+    
+    
+    else if(input$design_table_choice=="upload"){
+      fluidPage(
+        fileInput(inputId = "uploaded_design_table",
+                  label = "Upload your sample size table (.csv):",
+                  multiple = FALSE,
+                  accept = ".csv"),
+        p("Please use the ", a(href="design_template.csv", "template provided", download=NA, target="_blank"), "and ensure your file matches exactly."),
+        br(),
+        strong("Check your uploaded file below. If everything looks OK, click 'Calculate adjusted sample sizes' button."),
+        renderDT(df_sizes_uploaded(),
+                 rownames = FALSE,
+                 colnames = c("Cluster", "Target sample size", "% drop-out"),
+                 selection = "none",
+                 options = list(dom = 'rt',
+                                pageLength=20,
+                                columnDefs = list(list(className = "dt-center",
+                                                       targets = "_all")),
+                                scrollX = '400px')
+        ),
+        br(),
+        actionButton(
+          inputId = "calc_sizes",
+          label = "Calculate adjusted sample sizes",
+          icon = icon("clipboard-check"))
+      )
+    }
+  })
+  
+  # ----------------------------------
+  #  User-uploaded table: sample size and proportion drop-out
+  # ----------------------------------
+  
+  # If user uploads their own design sample size table, we create a new reactiveVal "df_sizes_uploaded"
+  df_sizes_uploaded <- reactive({
+    req(input$uploaded_design_table)
+    
+    # Validation check
+    tryCatch(
+      {
+        read.csv(input$uploaded_design_table$datapath)
+      },
+      # in theory this shouldn't be needed because the fileInput requires only .csv files (it only allows you to select .csv from your local files)
+      error = function(err){
+        show_alert(
+          title = "Error!",
+          text = "Invalid file. Please upload a .csv file.",
+          type = "error"
+        )
+      }
+    )
+    
+  })
+  
+  # ----------------------------------
   #  User-input table: sample size and proportion drop-out
   # ----------------------------------
   
