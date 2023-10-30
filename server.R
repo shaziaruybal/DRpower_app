@@ -243,6 +243,44 @@ function(input, output, session) {
     
   })
   
+  # Observe if add row button has been clicked, and if so add a row to the edited table (see: https://stackoverflow.com/questions/52427281/add-and-delete-rows-of-dt-datatable-in-r-shiny)
+  observeEvent(input$add_row_design, {
+    
+    print("add row button clicked")
+    
+    # get the latest updated data frame
+    df <- design_rv$df_sizes_update
+    row_num <- nrow(df)
+    
+    new_df <- df %>% add_row(cluster = row_num+1, 
+                             target_sample_size = NA,
+                             percent_dropout = NA)
+    
+    print(new_df)
+    
+    # assign the updated data frame to df_sizes_update
+    design_rv$df_sizes_update <- new_df
+  })
+  
+  # Observe if delete row button has been clicked, and if so add a row to the edited table
+  observeEvent(input$delete_row_design, {
+    
+    print("delete row button clicked")
+    
+    # get the latest updated data frame
+    df <- design_rv$df_sizes_update
+    
+    # check if rows are selected
+    if(!is.null(input$editable_clusttab_rows_selected)){
+      # if they are, delete them from the data frame
+      df <- df[-as.numeric(input$editable_clusttab_rows_selected),]
+    }
+    
+    print(df)
+    
+    # assign the updated data frame to df_analysis_update
+    design_rv$df_sizes_update <- df
+  })
   
   # ----------------------------------
   #  Calculate adjusted sample sizes
