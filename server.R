@@ -611,7 +611,7 @@ function(input, output, session) {
     
     # get the latest updated data frame
     df <- analysis_rv$df_analysis_update
-    
+
     # iterate over each cell edit event
     for (i in seq_along(input$editable_deltab_cell_edit$row)) {
       print("original col index:")
@@ -646,9 +646,48 @@ function(input, output, session) {
       df[row, col] <- value
     }
     
-    # assign the updated data frame to df_sizes_update
+    # assign the updated data frame to df_analysis_update
     analysis_rv$df_analysis_update <- df
     
+  })
+  
+  # Observe if add row button has been clicked, and if so add a row to the edited table (see: https://stackoverflow.com/questions/52427281/add-and-delete-rows-of-dt-datatable-in-r-shiny)
+  observeEvent(input$add_row_analysis, {
+
+    print("add row button clicked")
+
+    # get the latest updated data frame
+    df <- analysis_rv$df_analysis_update
+    row_num <- nrow(df)
+
+    new_df <- df %>% add_row(cluster = row_num+1, 
+                             n_deletions = NA,
+                             sample_size = NA)
+
+    print(new_df)
+    
+    # assign the updated data frame to df_analysis_update
+    analysis_rv$df_analysis_update <- new_df
+  })
+  
+  # Observe if delete row button has been clicked, and if so add a row to the edited table
+  observeEvent(input$delete_row_analysis, {
+
+    print("delete row button clicked")
+
+    # get the latest updated data frame
+    df <- analysis_rv$df_analysis_update
+
+    # check if rows are selected
+    if(!is.null(input$editable_deltab_rows_selected)){
+      # if they are, delete them from the data frame
+      df <- df[-as.numeric(input$editable_deltab_rows_selected),]
+    }
+
+    print(df)
+
+    # assign the updated data frame to df_analysis_update
+    analysis_rv$df_analysis_update <- df
   })
   
   # ----------------------------------
