@@ -227,6 +227,13 @@ dashboardPage(#theme = "flatly",
                                        DTOutput("editable_clusttab"),
                                        br(),
                                        bsAlert("error_noclusters"), # this creates an error message if user clicks calculate without choosing number of clusters
+                                       actionButton(inputId = "add_row_design", 
+                                                    label = "Add row",
+                                                    icon("circle-plus")),
+                                       actionButton(inputId = "delete_row_design", 
+                                                    label = "Delete row",
+                                                    icon("circle-minus")),
+                                       br(), br(),
                                        actionButton(
                                          inputId = "calc_sizes",
                                          label = "Calculate adjusted sample sizes",
