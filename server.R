@@ -114,8 +114,7 @@ function(input, output, session) {
           inputId = "design_nclust",
           label = strong("Select number of clusters: "),
           width = "40%",
-          choices = c(seq(2, 20)),
-          selected = 10, # making a selection here as default of 10 because if not, it crashes when initial input is NULL 
+          choices = c("", seq(2, 20)),
         ),
         htmlOutput("text_edit_clusttab"),
         DTOutput("editable_clusttab"),
@@ -231,7 +230,7 @@ function(input, output, session) {
   # observe when the user specifies n clusters
   observeEvent(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     # require the user to have selected manual enter
-    req(input$design_table_choice=="manual")
+    req(input$design_table_choice=="manual", input$design_nclust!= "")
     
     print("Number of clusters selected")
     output$text_edit_clusttab <- renderUI(HTML(paste("Please edit the target sample size and expected proportion of participant drop-out for each cluster by ", strong("double-clicking"), " and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate adjusted sample sizes' button. ")))
@@ -726,8 +725,7 @@ function(input, output, session) {
           inputId = "analysis_nclust",
           label = strong("Select final number of clusters: "),
           width = "40%",
-          choices = c(seq(2, 20)),
-          selected = 10 # making a selection here as default of 10 because if not, it crashes when initial input is NULL 
+          choices = c("", seq(2, 20)),
         ),
         DTOutput("editable_deltab"),
         br(),
@@ -824,7 +822,7 @@ function(input, output, session) {
   
   # When the user selects the number of clusters, we store the initial values in df_analysis_update() so we can keep track of any user edits to the table
   observeEvent(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
-    req(input$analysis_table_choice=="manual")
+    req(input$analysis_table_choice=="manual", input$analysis_nclust!="")
     
     print("Number of final clusters selected - saving initial df as reactiveVal")
     
