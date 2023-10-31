@@ -713,6 +713,94 @@ function(input, output, session) {
   ##################################################
   # ANALYSIS
   ##################################################
+  # ----------------------------------
+  #  Dynamic UI that controls how user enters deletions and final sample sizes
+  # ----------------------------------
+  
+  # render the dynamic UI based on the user choice, if manual enter then the editable table is displayed, if not the user-uploaded .csv table is displayed
+  output$enter_deletions_dynamicUI <- renderUI({
+    
+    if(input$analysis_table_choice=="manual"){
+      fluidPage(
+        selectInput(
+          inputId = "analysis_nclust",
+          label = strong("Select final number of clusters: "),
+          width = "40%",
+          choices = c(seq(2, 20)),
+          selected = 10 # making a selection here as default of 10 because if not, it crashes when initial input is NULL 
+        ),
+        DTOutput("editable_deltab"),
+        br(),
+        bsAlert("error_nodeletions"), # this creates an error message if user clicks estimate prevalence without entering deletions/sample sizes
+        actionButton(inputId = "add_row_analysis",
+                     label = "Add row",
+                     icon("circle-plus")),
+        actionButton(inputId = "delete_row_analysis",
+                     label = "Delete row",
+                     icon("circle-minus")),
+        bsTooltip(id = "delete_row_analysis",
+                  title = "Select the row you want to delete by clicking it once, this should highlight the row in blue. Then click button.",
+                  placement = "right"),
+        br(), br(),
+        actionButton(inputId = "est_prev",
+                     label = "Estimate prevalence",
+                     icon("clipboard-check")),
+        helpText(em("If you update these values, make sure you remember to recalculate prevalence"))
+      )
+    }
+    
+    else if(input$analysis_table_choice=="upload"){
+      fluidPage(
+        fileInput(inputId = "uploaded_analysis_table",
+                  label = "Upload your final study table (.csv):",
+                  multiple = FALSE,
+                  accept = ".csv"),
+        p("Please use the ", a(href="analysis_template.csv", "template provided", download=NA, target="_blank"), "and ensure your file matches exactly."),
+        br(),
+        strong("Check your uploaded file below. If everything looks OK, click the 'Estimate prevalence' button."),
+        renderDT(df_deletions_uploaded(),
+                 rownames = FALSE,
+                 colnames = c("Cluster", "Number of deletions", "Sample size"),
+                 selection = "none",
+                 options = list(dom = 'rt',
+                                pageLength=20,
+                                columnDefs = list(list(className = "dt-center",
+                                                       targets = "_all")),
+                                scrollX = '400px')
+        ),
+        br(),
+        actionButton(inputId = "est_prev",
+                     label = "Estimate prevalence",
+                     icon("clipboard-check"))
+      )
+    }
+    
+  })
+  
+  # ----------------------------------
+  #  User-uploaded table: number of deletions and final sample sizes
+  # ----------------------------------
+  
+  # If user uploads their own analysis deletions/final sample sizes table, we create a new reactiveVal "df_deletions_uploaded"
+  df_deletions_uploaded <- reactive({
+    req(input$uploaded_analysis_table)
+    
+    # Validation check
+    tryCatch(
+      {
+        read.csv(input$uploaded_analysis_table$datapath)
+      },
+      # in theory this shouldn't be needed because the fileInput requires only .csv files (it only allows you to select .csv from your local files)
+      error = function(err){
+        show_alert(
+          title = "Error!",
+          text = "Invalid file. Please upload a .csv file.",
+          type = "error"
+        )
+      }
+    )
+    
+  })
   
   # ----------------------------------
   #  User-input table: number of deletions and final sample sizes
