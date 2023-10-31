@@ -824,6 +824,8 @@ function(input, output, session) {
   
   # When the user selects the number of clusters, we store the initial values in df_analysis_update() so we can keep track of any user edits to the table
   observeEvent(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
+    req(input$analysis_table_choice=="manual")
+    
     print("Number of final clusters selected - saving initial df as reactiveVal")
     
     print("number of analysis clusters selected and initial df created")
@@ -836,11 +838,14 @@ function(input, output, session) {
     )
     
     # assign the initial data frame 'df_deletions' to df_analysis_update
+    if(input$analysis_table_choice=="manual"){
     analysis_rv$df_analysis_update <- df_deletions
+    }
   }) 
   
   # Render editable table
   output$editable_deltab <- renderDT({
+    if(input$analysis_table_choice=="manual"){
     datatable(analysis_rv$df_analysis_update, 
               editable = list(
                 target = 'cell',
@@ -863,10 +868,13 @@ function(input, output, session) {
                                                     targets = "_all")),
                              # fixedColumns = list(leftColumns = c(1)),
                              scrollX = '400px')) 
+    }
   })
   
   # observe when table is edited and update the data frame with the user entered values
   observeEvent(input$editable_deltab_cell_edit, {
+    req(input$analysis_table_choice=="manual")
+    
     print("Editable analysis table has been edited")
     
     # get the latest updated data frame
@@ -913,7 +921,8 @@ function(input, output, session) {
   
   # Observe if add row button has been clicked, and if so add a row to the edited table (see: https://stackoverflow.com/questions/52427281/add-and-delete-rows-of-dt-datatable-in-r-shiny)
   observeEvent(input$add_row_analysis, {
-
+    req(input$analysis_table_choice=="manual")
+    
     print("add row button clicked")
 
     # get the latest updated data frame
@@ -932,7 +941,8 @@ function(input, output, session) {
   
   # Observe if delete row button has been clicked, and if so add a row to the edited table
   observeEvent(input$delete_row_analysis, {
-
+    req(input$analysis_table_choice=="manual")
+    
     print("delete row button clicked")
 
     # get the latest updated data frame
@@ -969,7 +979,13 @@ function(input, output, session) {
     # remove notification when calculation finishes
     on.exit(removeNotification(id), add = TRUE)
     
-    df <- analysis_rv$df_analysis_update
+    # get the stored and edited data frame with sample sizes, or the uploaded data frame
+    if(input$analysis_table_choice=="manual"){
+      df <- analysis_rv$df_analysis_update
+    }
+    else if(input$analysis_table_choice=="upload"){
+      df <- df_deletions_uploaded()
+    }
     
     # check that values are numeric and that no value is NA (and if so show pop-up error message)
     if(is.numeric(df$n_deletions) && !any(is.na(df$n_deletions)) && is.numeric(df$sample_size) && !any(is.na(df$sample_size))){
@@ -1117,7 +1133,13 @@ function(input, output, session) {
       # remove notification when calculation finishes
       on.exit(removeNotification(id), add = TRUE)
       
-      df <- analysis_rv$df_analysis_update
+      # get the stored and edited data frame with sample sizes, or the uploaded data frame
+      if(input$analysis_table_choice=="manual"){
+        df <- analysis_rv$df_analysis_update
+      }
+      else if(input$analysis_table_choice=="upload"){
+        df <- df_deletions_uploaded()
+      }
       
       DRpower::get_ICC(n = df$n_deletions,
                        N = df$sample_size)
@@ -1237,7 +1259,14 @@ function(input, output, session) {
           collapsible = TRUE,
           title = "Data summary",
           h4("Final study values:"),
-          renderTable(analysis_rv$df_analysis_update, digits = 0),
+          if(input$analysis_table_choice=="manual"){
+            req(analysis$df_analysis_update)
+            renderTable(analysis_rv$df_analysis_update, digits = 0)
+          }
+          else if(input$analysis_table_choice=="upload"){
+            req(df_deletions_uploaded())
+            renderTable(df_deletions_uploaded(), digits = 0)
+          },
           br(), br(),
           h4("Prevalence estimates:"),
           renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100), 
