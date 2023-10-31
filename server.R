@@ -1310,8 +1310,16 @@ function(input, output, session) {
       tempReport <- file.path(tempdir(), "template_analysis_report.Rmd")
       file.copy("template_analysis_report.Rmd", tempReport, overwrite = TRUE)
       
+      # select the correct study data based on manual entry vs uploaded
+      if(input$analysis_table_choice=="manual"){
+        study_data <- analysis_rv$df_analysis_update
+      }
+      else if(input$analysis_table_choice=="upload"){
+        study_data <- df_deletions_uploaded()
+      }
+      
       params <- list(analysis_nclusters = input$analysis_nclust,
-                     analysis_study_data = analysis_rv$df_analysis_update,
+                     analysis_study_data = study_data,
                      analysis_prevoutput = prev_output(),
                      analysis_iccoutput = icc_output()
                      )
