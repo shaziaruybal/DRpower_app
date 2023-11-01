@@ -141,11 +141,11 @@ function(input, output, session) {
     
     else if(input$design_table_choice=="upload"){
       fluidPage(
+        p("Please use the ", a(href="design_template.csv", "template provided", download=NA, target="_blank"), "and ensure your file matches exactly."),
         fileInput(inputId = "uploaded_design_table",
                   label = "Upload your sample size table (.csv):",
                   multiple = FALSE,
                   accept = ".csv"),
-        p("Please use the ", a(href="design_template.csv", "template provided", download=NA, target="_blank"), "and ensure your file matches exactly."),
         br(),
         strong("Check your uploaded file below. If everything looks OK, click 'Calculate adjusted sample sizes' button."),
         renderDT(df_sizes_uploaded(),
@@ -749,11 +749,11 @@ function(input, output, session) {
     
     else if(input$analysis_table_choice=="upload"){
       fluidPage(
+        p("Please use the ", a(href="analysis_template.csv", "template provided", download=NA, target="_blank"), "and ensure your file matches exactly."),
         fileInput(inputId = "uploaded_analysis_table",
                   label = "Upload your final study table (.csv):",
                   multiple = FALSE,
                   accept = ".csv"),
-        p("Please use the ", a(href="analysis_template.csv", "template provided", download=NA, target="_blank"), "and ensure your file matches exactly."),
         br(),
         strong("Check your uploaded file below. If everything looks OK, click the 'Estimate prevalence' button."),
         renderDT(df_deletions_uploaded(),
