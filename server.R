@@ -1178,12 +1178,37 @@ function(input, output, session) {
   #  Results table/plot: estimated ICC
   # ----------------------------------
   
+  # If user clicks 'estimate ICC' button before selecting clusters and entering sample sizes in step 1, an error message will pop-up
+  observeEvent(input$est_icc, {
+    print("Estimate ICC button clicked")
+    
+    # To make sure the error message pops up as expected, don't show it if est_prev button has been clicked AND power_output() has been created, otherwise show error message 
+    if(input$est_prev && !is.null(prev_output())){
+      # debugging, remove later
+      print("After user clicks the estimate ICC button, this is the edited df and prev_output() (no pop-up error msg needed): ")
+      print(prev_output())
+      return(NULL)
+      
+    }
+    else{
+      # TODO debugging
+      print("ICC error should have popped up")
+      
+      show_alert(
+        title = "Error!",
+        text = "You have not entered the values for your study. Please go back to Step 1 ('Enter the values specific to your study') and select the number of clusters from the drop-down menu and enter the values in the table if you want to enter them manually, or upload your study data .csv file.",
+        type = "error"
+      )
+    }
+    
+  })
+  
     # When 'Estimate ICC' button is clicked:
     # Calculate ICC using DRpower::get_ICC() with the user-entered deletions and sample sizes
     icc_output <- eventReactive(input$est_icc, {
       
       # require the updated data frame to have been created to make sure there is a data frame to get values from
-      req(analysis_rv$df_analysis_update, prev_output())
+      req(prev_output())
       
       # create a progress notification pop-up telling the user that ICC is being estimated
       id <- showNotification(paste0("Estimating intra-cluster correlation..."), 
