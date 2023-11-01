@@ -177,9 +177,6 @@ function(input, output, session) {
                               df_sizes_update = NULL,
                               # this is the reactiveVal where the uploaded data frame will be stored
                               df_sizes_uploaded = NULL,
-                              # Create a reactiveVal that counts how many times the calculate final sample sizes button has been clicked
-                              # - this is useful if the user clicks the button without having selected n_clust, because error message will pop-up and the counter can be reset to 0
-                              # calc_sizes_click = NULL,
                               # Store a reactive value that checks whether the summary data is complete or not (T/F)
                               design_data_ready = FALSE
                               )
