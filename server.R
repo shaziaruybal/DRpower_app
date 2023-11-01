@@ -261,7 +261,7 @@ function(input, output, session) {
       select(n_clust, prevalence, N_opt) %>%
       pivot_wider(names_from = prevalence, values_from = N_opt) 
     
-    # get the target sample sizes from table with fixed prev of 10%, fix it at 500 if nclust is 2 or 3 (because NA)
+    # get the target sample sizes from table with fixed prev of 10%, fix it at 500 if nclust is 2, 3 or 4 (because NA)
     if(input$design_nclust==2 | input$design_nclust==3 | input$design_nclust==4){
       target_size <- 500
     }
@@ -281,6 +281,13 @@ function(input, output, session) {
     
     # when df_sizes is created, store the initial values in df_sizes_update()
     design_rv$df_sizes_update <- df_sizes
+    }
+    
+    else{
+      print("input$design_clust==''")
+      # be explicit here, but this should happen anyways
+      design_rv$df_sizes_update <- NULL
+    }
   })
   
   # render editable table
