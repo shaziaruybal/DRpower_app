@@ -1223,39 +1223,23 @@ function(input, output, session) {
         df <- analysis_rv$df_analysis_update
       }
       else if(input$analysis_table_choice=="upload"){
-        df <- df_deletions_uploaded()
+        df <- analysis_rv$df_deletions_uploaded
       }
       
+      # this tryCatch will make sure an error message pops up if there is an error in the ICC calculation (eg the user enters negative values, or number of deletions is larger than sample size)
+      tryCatch({
       DRpower::get_ICC(n = df$n_deletions,
                        N = df$sample_size)
+        
+      }, error = function(err){
+        show_alert(
+          title = "Error!",
+          text = "ICC cannot be estimated because there is an error in the values you entered. Please make sure you have entered only positive integers. The number of deletions should always be less than or equal to the total sample size.",
+          type = "error"
+        )
+      })
       
     })
-    
-  # If user clicks 'estimate ICC' button before selecting clusters and entering sample sizes in step 1, an error message will pop-up
-  observeEvent(input$est_icc, {
-    print("Estimate ICC button clicked")
-
-    # To make sure the error message pops up as expected, don't show it if est_prev button has been clicked AND power_output() has been created, otherwise show error message 
-    if(input$est_prev && !is.null(analysis_rv$df_analysis_update) && !is.null(prev_output())){
-      # debugging, remove later
-      print("After user clicks the estimate ICC button, this is the edited df and prev_output() (no pop-up error msg needed): ")
-      print(analysis_rv$df_analysis_update)
-      print(prev_output())
-      return(NULL)
-      
-    }
-    else{
-      # TODO debugging
-      print("ICC error should have popped up")
-      
-      show_alert(
-        title = "Error!",
-        text = "You have not selected the number of clusters or entered the values for your study. Please go back to Step 1 ('Enter the values specific to your study') and select the number of clusters from the drop-down menu and enter the values in the table.",
-        type = "error"
-      )
-    }
-    
-  })
   
   # The results box, text and plots are displayed once the estimate icc button is clicked 
   output$est_icc_results <- renderUI({
