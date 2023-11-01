@@ -1258,7 +1258,7 @@ function(input, output, session) {
           title = "Data summary",
           h4("Final study values:"),
           if(input$analysis_table_choice=="manual"){
-            req(analysis$df_analysis_update)
+            req(analysis_rv$df_analysis_update)
             renderTable(analysis_rv$df_analysis_update, digits = 0)
           }
           else if(input$analysis_table_choice=="upload"){
