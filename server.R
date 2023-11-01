@@ -169,70 +169,87 @@ function(input, output, session) {
   })
   
   # ----------------------------------
+  #  Set up reactiveVals for design tab
+  # ----------------------------------
+  
+  design_rv <- reactiveValues(
+                              # this is the data frame that will be created when the user selects n clusters, and if they update any values in the table and/or add/delete rows etc
+                              df_sizes_update = NULL,
+                              # this is the reactiveVal where the uploaded data frame will be stored
+                              df_sizes_uploaded = NULL,
+                              # Create a reactiveVal that counts how many times the calculate final sample sizes button has been clicked
+                              # - this is useful if the user clicks the button without having selected n_clust, because error message will pop-up and the counter can be reset to 0
+                              # calc_sizes_click = NULL,
+                              # Store a reactive value that checks whether the summary data is complete or not (T/F)
+                              design_data_ready = FALSE
+                              )
+  
+  # ----------------------------------
   #  User-uploaded table: sample size and proportion drop-out
   # ----------------------------------
   
-  # If user uploads their own design sample size table, we create a new reactiveVal "df_sizes_uploaded"
-  df_sizes_uploaded <- reactive({
-    req(input$uploaded_design_table)
+  # If user uploads their own design sample size table, we save the dataframe as the reactiveVal "df_sizes_uploaded"
+  observeEvent(input$uploaded_design_table, {
+    # require the user to have selected upload option
+    req(input$design_table_choice=="upload")
+    
+    print("dataset uploaded")
     
     # Validation check
     tryCatch(
       {
-        read.csv(input$uploaded_design_table$datapath)
+        df <- read.csv(input$uploaded_design_table$datapath)
+        
+        if(!any(is.na(df$cluster)) && is.numeric(df$percent_dropout) && !any(is.na(df$percent_dropout)) && is.numeric(df$target_sample_size) && !any(is.na(df$target_sample_size))){
+        
+          print("uploaded data looks OK")
+          
+          design_rv$df_sizes_uploaded <- df
+        }
+        
+        else{
+          show_alert(
+            title = "Error!",
+            text = "The dataset you uploaded is not in the correct format. Please use the template provided and only edit the appropriate cells.",
+            type = "error"
+          )
+          
+          print("uploaded data does not look OK")
+          design_rv$df_sizes_uploaded <- NULL
+        }
       },
       # in theory this shouldn't be needed because the fileInput requires only .csv files (it only allows you to select .csv from your local files)
       error = function(err){
         show_alert(
           title = "Error!",
-          text = "Invalid file. Please upload a .csv file.",
+          text = "Invalid file type. Please upload a .csv file.",
           type = "error"
         )
       }
     )
     
   })
+
+  output$design_upload_status <- renderText({
+    if (is.null(design_rv$df_sizes_uploaded)) {
+      "Please upload a correctly-formatted CSV file."
+    } else {
+      paste("File uploaded:", input$uploaded_design_table$name)
+    }
+  })
   
   # ----------------------------------
   #  User-input table: sample size and proportion drop-out
   # ----------------------------------
   
-  # create a reactive value for df_sizes_update
-  design_rv <- reactiveValues(df_sizes_update = NULL)
-
-  # Make the editable data frame reactive and dependent on the number of clusters entered by the user
-  # df_sizes <- eventReactive(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
-  #   
-  #   # TODO: question for Bob - do we want this to populate based on df_sample_sizes() or defaults? 
-  #   # getting target sizes to pre-populate the table from fixed defaults of ICC=0.05 and prev_thresh=0.05 
-  #   df_targets <- df_ss %>% 
-  #       filter(ICC == 0.05) %>% 
-  #       filter(prev_thresh == 0.05) %>% 
-  #       filter(prior_ICC_shape2==9) %>% # TODO fixed at 9 (check this when final final table is ready)
-  #       select(n_clust, prevalence, N_opt) %>%
-  #       pivot_wider(names_from = prevalence, values_from = N_opt) 
-  #   
-  #   # get the target sample sizes from table with fixed prev of 10%, fix it at 500 if nclust is 2 or 3 (because NA)
-  #   if(input$design_nclust==2 | input$design_nclust==3 | input$design_nclust==4){
-  #     target_size <- 500
-  #   }
-  #   else{
-  #     target_size <- df_targets %>% filter(n_clust == input$design_nclust) %>% select(`0.1`) %>% as.integer()
-  #   }
-  # 
-  #   # create the data frame with fixed columns and rows based on user input and target sample sizes as defaults
-  #   data.frame(
-  #     cluster = rep(1:input$design_nclust),
-  #     target_sample_size = rep(target_size, input$design_nclust),
-  #     percent_dropout = rep(10, input$design_nclust)
-  #   )
-  # })
-  
   # observe when the user specifies n clusters
   observeEvent(input$design_nclust, ignoreNULL=T, ignoreInit=T, {
     # require the user to have selected manual enter
-    req(input$design_table_choice=="manual", input$design_nclust!= "")
+    req(input$design_table_choice=="manual")
     
+    # Only perform the following if the user has selected n clusters (otherwise the blank option is default upon initialization, and will likely remain if users choose to upload)
+    if(input$design_nclust!=""){
+      
     print("Number of clusters selected")
     output$text_edit_clusttab <- renderUI(HTML(paste("Please edit the target sample size and expected proportion of participant drop-out for each cluster by ", strong("double-clicking"), " and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate adjusted sample sizes' button. ")))
     
