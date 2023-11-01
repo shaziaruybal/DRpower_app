@@ -415,35 +415,65 @@ function(input, output, session) {
   #  Calculate adjusted sample sizes
   # ----------------------------------
   
-  # Create a reactiveVal that counts how many times the calculate final sample sizes button has been clicked
-  # - this is useful if the user clicks the button without having selected n_clust, because error message will pop-up and the counter can be reset to 0
-  design_rv <- reactiveValues(calc_sizes_click = NULL)
+  # When 'calculate sample sizes' button is clicked:
+  observeEvent(input$calc_sizes, {
+    print("Calculate final sample sizes values button clicked")
+    
+    req(input$design_table_choice)
+    
+    # If user has selected manual but has not entered data, error message should pop-up
+    if(input$design_table_choice=="manual" && is.null(design_rv$df_sizes_update)){
+        show_alert(
+          title = "Error!",
+          text = "Make sure you have filled in the table. You should only enter integers in your table for sample size and drop-out and make sure you have filled in all the cells. Please go back and enter the values again.",
+          type = "error"
+        )
+    }
+    
+    # If user has selected 'upload' option but hasn't uploaded a file (or the data is not correct), error message should pop-up
+    else if(input$design_table_choice=="upload" && is.null(design_rv$df_sizes_uploaded)){
+       show_alert(
+        title = "Error!",
+        text = "Make sure you have uploaded the correct file type (.csv) and in the correct format (see template for an example). You should only enter integers for sample size and drop-out.",
+        type = "error"
+       )
+    }
+    else {
+      print("no error needed")
+      # return(NULL)
+    }
+      
+  })
   
   # When 'calculate sample sizes' button is clicked:
-  # update the data frame with the user-entered values or the uploaded data frame, calculate the adjusted sample size, and create a final df that is reactive
+  # update the data frame with the user-entered values or the uploaded data, check dfs are inputted correctly, calculate the adjusted sample size, and create a final df that is reactive
   df_sizes_final <- eventReactive(input$calc_sizes, {
-    
-    # require n clusters to be defined and the button click to be > 0 (if 0 then the user has clicked without select n_clust)
-    req(!is.na(design_rv$df_sizes_update), design_rv$calc_sizes_click > 0)
-    
-    # get the stored (and edited) data frame with sample sizes
-    if(input$design_table_choice=="manual"){
+
+    # If the user has selected "manual entry" and the design_rv$df_sizes_update data frame exists, get the stored (and edited) data frame with sample sizes
+    if(input$design_table_choice=="manual" && !is.null(design_rv$df_sizes_update)){
       df <- design_rv$df_sizes_update
+      print("df_sizes_final is based on the manual entry table")
     }
-    else if(input$design_table_choice=="upload"){
-      df <- df_sizes_uploaded()
+    # If the user has selected "upload" and the design_rv$df_sizes_uploaded data frame exists, get theuploaded data frame with sample sizes
+    else if(input$design_table_choice=="upload" && !is.null(design_rv$df_sizes_uploaded)){
+      df <- design_rv$df_sizes_uploaded
+      print("df_sizes_final is based on the uploaded table")
+    }
+    else{
+      print("data not correct so return NULL")
+      return(NULL)
     }
     
-    # check that sample size values are numeric and that no value is NA (and if so show pop-up error message)
+    # double check that sample size values are numeric and that no value is NA (and if so show pop-up error message)
     if(!any(is.na(df$cluster)) && is.numeric(df$percent_dropout) && !any(is.na(df$percent_dropout)) && is.numeric(df$target_sample_size) && !any(is.na(df$target_sample_size))){
-      
+
       # calculate adjusted sample size
       df <- df %>% mutate(adj_sample_size = ceiling(target_sample_size/(1-(percent_dropout/100))))
-    
+
       return(df)
     }
     else{
-      print(design_rv$df_sizes_update)
+      cat("The df that gives errors is:", df)
       show_alert(
         title = "Error!",
         text = "Make sure you have only entered integers in your table and/or make sure you have filled in all the cells. Please go back and enter the values again or upload your file again if you selected to upload your own.",
@@ -451,41 +481,12 @@ function(input, output, session) {
       )
     }
   }) 
-  
-  # observe when calculate sample sizes button is clicked 
-   observeEvent(input$calc_sizes, {
-     print("Calculate final sample sizes values button clicked")
-     #------- debugging, remove later ----
-     print("After user clicks the calc sample size button, this is the edited df: ")
-     print(design_rv$df_sizes_update)
-     #------------------------------------
-     
-     # error message if the user has not chosen the number of clusters
-     if(input$design_nclust==""){
-       show_alert(
-         title = "Error!",
-         text = "You have not chosen the number of clusters. Please go back to Step 1 and choose the number of clusters and enter the values in the table.",
-         type = "error"
-       )
-       
-       # Reset the button click count to 0 so that a new click (with no error - ie the user has chosen n_clust) will trigger the results box to render
-       design_rv$calc_sizes_click <- input$calc_sizes
-       design_rv$calc_sizes_click <- 0
-       print(design_rv$calc_sizes_click)
-     }
-     else{
-       # return(NULL)
-       # Save the current number of clicks to a reactiveVal, we can use clicks>0 to ensure that the results box only renders when the user clicks again
-       design_rv$calc_sizes_click <- input$calc_sizes
-       print(design_rv$calc_sizes_click)
-     }
-   })     
      
    # The results box, text and plots are displayed once the calculate final sample sizes button is clicked 
    output$final_sizes_results <- renderUI({
      
      # require n clusters to be defined, calculate sizes button to be clicked and df_sizes_final() to be created
-     req(input$design_nclust, input$calc_sizes, df_sizes_final())
+     req(input$calc_sizes, df_sizes_final())
      
      box(width = 5, 
          collapsible = T,
@@ -620,10 +621,7 @@ function(input, output, session) {
   
   # ----------------------------------
   #  Save results and render downloadable design report
-  # ----------------------------------
-  
-  # Store a reactive value that checks whether the summary data is complete or not (T/F)
-  design_rv <- reactiveValues(design_data_ready = FALSE)
+  # ---------------------------------
   
   # The save button allows the user to cross-check the assumed parameters entered and check the numbers that will be printed in the report
   # - if the user has not entered the values correctly in the previous tab, an error message will pop-up and the design_data_ready reactive val will be set to FALSE
@@ -632,7 +630,7 @@ function(input, output, session) {
     print("Save design data button has been clicked")
 
     # If all conditions are not met - ie the user has gone through the entire Step 2 Final cluster sizes tab, set design_data_ready as FALSE
-    if (input$design_nclust=="" || input$calc_sizes==0 || input$est_pow==0 || is.null(df_sizes_final()) || is.null(power_output())) {
+    if (input$est_pow==0 || is.null(df_sizes_final()) || is.null(power_output())) {
       print("error should pop up when save results is clicked")
       show_alert(
         title = "Error!",
