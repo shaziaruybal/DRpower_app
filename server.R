@@ -796,69 +796,101 @@ function(input, output, session) {
     
   })
   
+  
+  # ----------------------------------
+  #  Set up reactiveVals for analysis tab
+  # ----------------------------------
+  
+  analysis_rv <- reactiveValues(
+                                # this is the data frame that will be created when the user selects n clusters, and if they update any values in the table and/or add/delete rows etc
+                                df_analysis_update = NULL,
+                                # this is the reactiveVal where the uploaded data frame will be stored
+                                df_deletions_uploaded = NULL,
+                                # Store a reactive value that checks whether the summary data is complete or not (T/F)
+                                analysis_data_ready = FALSE
+                              )
+              
   # ----------------------------------
   #  User-uploaded table: number of deletions and final sample sizes
   # ----------------------------------
   
-  # If user uploads their own analysis deletions/final sample sizes table, we create a new reactiveVal "df_deletions_uploaded"
-  df_deletions_uploaded <- reactive({
-    req(input$uploaded_analysis_table)
+  # If user uploads their own analysis deletions/final sample sizes table, we save the dataframe as the reactiveVal "df_deletions_uploaded"
+  observeEvent(input$uploaded_analysis_table, {
+    # require the user to have selected upload option
+    req(input$analysis_table_choice=="upload")
+    
+    print("analysis dataset uploaded")
     
     # Validation check
     tryCatch(
       {
-        read.csv(input$uploaded_analysis_table$datapath)
+       df <- read.csv(input$uploaded_analysis_table$datapath)
+       
+       if(is.numeric(df$n_deletions) && !any(is.na(df$n_deletions)) && is.numeric(df$sample_size) && !any(is.na(df$sample_size))){
+         print("uploaded data looks OK")
+         
+         analysis_rv$df_deletions_uploaded <- df
+       }
+        
+       else{
+         show_alert(
+           title = "Error!",
+           text = "The dataset you uploaded is not in the correct format. Please use the template provided and only edit the appropriate cells.",
+           type = "error"
+         )
+         
+         print("uploaded data does not look OK")
+         analysis_rv$df_deletions_uploaded <- NULL
+       } 
       },
       # in theory this shouldn't be needed because the fileInput requires only .csv files (it only allows you to select .csv from your local files)
       error = function(err){
         show_alert(
           title = "Error!",
-          text = "Invalid file. Please upload a .csv file.",
+          text = "Invalid file type. Please upload a .csv file.",
           type = "error"
         )
       }
     )
+  })
     
+  
+  output$analysis_upload_status <- renderText({
+    if (is.null(analysis_rv$df_deletions_uploaded)) {
+      "Please upload a correctly-formatted CSV file."
+    } else {
+      paste("File uploaded:", input$uploaded_analysis_table$name)
+    }
   })
   
   # ----------------------------------
   #  User-input table: number of deletions and final sample sizes
   # ----------------------------------
-
-  # create a reactive value for df_analysis_update
-  analysis_rv <- reactiveValues(df_analysis_update = NULL)
-
-  # Make the editable data frame reactive and dependent on the deletion and sample sizes entered by the user
-  # df_deletions <- eventReactive(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
-  #   
-  #   print("number of analysis clusters selected and initial df created")
-  #   
-  #   # create the data frame with fixed columns and rows based on user input
-  #   data.frame(
-  #     cluster = c(rep(1:input$analysis_nclust)),
-  #     n_deletions = c(rep(NA, input$analysis_nclust)),
-  #     sample_size = c(rep(NA, input$analysis_nclust))
-  #   )
-  # })  
   
   # When the user selects the number of clusters, we store the initial values in df_analysis_update() so we can keep track of any user edits to the table
   observeEvent(input$analysis_nclust, ignoreNULL=T, ignoreInit=T, {
-    req(input$analysis_table_choice=="manual", input$analysis_nclust!="")
+    req(input$analysis_table_choice=="manual")
     
-    print("Number of final clusters selected - saving initial df as reactiveVal")
-    
-    print("number of analysis clusters selected and initial df created")
-    
-    # create the data frame with fixed columns and rows based on user input
-    df_deletions <- data.frame(
-      cluster = c(rep(1:input$analysis_nclust)),
-      n_deletions = c(rep(NA, input$analysis_nclust)),
-      sample_size = c(rep(NA, input$analysis_nclust))
-    )
-    
-    # assign the initial data frame 'df_deletions' to df_analysis_update
-    if(input$analysis_table_choice=="manual"){
-    analysis_rv$df_analysis_update <- df_deletions
+    # Only perform the following if the user has selected n clusters (otherwise the blank option is default upon initialization, and will likely remain if users choose to upload)
+    if(input$analysis_nclust!=""){
+      print("number of analysis clusters selected and initial df created")
+      
+      # create the data frame with fixed columns and rows based on user input
+      df_deletions <- data.frame(
+        cluster = c(rep(1:input$analysis_nclust)),
+        n_deletions = c(rep(NA, input$analysis_nclust)),
+        sample_size = c(rep(NA, input$analysis_nclust))
+      )
+      
+      print(df_deletions)
+      
+      # when df_deletions is created, store the initial values in df_analysis_update()
+      analysis_rv$df_analysis_update <- df_deletions
+    }
+    else{
+      print("input$analysis_nclust==''")
+      # be explicit here, but this should happen anyways
+      analysis_rv$df_analysis_update <- NULL
     }
   }) 
   
