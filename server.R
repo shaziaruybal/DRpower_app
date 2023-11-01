@@ -1014,40 +1014,72 @@ function(input, output, session) {
   # ----------------------------------
   #  Results table/plot: estimated prevalence
   # ----------------------------------
- 
+  
+  # When 'estimate prevalence' button is clicked (error msgs):
+  observeEvent(input$est_prev, {
+    print("Estimate prevalence button clicked")
+
+    req(input$analysis_table_choice)
+    
+    # If user has selected manual but has not entered data, error message should pop-up
+    if(input$analysis_table_choice=="manual" && is.null(analysis_rv$df_analysis_update)){
+      show_alert(
+        title = "Error!",
+        text = "Make sure you have filled in the table. You should only enter integers in your table for number of deletions and sample sizes and make sure you have filled in all the cells. Please go back and enter the values again.",
+        type = "error"
+      )
+    }
+    
+    # If user has selected 'upload' option but hasn't uploaded a file (or the data is not correct), error message should pop-up
+    else if(input$analysis_table_choice=="upload" && is.null(analysis_rv$df_deletions_uploaded)){
+      show_alert(
+        title = "Error!",
+        text = "Make sure you have uploaded the correct file type (.csv) and in the correct format (see template for an example). You should only enter integers for number of deletions and sample size.",
+        type = "error"
+      )
+    }
+    else {
+      print("no error needed")
+      # return(NULL)
+    }
+  })
+  
   # When 'Estimate prevalence' button is clicked:
   # Calculate prevalence using DRpower ::get_prevalence() with the user-entered deletions and sample sizes
   prev_output <- eventReactive(input$est_prev, {
     
-    # require the updated data frame to have been created to make sure there is a data frame to get values from
-    req(analysis_rv$df_analysis_update)
-
-    # create a progress notification pop-up telling the user that prevalence is being estimated
-    id <- showNotification(paste0("Estimating prevalence..."), 
-                           duration = 10, 
-                           closeButton = FALSE)
-    
-    # remove notification when calculation finishes
-    on.exit(removeNotification(id), add = TRUE)
-    
-    # get the stored and edited data frame with sample sizes, or the uploaded data frame
-    if(input$analysis_table_choice=="manual"){
+    # If the user has selected "manual entry" and the analysis_rv$df_analysis_update data frame exists, get the stored (and edited) data frame with sample sizes
+    if(input$analysis_table_choice=="manual" && !is.null(analysis_rv$df_analysis_update)){
       df <- analysis_rv$df_analysis_update
+      print("df_deletions_final is based on the manual entry table")
     }
-    else if(input$analysis_table_choice=="upload"){
-      df <- df_deletions_uploaded()
+    # If the user has selected "upload" and the analysis_rv$df_deletions_uploaded data frame exists, get the uploaded data frame with sample sizes
+    else if(input$analysis_table_choice=="upload" && !is.null(analysis_rv$df_deletions_uploaded)){
+      df <- analysis_rv$df_deletions_uploaded
+      print("df_deletions_final is based on the uploaded table")
     }
-    
-    # check that values are numeric and that no value is NA (and if so show pop-up error message)
-    if(is.numeric(df$n_deletions) && !any(is.na(df$n_deletions)) && is.numeric(df$sample_size) && !any(is.na(df$sample_size))){
-      print(str(df))
-      print(df)
+    else{
+      print("data not correct so return NULL")
+      return(NULL)
+    }
 
-      # this tryCatch will make sure an error message pops up if there is an error in the power calculation (eg the user enters negative values, or number of deletions is larger than sample size)  
+    # double check that values are numeric and that no value is NA (and if so show pop-up error message)
+    if(is.numeric(df$n_deletions) && !any(is.na(df$n_deletions)) && is.numeric(df$sample_size) && !any(is.na(df$sample_size))){
+
+      # create a progress notification pop-up telling the user that prevalence is being estimated
+      id <- showNotification(paste0("Estimating prevalence..."),
+                             duration = 10,
+                             closeButton = FALSE)
+
+      # remove notification when calculation finishes
+      on.exit(removeNotification(id), add = TRUE)
+
+      # this tryCatch will make sure an error message pops up if there is an error in the power calculation (eg the user enters negative values, or number of deletions is larger than sample size)
       tryCatch({
       DRpower::get_prevalence(n = df$n_deletions,
                               N = df$sample_size,
                               prev_thresh = 0.05) # HARD CODING 5% THRESHOLD
+
       }, error = function(err){
         show_alert(
           title = "Error!",
@@ -1057,38 +1089,15 @@ function(input, output, session) {
       })
     }
     else {
-      print(str(df))
+      print("df gives errors:")
+      print(df)
       show_alert(
         title = "Error!",
-        text = "Make sure you have only entered integers in your table and/or make sure you have filled in all the cells. Please go back and enter the values again.",
+        text = "Make sure you have only entered integers in your table and/or make sure you have filled in all the cells. Please go back and enter the values again or upload your file again if you selected to upload your own.",
         type = "error"
       )
     }
     
-  })
-  
-  # If user clicks 'estimate prevalence' button before selecting clusters and entering sample sizes, an error message will pop-up
-  observeEvent(input$est_prev, {
-    print("Estimate prevalence button clicked")
-    
-      # display error message if the user has not selected prev_thresh and/or entered the deletions and sample sizes, require the reactiveVal 'df_analysis_update' to have been created
-      if(is.null(analysis_rv$df_analysis_update)){
-        # TODO debugging
-        print("estimate prev is NULL")
-        print("error should have popped up")
-        
-        show_alert(
-          title = "Error!",
-          text = "You have not selected the number of clusters and/or entered the values for your study. Please select the number of clusters from the drop-down menu and enter the values in the table.",
-          type = "error"
-        )
-      }
-      else{
-        # debugging, remove later
-        print("After user clicks the estimate prev button, this is the edited df (no pop-up error msg needed): ")
-        print(analysis_rv$df_analysis_update)
-        return(NULL)
-      }
   })
   
   # The results box, text and plots are displayed once the estimate prevalence button is clicked 
