@@ -1298,9 +1298,6 @@ function(input, output, session) {
   # ----------------------------------
   #  Save results and render downloadable analysis report  
   # ----------------------------------
-
-  # Store a reactive value that checks whether the summary data is complete or not (T/F)
-  analysis_rv <- reactiveValues(analysis_data_ready = FALSE)
   
   # The save button allows the user to cross-check the assumed parameters entered and check the numbers that will be printed in the report
   # - if the user has not entered the values correctly in the previous tabs, an error message will pop-up and the analysis_data_ready reactive val will be set to FALSE
@@ -1309,7 +1306,7 @@ function(input, output, session) {
     print("Save analysis data button has been clicked")
     
     # If all conditions are not met - ie the user has gone through the entire Estimate Prevalence and ICC tabs, set analysis_data_ready as FALSE
-    if (input$analysis_nclust=="" || input$est_prev==0 || input$est_icc==0 || is.null(prev_output()) || is.null(icc_output())) {
+    if (input$est_prev==0 || input$est_icc==0 || is.null(prev_output()) || is.null(icc_output())) {
       print("error should pop up when save results is clicked")
       show_alert(
         title = "Error!",
@@ -1349,8 +1346,8 @@ function(input, output, session) {
             renderTable(analysis_rv$df_analysis_update, digits = 0)
           }
           else if(input$analysis_table_choice=="upload"){
-            req(df_deletions_uploaded())
-            renderTable(df_deletions_uploaded(), digits = 0)
+            req(analysis_rv$df_deletions_uploaded)
+            renderTable(analysis_rv$df_deletions_uploaded, digits = 0)
           },
           br(), br(),
           h4("Prevalence estimates:"),
@@ -1400,7 +1397,7 @@ function(input, output, session) {
         study_data <- analysis_rv$df_analysis_update
       }
       else if(input$analysis_table_choice=="upload"){
-        study_data <- df_deletions_uploaded()
+        study_data <- analysis_rv$df_deletions_uploaded
       }
       
       params <- list(analysis_nclusters = input$analysis_nclust,
