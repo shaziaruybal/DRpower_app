@@ -1079,7 +1079,9 @@ function(input, output, session) {
       tryCatch({
       DRpower::get_prevalence(n = df$n_deletions,
                               N = df$sample_size,
-                              prev_thresh = 0.05) # HARD CODING 5% THRESHOLD
+                              prev_thresh = 0.05, # HARD CODING 5% THRESHOLD
+                              post_full_on = TRUE, 
+                              post_full_breaks = seq(0, 1, 0.001)) 
 
       }, error = function(err){
         show_alert(
@@ -1113,8 +1115,9 @@ function(input, output, session) {
         title = "Prevalence estimates",
         p("The table and the plot below show the maximum a posteriori (MAP) estimate of the prevalence, along with a 95% credible interval (CrI). The MAP estimate can be used as a central estimate of the prevalence, but it should always be reported alongside the CrI to give a measure of uncertainty. "),
         br(),
-        renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100) %>% 
-                      rename("Prevalence estimate (%)" = MAP, "Lower CrI (%)" = CrI_lower, "Upper CrI (%)" = CrI_upper, "Probability above threshold (%)" = prob_above_threshold), 
+        renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100) %>%
+                      select(-post_full) %>%
+                      rename("Prevalence estimate (%)" = MAP, "Lower CrI (%)" = CrI_lower, "Upper CrI (%)" = CrI_upper, "Probability above threshold (%)" = prob_above_threshold),
                     digits = 2,
                     colnames = T,
                     align = "c"),
