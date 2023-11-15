@@ -123,12 +123,12 @@ function(input, output, session) {
         actionButton(inputId = "add_row_design",
                      label = "Add row",
                      icon("circle-plus")),
-        actionButton(inputId = "delete_row_design",
-                     label = "Delete row",
-                     icon("circle-minus")),
-        bsTooltip(id = "delete_row_design",
-                  title = "Select the row you want to delete by clicking it once, this should highlight the row in blue. Then click button.",
-                  placement = "right"),
+        # actionButton(inputId = "delete_row_design",
+        #              label = "Delete row",
+        #              icon("circle-minus")),
+        # bsTooltip(id = "delete_row_design",
+        #           title = "Select the row you want to delete by clicking it once, this should highlight the row in blue. Then click button.",
+        #           placement = "right"),
         br(), br(),
         actionButton(
           inputId = "calc_sizes",
@@ -300,7 +300,7 @@ function(input, output, session) {
               ),
               rownames = FALSE, 
               colnames = c("Cluster", "Target sample size", "% drop-out"),
-              # selection = "none", # uncomment if you want to disable row selection when clicking (it was annoying before but now we need for delete row)
+              selection = "none", # uncomment if you want to disable row selection when clicking (it was annoying before but now we need for delete row)
               # extensions = c("FixedHeader"),
               # extensions = c("FixedHeader", "FixedColumns"),
               options = list(dom = 'rt',
@@ -386,26 +386,26 @@ function(input, output, session) {
   })
   
   # Observe if delete row button has been clicked, and if so add a row to the edited table
-  observeEvent(input$delete_row_design, {
-    # Require user to have selected 'manual'
-    req(input$design_table_choice=="manual")
-    
-    print("delete row button clicked")
-    
-    # get the latest updated data frame
-    df <- design_rv$df_sizes_update
-    
-    # check if rows are selected
-    if(!is.null(input$editable_clusttab_rows_selected)){
-      # if they are, delete them from the data frame
-      df <- df[-as.numeric(input$editable_clusttab_rows_selected),]
-    }
-    
-    print(df)
-    
-    # assign the updated data frame to df_analysis_update
-    design_rv$df_sizes_update <- df
-  })
+  # observeEvent(input$delete_row_design, {
+  #   # Require user to have selected 'manual'
+  #   req(input$design_table_choice=="manual")
+  #   
+  #   print("delete row button clicked")
+  #   
+  #   # get the latest updated data frame
+  #   df <- design_rv$df_sizes_update
+  #   
+  #   # check if rows are selected
+  #   if(!is.null(input$editable_clusttab_rows_selected)){
+  #     # if they are, delete them from the data frame
+  #     df <- df[-as.numeric(input$editable_clusttab_rows_selected),]
+  #   }
+  #   
+  #   print(df)
+  #   
+  #   # assign the updated data frame to df_analysis_update
+  #   design_rv$df_sizes_update <- df
+  # })
   
   
   # ----------------------------------
@@ -470,7 +470,8 @@ function(input, output, session) {
       return(df)
     }
     else{
-      cat("The df that gives errors is:", df)
+      print("data is not correct so error msg pops up")
+      print(df)
       show_alert(
         title = "Error!",
         text = "Make sure you have only entered integers in your table and/or make sure you have filled in all the cells. Please go back and enter the values again or upload your file again if you selected to upload your own.",
@@ -753,12 +754,12 @@ function(input, output, session) {
         actionButton(inputId = "add_row_analysis",
                      label = "Add row",
                      icon("circle-plus")),
-        actionButton(inputId = "delete_row_analysis",
-                     label = "Delete row",
-                     icon("circle-minus")),
-        bsTooltip(id = "delete_row_analysis",
-                  title = "Select the row you want to delete by clicking it once, this should highlight the row in blue. Then click button.",
-                  placement = "right"),
+        # actionButton(inputId = "delete_row_analysis",
+        #              label = "Delete row",
+        #              icon("circle-minus")),
+        # bsTooltip(id = "delete_row_analysis",
+        #           title = "Select the row you want to delete by clicking it once, this should highlight the row in blue. Then click button.",
+        #           placement = "right"),
         br(), br(),
         actionButton(inputId = "est_prev",
                      label = "Estimate prevalence",
@@ -907,7 +908,7 @@ function(input, output, session) {
               ),
               rownames = FALSE,
               colnames = c("Cluster", "Number of deletions", "Sample size"), 
-              # selection = "none", # uncomment if you want to disable row selection when clicking (it was annoying before but now we need for delete row)
+              selection = "none", # uncomment if you want to disable row selection when clicking (it was annoying before but now we need for delete row)
               # extensions = c("FixedHeader"),
               # extensions = c("FixedHeader", "FixedColumns"),
               caption = htmltools::tags$caption(htmltools::tags$span("Double-click ", style="font-weight:bold; color:black"), htmltools::tags$span("to edit each cell in the table below and enter your study values.")),
@@ -991,25 +992,25 @@ function(input, output, session) {
   })
   
   # Observe if delete row button has been clicked, and if so add a row to the edited table
-  observeEvent(input$delete_row_analysis, {
-    req(input$analysis_table_choice=="manual")
-    
-    print("delete row button clicked")
-
-    # get the latest updated data frame
-    df <- analysis_rv$df_analysis_update
-
-    # check if rows are selected
-    if(!is.null(input$editable_deltab_rows_selected)){
-      # if they are, delete them from the data frame
-      df <- df[-as.numeric(input$editable_deltab_rows_selected),]
-    }
-
-    print(df)
-
-    # assign the updated data frame to df_analysis_update
-    analysis_rv$df_analysis_update <- df
-  })
+  # observeEvent(input$delete_row_analysis, {
+  #   req(input$analysis_table_choice=="manual")
+  #   
+  #   print("delete row button clicked")
+  # 
+  #   # get the latest updated data frame
+  #   df <- analysis_rv$df_analysis_update
+  # 
+  #   # check if rows are selected
+  #   if(!is.null(input$editable_deltab_rows_selected)){
+  #     # if they are, delete them from the data frame
+  #     df <- df[-as.numeric(input$editable_deltab_rows_selected),]
+  #   }
+  # 
+  #   print(df)
+  # 
+  #   # assign the updated data frame to df_analysis_update
+  #   analysis_rv$df_analysis_update <- df
+  # })
   
   # ----------------------------------
   #  Results table/plot: estimated prevalence
