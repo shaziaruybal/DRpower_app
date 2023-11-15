@@ -54,13 +54,13 @@ function(input, output, session) {
     # require the user inputs to render the text
     req(input$ss_icc, input$ss_prev)
 
-    "Columns give the assumed true prevalence of pfhrp2/3 deletions in the province. 10% is highlighted as the suggested default. Rows give the number of clusters (e.g., health facilities) within the province. Scroll the table to view all suggested values. Note that if a particular cell is blank, the target sample size is >2000."
+    "Columns give the assumed true prevalence of pfhrp2/3 deletions in the province. 10% is highlighted as the suggested default. Rows give the number of health facilities (i.e., clusters) within the province. Scroll the table to view all suggested values. Note that if a particular cell is blank, the target sample size is >2000."
 
   })
 
   output$sample_size_table <- renderDT({
     datatable(df_sample_sizes(),
-              colnames = c("Number of clusters", "1%", "2%", "3%", "4%", "5%", "6%", "7%", "8%", "9", "10%", "11%", "12%", "13%", "14%", "15%", "16%", "17%", "18%", "19%", "20%"),
+              colnames = c("Number of health facilities", "1%", "2%", "3%", "4%", "5%", "6%", "7%", "8%", "9", "10%", "11%", "12%", "13%", "14%", "15%", "16%", "17%", "18%", "19%", "20%"),
               rownames = FALSE,
               extensions = c("Buttons", "FixedHeader"),
               # extensions = c("Buttons", "FixedHeader", "FixedColumns"),
@@ -112,7 +112,7 @@ function(input, output, session) {
       fluidPage(
         selectInput(
           inputId = "design_nclust",
-          label = strong("Select number of clusters: "),
+          label = strong("Select number of health facilities: "),
           width = "40%",
           choices = c("", seq(2, 20)),
         ),
@@ -151,7 +151,7 @@ function(input, output, session) {
         # strong("Check your uploaded file below. If everything looks OK, click 'Calculate adjusted sample sizes' button."),
         renderDT(design_rv$df_sizes_uploaded,
                  rownames = FALSE,
-                 colnames = c("Cluster", "Target sample size", "% drop-out"),
+                 colnames = c("Health facility", "Target sample size", "% drop-out"),
                  selection = "none",
                  options = list(dom = 'rt',
                                 pageLength=20,
@@ -248,7 +248,7 @@ function(input, output, session) {
     if(input$design_nclust!=""){
       
     print("Number of clusters selected")
-    output$text_edit_clusttab <- renderUI(HTML(paste("Please edit the target sample size and expected proportion of participant drop-out for each cluster by ", strong("double-clicking"), " and editing each cell in the table below. You can also edit the cluster number to your own cluster or site names if you wish. When you are finished click the 'Calculate adjusted sample sizes' button. ")))
+    output$text_edit_clusttab <- renderUI(HTML(paste("Please edit the target sample size and expected proportion of participant drop-out for each health facility by ", strong("double-clicking"), " and editing each cell in the table below. You can also edit the health facility number to your own names if you wish. When you are finished click the 'Calculate adjusted sample sizes' button. ")))
     
     # getting target sizes to pre-populate the table from fixed defaults of ICC=0.05 and prev_thresh=0.05 
     df_targets <- df_ss %>% 
@@ -299,7 +299,7 @@ function(input, output, session) {
                 # )
               ),
               rownames = FALSE, 
-              colnames = c("Cluster", "Target sample size", "% drop-out"),
+              colnames = c("Health facility", "Target sample size", "% drop-out"),
               selection = "none", # uncomment if you want to disable row selection when clicking (it was annoying before but now we need for delete row)
               # extensions = c("FixedHeader"),
               # extensions = c("FixedHeader", "FixedColumns"),
@@ -499,7 +499,7 @@ function(input, output, session) {
   # render the edited table
   output$final_sizes_table <- renderDT({
     datatable(df_sizes_final(), 
-              colnames = c("Cluster", "Target sample size", "% drop-out", "Adjusted sample size"),
+              colnames = c("Health facility", "Target sample size", "% drop-out", "Adjusted sample size"),
               # extensions = c("FixedHeader"),
               # extensions = c("FixedHeader", "FixedColumns"),
               rownames = F,
@@ -569,7 +569,7 @@ function(input, output, session) {
       print("error should have popped up")
       show_alert(
         title = "Error!",
-        text = "You have not entered the sample sizes correctly. Please go back to Step 1 and choose the number of clusters and enter the values in the table, and then click the 'Calculate final sample sizes' button.",
+        text = "You have not entered the sample sizes correctly. Please go back to Step 1 and choose the number of health facilities (or clusters) and enter the values in the table, and then click the 'Calculate final sample sizes' button.",
         type = "error"
       )
     }
@@ -585,7 +585,7 @@ function(input, output, session) {
         collapsible = T,
         background = "purple",
         title = "Estimated power",
-        p("The plot shows the mean and lower and upper 95% confidence interval based on cluster sizes and parameters chosen above."),
+        p("The plot shows the mean and lower and upper 95% confidence interval based on health facility sizes and parameters chosen above."),
         br(),
         renderTable(power_output() %>%
                       rename("Power" = power, "Lower 95%CI" = lower, "Upper 95%CI" = upper),
@@ -632,7 +632,7 @@ function(input, output, session) {
       print("error should pop up when save results is clicked")
       show_alert(
         title = "Error!",
-        text = "The summary cannot be displayed because you haven't completed the previous steps. Please go back to 'Final cluster sizes' and follow all the steps.",
+        text = "The summary cannot be displayed because you haven't completed the previous steps. Please go back to 'Final health facility sizes' and follow all the steps.",
         type = "error"
       )
       
@@ -663,7 +663,7 @@ function(input, output, session) {
           # background = "purple",
           collapsible = TRUE,
           title = "Data summary",
-          h4("Final cluster sizes:"),
+          h4("Final health facility sizes:"),
           renderTable(df_sizes_final(), digits = 0),
           br(), br(),
           h4("Parameters for power calculation:"),
@@ -744,7 +744,7 @@ function(input, output, session) {
       fluidPage(
         selectInput(
           inputId = "analysis_nclust",
-          label = strong("Select final number of clusters: "),
+          label = strong("Select final number of health facilities: "),
           width = "40%",
           choices = c("", seq(2, 20)),
         ),
@@ -780,7 +780,7 @@ function(input, output, session) {
         # strong("Check your uploaded file below. If everything looks OK, click the 'Estimate prevalence' button."),
         renderDT(analysis_rv$df_deletions_uploaded,
                  rownames = FALSE,
-                 colnames = c("Cluster", "Number of deletions", "Sample size"),
+                 colnames = c("Health facility", "Number of deletions", "Sample size"),
                  selection = "none",
                  options = list(dom = 'rt',
                                 pageLength=20,
@@ -907,7 +907,7 @@ function(input, output, session) {
                 # )
               ),
               rownames = FALSE,
-              colnames = c("Cluster", "Number of deletions", "Sample size"), 
+              colnames = c("Health facility", "Number of deletions", "Sample size"), 
               selection = "none", # uncomment if you want to disable row selection when clicking (it was annoying before but now we need for delete row)
               # extensions = c("FixedHeader"),
               # extensions = c("FixedHeader", "FixedColumns"),
@@ -1206,7 +1206,7 @@ function(input, output, session) {
       
       show_alert(
         title = "Error!",
-        text = "You have not entered the values for your study. Please go back to Step 1 ('Enter the values specific to your study') and select the number of clusters from the drop-down menu and enter the values in the table if you want to enter them manually, or upload your study data .csv file.",
+        text = "You have not entered the values for your study. Please go back to Step 1 ('Enter the values specific to your study') and select the number of health facilities from the drop-down menu and enter the values in the table if you want to enter them manually, or upload your study data .csv file.",
         type = "error"
       )
     }
