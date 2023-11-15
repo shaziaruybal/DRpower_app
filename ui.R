@@ -127,15 +127,15 @@ dashboardPage(#theme = "flatly",
                  p("For those wanting more background information on the method, or who want to perform more advanced analyses, please take a look at the ",
                     a("DRpower R package ", target = "_blank", href='https://mrc-ide.github.io/DRpower/'), "that underpins this app."),
                  h3("Our framework", style = "color: #605ca3"),
-                 img(src = "img/design_phase_v2.png", height = "75%", width = "75%"),
-                 img(src = "img/analysis_phase_v3.png", height = "75%", width = "75%"),
+                 img(src = "img/design_phase_v3.png", height = "75%", width = "75%"),
+                 img(src = "img/analysis_phase_v4.png", height = "75%", width = "75%"),
                  br(), br(),
                  h3("Now go ahead and start ", strong(shinyLink(to = "explore", label = "exploring!")), style = "color: #605ca3"),
                  br(), 
                  h4("Acknowledgments", style = "color: #605ca3"),
                  p("This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the Global Malaria Programme, World Health Organisation (WHO)."),
                  br(), 
-                 p(em("Most recent update 5 October 2023.")),
+                 p(em("Most recent update 15 November 2023.")),
                  br()
           )
         )
