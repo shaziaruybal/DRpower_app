@@ -1154,28 +1154,34 @@ function(input, output, session) {
   })
   
   output$est_prev_plot <- renderPlot({
-      # require prev_output() to exist
-      req(prev_output())
-      
-      ggplot(prev_output()) +
-        geom_segment(aes(x = " ", xend = " ", y = CrI_lower, yend = CrI_upper),
-                     color = "black", linewidth = 1) +
-        geom_point(aes(x = " ", y = MAP),
-                   size = 4,
-                   shape = 21,
-                   fill = "mediumpurple") +
-        geom_hline(aes(yintercept = 5), 
-                   color = "darkgrey",
-                   linetype = "dashed") +
-        geom_text(aes(x= " ", 
-                      y = 7, 
-                      label = "5% threshold"), 
-                      color = "darkgrey") +
-        scale_y_continuous(labels = scales::percent_format(1, scale = 1), limits = c(0,100)) +
-        labs(x = "",
-             y = "Estimated prevalence") +
-        theme_light() +
-        theme(text = element_text(size = 16))
+    # require prev_output() to exist
+    req(prev_output())
+    
+    # create labels
+    lab1 <- sprintf("%s%% chance below threshold", round(1e2*(1 - prev_output()$prob_above_threshold), 1))
+    lab2 <- sprintf("%s%% chance above threshold", round(1e2*prev_output()$prob_above_threshold, 1))
+    
+    # Create data frame with the full posterior probability density values and the x sequence we used above in get_prevalence() line 1084
+    prob_vals <- data.frame(x = seq(0, 1, 0.001), y = prev_output()$post_full[[1]])
+    
+    prob_vals %>%
+      # label to show if above or below threshold
+      mutate(above = ifelse(x > 0.05, lab2, lab1)) %>%
+      ggplot() +
+        theme_bw() +
+        geom_ribbon(aes(x = 1e2*x, ymin = 0, ymax = y, fill = above)) +
+        geom_line(aes(x = 1e2*x, y = y)) +
+        # this splits up the curve into two segments above/below threshold
+        geom_segment(aes(x = 5, xend = 5, y = 0, yend = y[x == 0.05])) +
+        geom_errorbar(aes(xmin = prev_output()$CrI_lower, xmax = prev_output()$CrI_upper, y = 1.1*max(y)), width = 0.5) +
+        annotate(geom = "text", x = prev_output()$MAP, y = 1.2*max(prob_vals$y), label = "95% Credible Interval", hjust = 0) +
+        geom_point(aes(x = prev_output()$MAP, y = 1.1*max(y)), size = 4) +
+        scale_fill_manual(values = c("grey", "tomato1"), name = NULL) +
+        scale_x_continuous(limits = c(0, 1e2+1), expand = c(0, 0)) +
+        scale_y_continuous(limits = c(0, 1.3*max(prob_vals$y)), expand = c(0, 0)) +
+        xlab("Prevalence of pfhrp2/3 deletions (%)") + ylab("Posterior probability density") +
+        theme(legend.position = "bottom",
+              text = element_text(size = 16))
     })
   
   # ----------------------------------
