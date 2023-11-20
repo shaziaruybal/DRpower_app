@@ -1345,7 +1345,8 @@ function(input, output, session) {
           },
           br(), br(),
           h4("Prevalence estimates:"),
-          renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100), 
+          renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100) %>% 
+                        select(-post_full), 
                       digits = 2),
           br(), br(),
           h4("ICC estimates:"),
