@@ -23,6 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(bslib)
 library(kableExtra)
+library(DRpower)
 
 set.seed(10)
 ```
@@ -82,34 +83,15 @@ We estimate that the prevalence of *pfhrp2/3* deletions is `r round(as.numeric(p
 
 <!-- Add here the rendering of the conclusion text if prob is > or < 95% -->
 
-```{r fig.height=3, fig.width=3, echo=F}
-prev_output %>% 
-  ggplot() +
-        geom_segment(aes(x = " ", xend = " ", y = CrI_lower, yend = CrI_upper),
-                     color = "gray20", linewidth = 1) + 
-        geom_point(aes(x = " ", y = MAP),
-                   size = 2,
-                   shape = 21,
-                   fill = "mediumpurple") +
-        geom_hline(aes(yintercept = 5), 
-                   color = "darkgrey",
-                   linetype = "dashed") +
-        geom_text(aes(x= " ", 
-                      y = 8, 
-                      label = "5% threshold"), 
-                      color = "darkgrey", size = 3) +
-        scale_y_continuous(labels = scales::percent_format(1, scale = 1), limits = c(0,100)) +
-        labs(x = "",
-             y = "Estimated prevalence") +
-        theme_light() +
-        theme(text = element_text(size = 12))
+```{r fig.height=4, fig.width=6, echo=F}
+DRpower::plot_prevalence(n = study_data$n_deletions, N = study_data$sample_size) 
 ```
 
 ### Estimated intra-cluster correlation (ICC)
 
 We estimate that the intra-cluster correlation is `r round(as.numeric(icc_output$MAP),2)` (95% CrI: `r round(as.numeric(icc_output$CrI_lower), 2)`-`r round(as.numeric(icc_output$CrI_upper),2)`).
 
-```{r fig.height=3, fig.width=3, echo=F}
+```{r fig.height=4, fig.width=4, echo=F}
 icc_output %>% 
   ggplot() +
         geom_segment(aes(x = " ", xend = " ", y = CrI_lower, yend = CrI_upper), 

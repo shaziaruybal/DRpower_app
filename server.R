@@ -1154,34 +1154,23 @@ function(input, output, session) {
   })
   
   output$est_prev_plot <- renderPlot({
-    # require prev_output() to exist
-    req(prev_output())
+    # require estimate prevalence button to have been clicked
+    req(input$est_prev)
     
-    # create labels
-    lab1 <- sprintf("%s%% chance below threshold", round(1e2*(1 - prev_output()$prob_above_threshold), 1))
-    lab2 <- sprintf("%s%% chance above threshold", round(1e2*prev_output()$prob_above_threshold, 1))
-    
-    # Create data frame with the full posterior probability density values and the x sequence we used above in get_prevalence() line 1084
-    prob_vals <- data.frame(x = seq(0, 1, 0.001), y = prev_output()$post_full[[1]])
-    
-    prob_vals %>%
-      # label to show if above or below threshold
-      mutate(above = ifelse(x > 0.05, lab2, lab1)) %>%
-      ggplot() +
-        theme_bw() +
-        geom_ribbon(aes(x = 1e2*x, ymin = 0, ymax = y, fill = above)) +
-        geom_line(aes(x = 1e2*x, y = y)) +
-        # this splits up the curve into two segments above/below threshold
-        geom_segment(aes(x = 5, xend = 5, y = 0, yend = y[x == 0.05])) +
-        geom_errorbar(aes(xmin = prev_output()$CrI_lower, xmax = prev_output()$CrI_upper, y = 1.1*max(y)), width = 0.5) +
-        annotate(geom = "text", x = prev_output()$MAP, y = 1.2*max(prob_vals$y), label = "95% Credible Interval", hjust = 0) +
-        geom_point(aes(x = prev_output()$MAP, y = 1.1*max(y)), size = 4) +
-        scale_fill_manual(values = c("grey", "tomato1"), name = NULL) +
-        scale_x_continuous(limits = c(0, 1e2+1), expand = c(0, 0)) +
-        scale_y_continuous(limits = c(0, 1.3*max(prob_vals$y)), expand = c(0, 0)) +
-        xlab("Prevalence of pfhrp2/3 deletions (%)") + ylab("Posterior probability density") +
-        theme(legend.position = "bottom",
-              text = element_text(size = 16))
+    # If the user has selected "manual entry" and the analysis_rv$df_analysis_update data frame exists, get the stored (and edited) data frame with sample sizes
+    if(input$analysis_table_choice=="manual" && !is.null(analysis_rv$df_analysis_update)){
+      df <- analysis_rv$df_analysis_update
+      print("df_deletions_final is based on the manual entry table")
+    }
+    # If the user has selected "upload" and the analysis_rv$df_deletions_uploaded data frame exists, get the uploaded data frame with sample sizes
+    else if(input$analysis_table_choice=="upload" && !is.null(analysis_rv$df_deletions_uploaded)){
+      df <- analysis_rv$df_deletions_uploaded
+      print("df_deletions_final is based on the uploaded table")
+    }
+
+    # This function re-calculates prev_output() so we need to get the right df values for the calculation and plotting 
+    DRpower::plot_prevalence(n = df$n_deletions,
+                             N = df$sample_size)
     })
   
   # ----------------------------------
