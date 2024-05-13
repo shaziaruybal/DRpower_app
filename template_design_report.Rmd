@@ -26,6 +26,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(kableExtra)
+library(janitor)
 
 set.seed(10)
 ```
