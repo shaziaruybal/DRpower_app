@@ -135,7 +135,11 @@ dashboardPage(#theme = "flatly",
                  h4("Acknowledgments", style = "color: #605ca3"),
                  p("This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the Global Malaria Programme, World Health Organisation (WHO)."),
                  br(), 
-                 p(em("Most recent update 15 November 2023.")),
+                 h5(em("Data privacy disclaimer"), style = "color: #605ca3"),
+                 p(em("This web application does not store any data within the application itself. Data is temporarily stored on our the Shiny server during your active session and/or when you save your results for export into the downloadable report. Please note that any refresh or reload of the page will result in the loss of data, as it is not stored beyond the duration of your session.")),
+                 br(), 
+                 br(),
+                 p(em("Most recent update XX May 2024.")),
                  br()
           )
         )
