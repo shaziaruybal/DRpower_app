@@ -479,7 +479,38 @@ function(input, output, session) {
       )
     }
   }) 
-     
+
+  
+  # When 'calculate sample sizes' button is clicked:
+  # update the data frame with the user-entered values or the uploaded data, check dfs are inputted correctly, calculate the adjusted sample size, and create a final df that is reactive
+  # we then want to calculate the total number of inflated samples so we can display this value reactively
+  total_inflated_samples <- eventReactive(input$calc_sizes, {
+    
+    # If the user has selected "manual entry" and the design_rv$df_sizes_update data frame exists, get the stored (and edited) data frame with sample sizes
+    if(input$design_table_choice=="manual" && !is.null(design_rv$df_sizes_update)){
+      df <- design_rv$df_sizes_update
+      print("total_inflated_samples is based on the manual entry table")
+    }
+    # If the user has selected "upload" and the design_rv$df_sizes_uploaded data frame exists, get theuploaded data frame with sample sizes
+    else if(input$design_table_choice=="upload" && !is.null(design_rv$df_sizes_uploaded)){
+      df <- design_rv$df_sizes_uploaded
+      print("total_inflated_samples is based on the uploaded table")
+    }
+    else{
+      print("data not correct so return NULL")
+      return(NULL)
+    }
+    
+    # double check that sample size values are numeric and that no value is NA (and if so show pop-up error message)
+    if(!any(is.na(df$cluster)) && is.numeric(df$percent_dropout) && !any(is.na(df$percent_dropout)) && is.numeric(df$target_sample_size) && !any(is.na(df$target_sample_size))){
+      
+      # calculate total adjusted sample size
+      tot <- df %>% mutate(adj_sample_size = ceiling(target_sample_size/(1-(percent_dropout/100)))) %>% summarise(sum(adj_sample_size)) %>% as.character()
+      
+      return(tot)
+    }
+  }) 
+  
    # The results box, text and plots are displayed once the calculate final sample sizes button is clicked 
    output$final_sizes_results <- renderUI({
      
@@ -492,7 +523,9 @@ function(input, output, session) {
          title = "Adjusted sample sizes",
          p("Based on the values you entered for sample size (n) and taking into account the proportion drop-out (d), the adjusted sample size is calculated using the formula n_adj = n/(1-d). This still refers to confirmed malaria positive cases. Scroll the table to view."),
          br(),
-         DTOutput("final_sizes_table")
+         DTOutput("final_sizes_table"),
+         br(),
+         textOutput("final_adj_samples"),
      )
    })
   
@@ -520,6 +553,11 @@ function(input, output, session) {
               ) %>% DT::formatStyle(columns = names(df_sizes_final()), backgroundColor = "#f9f9f9") 
   })
 
+  # render the total adj samples
+  output$final_adj_samples <- renderText({
+    paste("Total number of samples needed (considering drop-out): ", total_inflated_samples())
+  })
+  
   # ----------------------------------
   #  Results plot: estimated power
   # ----------------------------------
