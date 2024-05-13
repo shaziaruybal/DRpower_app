@@ -468,7 +468,7 @@ dashboardPage(#theme = "flatly",
     }"
     )),
     fluidRow(
-      column(12, class = "footer", HTML("<span style='font-size:12px;background-color: black;'><p>Developed by Shazia Ruybal-Pesántez and Bob Verity</span>")))
+      column(12, class = "footer", HTML("<span style='font-size:12px;background-color: black;'><p>DRpower pfhrp2/3 planner app version 1.0.0. Developed by Shazia Ruybal-Pesántez and Bob Verity.</span>")))
       # this option has hyperlinks to github if needed
       # column(12, class = "footer", HTML("<span style='font-size:12px;background-color: black;'><p>Developed by <a href='https://www.github.com/shaziaruybal' style='color:#535394;'>Shazia Ruybal-Pesántez</a> and <a href='https://www.github.com/bobverity' style='color:#535394;'>Bob Verity</a></span>")))
   )
