@@ -130,6 +130,8 @@ function(input, output, session) {
         #           title = "Select the row you want to delete by clicking it once, this should highlight the row in blue. Then click button.",
         #           placement = "right"),
         br(), br(),
+        textOutput("final_target_samples"),
+        br(),
         actionButton(
           inputId = "calc_sizes",
           label = "Calculate adjusted sample sizes",
@@ -160,6 +162,8 @@ function(input, output, session) {
                                 scrollX = '400px')
         ),
         br(),
+        textOutput("final_target_samples"),
+        br(),
         actionButton(
           inputId = "calc_sizes",
           label = "Calculate adjusted sample sizes",
@@ -175,6 +179,8 @@ function(input, output, session) {
   design_rv <- reactiveValues(
                               # this is the data frame that will be created when the user selects n clusters, and if they update any values in the table and/or add/delete rows etc
                               df_sizes_update = NULL,
+                              # this is the value for the total number of samples needed
+                              total_samples = NULL,
                               # this is the reactiveVal where the uploaded data frame will be stored
                               df_sizes_uploaded = NULL,
                               # Store a reactive value that checks whether the summary data is complete or not (T/F)
@@ -235,6 +241,20 @@ function(input, output, session) {
     }
   })
   
+  output$final_target_samples <- renderText({
+    if(input$design_table_choice=="manual" && !is.null(design_rv$df_sizes_update)){
+      paste("Total number of samples needed: ", design_rv$total_samples)
+    }
+    else if(input$design_table_choice=="upload" && !is.null(design_rv$df_sizes_uploaded)){
+      df <- design_rv$df_sizes_uploaded
+      tot <- df %>% summarise(sum(target_sample_size)) %>% as.character()
+      paste("Total number of samples needed: ", tot)
+    }
+    else{
+      return(NULL)
+    }
+  })
+  
   # ----------------------------------
   #  User-input table: sample size and proportion drop-out
   # ----------------------------------
@@ -276,8 +296,16 @@ function(input, output, session) {
     print("After user selects N clusters, this is the df:")
     print(df_sizes)
     
+    # calculate total samples
+    tot <- df_sizes %>% summarise(sum(target_sample_size)) %>% as.character()
+    print("This is the total number of samples:")
+    print(tot)
+    
     # when df_sizes is created, store the initial values in df_sizes_update()
     design_rv$df_sizes_update <- df_sizes
+    
+    # and also store the initial total value of samples
+    design_rv$total_samples <- tot
     }
     
     else{
@@ -361,6 +389,10 @@ function(input, output, session) {
 
     # assign the updated data frame to df_sizes_update
     design_rv$df_sizes_update <- df
+    
+    # assign the updated total samples to total_samples
+    tot <- df %>% summarise(sum(target_sample_size)) %>% as.character()
+    design_rv$total_samples <- tot
     
   })
   
