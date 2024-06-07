@@ -1151,7 +1151,7 @@ function(input, output, session) {
                               N = df$sample_size,
                               prev_thresh = 0.05, # HARD CODING 5% THRESHOLD
                               post_full_on = TRUE, 
-                              post_full_breaks = seq(0, 1, 0.001)) 
+                              post_full_breaks = seq(0, 1, length.out = 1e3)) 
 
       }, error = function(err){
         show_alert(
@@ -1237,12 +1237,41 @@ function(input, output, session) {
       df <- analysis_rv$df_deletions_uploaded
       print("df_deletions_final is based on the uploaded table")
     }
-
-    # This function re-calculates prev_output() so we need to get the right df values for the calculation and plotting 
-    DRpower::plot_prevalence(n = df$n_deletions,
-                             N = df$sample_size)
+    
+    # Hard coding plot_prevalence() function to avoid issues with re-calculation of prev_output() and unintended interactivity with the plot reloading when running DRpower::plot_prevalence()
+    
+    # get posterior from prev_output()
+    y <- prev_output()$post_full[[1]]
+    
+    prev_thresh <- 0.05 # hard code 5% 
+    prev_range <- c(0,1) # hard code 0-1 (0-100 for plot)
+    
+    # define plotting labels
+    lab1 <- sprintf("%s%% chance below threshold", round(1e2*(1 - prev_output()$prob_above_threshold), 1))
+    lab2 <- sprintf("%s%% chance above threshold", round(1e2*prev_output()$prob_above_threshold, 1))
+    
+    # find the y value where x equals the prev_thresh
+    y_thresh <- y[which.min(abs(x - prev_thresh))]
+    
+    data.frame(x = x, y = y) %>%
+      mutate(above = ifelse(x > prev_thresh, lab2, lab1),
+             above = factor(above, levels = c(lab1, lab2))) %>%
+      ggplot() + theme_bw() +
+      geom_ribbon(aes(x = 1e2*x, ymin = 0, ymax = y, fill = above)) +
+      geom_line(aes(x = 1e2*x, y = y)) +
+      geom_segment(aes(x = 1e2*prev_thresh, xend = 1e2*prev_thresh, y = 0, yend = y_thresh)) +
+      geom_errorbar(aes(xmin = prev_output()$CrI_lower, xmax = prev_output()$CrI_upper, y = 1.1*max(y)), width = 0.5) +
+      annotate(geom = "text", x = prev_output()$MAP, y = 1.2*max(y), label = "95% Credible Interval", hjust = 0) +
+      geom_point(aes(x = prev_output()$MAP, y = 1.1*max(y))) +
+      scale_fill_manual(values = c("grey", "tomato1"), name = NULL) +
+      scale_x_continuous(limits = 1e2*prev_range, expand = c(0, 0)) +
+      scale_y_continuous(limits = c(0, 1.3*max(y)), expand = c(0, 0)) +
+      xlab("Prevalence of pfhrp2/3 deletions") + ylab("Posterior probability density") +
+      theme(legend.position = "bottom")
     })
   
+    
+    
   # ----------------------------------
   #  Results table/plot: estimated ICC
   # ----------------------------------
