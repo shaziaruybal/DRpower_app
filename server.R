@@ -1483,8 +1483,7 @@ function(input, output, session) {
         study_data <- analysis_rv$df_deletions_uploaded
       }
       
-      params <- list(analysis_nclusters = input$analysis_nclust,
-                     analysis_study_data = study_data,
+      params <- list(analysis_study_data = study_data,
                      analysis_prevoutput = prev_output(),
                      analysis_iccoutput = icc_output()
                      )
