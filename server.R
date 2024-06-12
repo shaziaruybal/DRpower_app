@@ -1203,18 +1203,18 @@ function(input, output, session) {
     req(prev_output())
     
     # check if prev_output() has been created, which means the results have been calculated and can be displayed
-    if(!is.null(prev_output()) && prev_output()$prob_above_threshold >= 0.95){
-      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%). The probability that the prevalence is above the 5% threshold is estimated at ", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "%. ", em("We require at least 95% probability to confidently conclude that prevalence is above the 5% threshold."))
-      line2 <- paste("CONCLUSION: The ", em("pfhrp2/3"), "deletion prevalence is ", strong("above"), " the 5% threshold.")
+    if(!is.null(prev_output()) && prev_output()$prob_above_threshold > 0.95){
+      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%). The probability that the prevalence is above the 5% threshold is estimated at ", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "%. ", em("We require greater than 95% probability to confidently conclude that prevalence is above the 5% threshold."))
+      line2 <- paste("CONCLUSION: The prevalence of", em("pfhrp2/3"), " deletions causing false-negative HRP2-based RDTs is", strong("above"), " the 5% threshold.")
 
       HTML(paste(line1, line2, sep = "<br/><br/>"))
 
     }
 
-    else if(!is.null(prev_output()) && prev_output()$prob_above_threshold < 0.95){
-      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%). The probability that the prevalence is above the 5% threshold is estimated at ", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "%. ", em("We require at least 95% probability to confidently conclude that prevalence is above the 5% threshold."))
-      line2 <- paste("CONCLUSION: The ", em("pfhrp2/3"), "deletion prevalence is ", strong("below"), " the 5% threshold.")
-
+    else if(!is.null(prev_output()) && prev_output()$prob_above_threshold <= 0.95){
+      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%). The probability that the prevalence is above the 5% threshold is estimated at ", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "%. ", em("We require greater than 95% probability to confidently conclude that prevalence is above the 5% threshold."))
+      line2 <- paste("CONCLUSION: The prevalence of", em("pfhrp2/3"), " deletions causing false-negative HRP2-based RDTs is", strong("below"), " the 5% threshold.")
+      
       HTML(paste(line1, line2, sep = "<br/><br/>"))
     }
 
