@@ -1,6 +1,6 @@
 ---
 title: "*pfhrp2/3* Planner: Design report"
-date: "*Downloaded on: `r Sys.Date()` | DRpower interactive app v1.0.0*"
+date: "*Downloaded on: `r Sys.Date()` | DRpower interactive app v1.0.1*"
 output: 
   html_document:
     # theme: flatly
