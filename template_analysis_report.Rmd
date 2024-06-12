@@ -77,7 +77,7 @@ kable(study_data,
 
 To estimate the prevalence of *pfhrp2/3* deletions causing false-negative HRP2-based RDTs, we used the [DRpower R package](https://mrc-ide.github.io/DRpower) to test whether the observed prevalence in this study was above or below the [WHO recommended prevalence threshold of 5%](https://iris.who.int/handle/10665/331197). 
 
-**RESULT**: We estimate that the prevalence of *pfhrp2/3* deletions causing false-negative HRP2-based RDTs is `r round(as.numeric(prev_output$MAP), 2)`% (95% CrI: `r round(as.numeric(prev_output$CrI_lower), 2)`-`r round(as.numeric(prev_output$CrI_upper), 2)`%). The probability that the prevalence is above the 5% threshold is estimated at `r round(as.numeric(prev_output$prob_above_threshold)*100, 2)`%. *We require at least 95% probability to confidently conclude that prevalence is above the 5% threshold.*
+**RESULT**: We estimate that the prevalence of *pfhrp2/3* deletions causing false-negative HRP2-based RDTs is `r round(as.numeric(prev_output$MAP), 2)`% (95% CrI: `r round(as.numeric(prev_output$CrI_lower), 2)`-`r round(as.numeric(prev_output$CrI_upper), 2)`%). The probability that the prevalence is above the 5% threshold is estimated at `r round(as.numeric(prev_output$prob_above_threshold)*100, 2)`%. *We require greater than 95% probability to confidently conclude that prevalence is above the 5% threshold.*
 
 ##### CONCLUSION: The prevalence of *pfhrp2/3* deletions causing false-negative HRP2-based RDTs within symptomatic *P. falciparum* patients is **`r if(prev_output$prob_above_threshold>0.95) "above" else "below"`** the 5% WHO threshold.
 
