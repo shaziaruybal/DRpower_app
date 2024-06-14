@@ -1,6 +1,7 @@
 packages:
   - DRpower # repo link: https://github.com/mrc-ide/drpower
   - DT
+  - janitor
   - kableExtra
   - shiny
   - shiny.blueprint
