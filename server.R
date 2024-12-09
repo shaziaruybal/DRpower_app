@@ -130,6 +130,8 @@ function(input, output, session) {
         #           title = "Select the row you want to delete by clicking it once, this should highlight the row in blue. Then click button.",
         #           placement = "right"),
         br(), br(),
+        textOutput("final_target_samples"),
+        br(),
         actionButton(
           inputId = "calc_sizes",
           label = "Calculate adjusted sample sizes",
@@ -160,6 +162,8 @@ function(input, output, session) {
                                 scrollX = '400px')
         ),
         br(),
+        textOutput("final_target_samples"),
+        br(),
         actionButton(
           inputId = "calc_sizes",
           label = "Calculate adjusted sample sizes",
@@ -175,6 +179,8 @@ function(input, output, session) {
   design_rv <- reactiveValues(
                               # this is the data frame that will be created when the user selects n clusters, and if they update any values in the table and/or add/delete rows etc
                               df_sizes_update = NULL,
+                              # this is the value for the total number of samples needed
+                              total_samples = NULL,
                               # this is the reactiveVal where the uploaded data frame will be stored
                               df_sizes_uploaded = NULL,
                               # Store a reactive value that checks whether the summary data is complete or not (T/F)
@@ -235,6 +241,20 @@ function(input, output, session) {
     }
   })
   
+  output$final_target_samples <- renderText({
+    if(input$design_table_choice=="manual" && !is.null(design_rv$df_sizes_update)){
+      paste("Total number of samples needed: ", design_rv$total_samples)
+    }
+    else if(input$design_table_choice=="upload" && !is.null(design_rv$df_sizes_uploaded)){
+      df <- design_rv$df_sizes_uploaded
+      tot <- df %>% summarise(sum(target_sample_size)) %>% as.character()
+      paste("Total number of samples needed: ", tot)
+    }
+    else{
+      return(NULL)
+    }
+  })
+  
   # ----------------------------------
   #  User-input table: sample size and proportion drop-out
   # ----------------------------------
@@ -276,8 +296,16 @@ function(input, output, session) {
     print("After user selects N clusters, this is the df:")
     print(df_sizes)
     
+    # calculate total samples
+    tot <- df_sizes %>% summarise(sum(target_sample_size)) %>% as.character()
+    print("This is the total number of samples:")
+    print(tot)
+    
     # when df_sizes is created, store the initial values in df_sizes_update()
     design_rv$df_sizes_update <- df_sizes
+    
+    # and also store the initial total value of samples
+    design_rv$total_samples <- tot
     }
     
     else{
@@ -361,6 +389,10 @@ function(input, output, session) {
 
     # assign the updated data frame to df_sizes_update
     design_rv$df_sizes_update <- df
+    
+    # assign the updated total samples to total_samples
+    tot <- df %>% summarise(sum(target_sample_size)) %>% as.character()
+    design_rv$total_samples <- tot
     
   })
   
@@ -479,7 +511,38 @@ function(input, output, session) {
       )
     }
   }) 
-     
+
+  
+  # When 'calculate sample sizes' button is clicked:
+  # update the data frame with the user-entered values or the uploaded data, check dfs are inputted correctly, calculate the adjusted sample size, and create a final df that is reactive
+  # we then want to calculate the total number of inflated samples so we can display this value reactively
+  total_inflated_samples <- eventReactive(input$calc_sizes, {
+    
+    # If the user has selected "manual entry" and the design_rv$df_sizes_update data frame exists, get the stored (and edited) data frame with sample sizes
+    if(input$design_table_choice=="manual" && !is.null(design_rv$df_sizes_update)){
+      df <- design_rv$df_sizes_update
+      print("total_inflated_samples is based on the manual entry table")
+    }
+    # If the user has selected "upload" and the design_rv$df_sizes_uploaded data frame exists, get theuploaded data frame with sample sizes
+    else if(input$design_table_choice=="upload" && !is.null(design_rv$df_sizes_uploaded)){
+      df <- design_rv$df_sizes_uploaded
+      print("total_inflated_samples is based on the uploaded table")
+    }
+    else{
+      print("data not correct so return NULL")
+      return(NULL)
+    }
+    
+    # double check that sample size values are numeric and that no value is NA (and if so show pop-up error message)
+    if(!any(is.na(df$cluster)) && is.numeric(df$percent_dropout) && !any(is.na(df$percent_dropout)) && is.numeric(df$target_sample_size) && !any(is.na(df$target_sample_size))){
+      
+      # calculate total adjusted sample size
+      tot <- df %>% mutate(adj_sample_size = ceiling(target_sample_size/(1-(percent_dropout/100)))) %>% summarise(sum(adj_sample_size)) %>% as.character()
+      
+      return(tot)
+    }
+  }) 
+  
    # The results box, text and plots are displayed once the calculate final sample sizes button is clicked 
    output$final_sizes_results <- renderUI({
      
@@ -492,7 +555,9 @@ function(input, output, session) {
          title = "Adjusted sample sizes",
          p("Based on the values you entered for sample size (n) and taking into account the proportion drop-out (d), the adjusted sample size is calculated using the formula n_adj = n/(1-d). This still refers to confirmed malaria positive cases. Scroll the table to view."),
          br(),
-         DTOutput("final_sizes_table")
+         DTOutput("final_sizes_table"),
+         br(),
+         textOutput("final_adj_samples"),
      )
    })
   
@@ -520,6 +585,11 @@ function(input, output, session) {
               ) %>% DT::formatStyle(columns = names(df_sizes_final()), backgroundColor = "#f9f9f9") 
   })
 
+  # render the total adj samples
+  output$final_adj_samples <- renderText({
+    paste("Total number of samples needed (considering drop-out): ", total_inflated_samples())
+  })
+  
   # ----------------------------------
   #  Results plot: estimated power
   # ----------------------------------
@@ -1081,7 +1151,7 @@ function(input, output, session) {
                               N = df$sample_size,
                               prev_thresh = 0.05, # HARD CODING 5% THRESHOLD
                               post_full_on = TRUE, 
-                              post_full_breaks = seq(0, 1, 0.001)) 
+                              post_full_breaks = seq(0, 1, length.out = 1e3)) 
 
       }, error = function(err){
         show_alert(
@@ -1131,20 +1201,20 @@ function(input, output, session) {
   output$est_prev_resulttext <- renderUI({
     # require estimate prevalence button click
     req(prev_output())
-
+    
     # check if prev_output() has been created, which means the results have been calculated and can be displayed
-    if(!is.null(prev_output()) && prev_output()$prob_above_threshold >= 0.95){
-      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%).")
-      line2 <- paste("We conclude that the ", em("pfhrp2/3"), "deletion prevalence is above the 5% threshold (probability above threshold = ", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "%).")
+    if(!is.null(prev_output()) && prev_output()$prob_above_threshold > 0.95){
+      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%). The probability that the prevalence is above the 5% threshold is estimated at ", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "%. ", em("We require greater than 95% probability to confidently conclude that prevalence is above the 5% threshold."))
+      line2 <- paste("CONCLUSION: The prevalence of", em("pfhrp2/3"), " deletions causing false-negative HRP2 RDTs is", strong("above"), " the 5% threshold.")
 
       HTML(paste(line1, line2, sep = "<br/><br/>"))
 
     }
 
-    else if(!is.null(prev_output()) && prev_output()$prob_above_threshold < 0.95){
-      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%).")
-      line2 <- paste("We conclude that the ", em("pfhrp2/3"), "deletion prevalence is below the 5% threshold (probability above threshold = ", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "%).")
-
+    else if(!is.null(prev_output()) && prev_output()$prob_above_threshold <= 0.95){
+      line1 <- paste("RESULT: We estimate that the prevalence of", em("pfhrp2/3"), "deletions is ", round(as.numeric(prev_output()$MAP), 2), "% (95% CrI: ", round(as.numeric(prev_output()$CrI_lower), 2), "- ", round(as.numeric(prev_output()$CrI_upper), 2), "%). The probability that the prevalence is above the 5% threshold is estimated at ", round(as.numeric(prev_output()$prob_above_threshold)*100, 2), "%. ", em("We require greater than 95% probability to confidently conclude that prevalence is above the 5% threshold."))
+      line2 <- paste("CONCLUSION: The prevalence of", em("pfhrp2/3"), " deletions causing false-negative HRP2 RDTs is", strong("below"), " the 5% threshold.")
+      
       HTML(paste(line1, line2, sep = "<br/><br/>"))
     }
 
@@ -1153,26 +1223,90 @@ function(input, output, session) {
     }
   })
   
+  # this code is ugly because we aren't using plot_prevalence() because it's buggy if the user changes the values in the table (it replots - when it actually shoudn't re-plot unless the 'estimate prevalence' button is clicked)
   output$est_prev_plot <- renderPlot({
     # require estimate prevalence button to have been clicked
     req(input$est_prev)
     
     # If the user has selected "manual entry" and the analysis_rv$df_analysis_update data frame exists, get the stored (and edited) data frame with sample sizes
-    if(input$analysis_table_choice=="manual" && !is.null(analysis_rv$df_analysis_update)){
+    if(input$analysis_table_choice=="manual" && !is.null(analysis_rv$df_analysis_update) && !is.null(prev_output())){
       df <- analysis_rv$df_analysis_update
       print("df_deletions_final is based on the manual entry table")
+      
+      # Hard coding plot_prevalence() function to avoid issues with re-calculation of prev_output() and unintended interactivity with the plot reloading when running DRpower::plot_prevalence()
+
+      prev_thresh <- 0.05 # hard code 5% 
+      prev_range <- c(0,1) # hard code 0-1 (0-100 for plot)
+      
+      # get posterior from prev_output()
+      x <- seq(prev_range[1], prev_range[2], length.out = 1e3)
+      y <- prev_output()$post_full[[1]]
+      
+      # define plotting labels
+      lab1 <- sprintf("%s%% chance below threshold", round(1e2*(1 - prev_output()$prob_above_threshold), 1))
+      lab2 <- sprintf("%s%% chance above threshold", round(1e2*prev_output()$prob_above_threshold, 1))
+      
+      # find the y value where x equals the prev_thresh
+      y_thresh <- y[which.min(abs(x - prev_thresh))]
+      
+      data.frame(x = x, y = y) %>%
+        mutate(above = ifelse(x > prev_thresh, lab2, lab1),
+               above = factor(above, levels = c(lab1, lab2))) %>%
+        ggplot() + theme_bw() +
+        geom_ribbon(aes(x = 1e2*x, ymin = 0, ymax = y, fill = above)) +
+        geom_line(aes(x = 1e2*x, y = y)) +
+        geom_segment(aes(x = 1e2*prev_thresh, xend = 1e2*prev_thresh, y = 0, yend = y_thresh)) +
+        geom_errorbar(aes(xmin = prev_output()$CrI_lower, xmax = prev_output()$CrI_upper, y = 1.1*max(y)), width = 0.5) +
+        annotate(geom = "text", x = prev_output()$MAP, y = 1.2*max(y), label = "95% Credible Interval", hjust = 0) +
+        geom_point(aes(x = prev_output()$MAP, y = 1.1*max(y))) +
+        scale_fill_manual(values = c("grey", "tomato1"), name = NULL) +
+        scale_x_continuous(limits = 1e2*prev_range, expand = c(0, 0)) +
+        scale_y_continuous(limits = c(0, 1.3*max(y)), expand = c(0, 0)) +
+        xlab("Prevalence of pfhrp2/3 deletions") + ylab("Posterior probability density") +
+        theme(legend.position = "bottom")
     }
     # If the user has selected "upload" and the analysis_rv$df_deletions_uploaded data frame exists, get the uploaded data frame with sample sizes
-    else if(input$analysis_table_choice=="upload" && !is.null(analysis_rv$df_deletions_uploaded)){
+    else if(input$analysis_table_choice=="upload" && !is.null(analysis_rv$df_deletions_uploaded) && !is.null(prev_output())){
       df <- analysis_rv$df_deletions_uploaded
       print("df_deletions_final is based on the uploaded table")
+      
+      # Hard coding plot_prevalence() function to avoid issues with re-calculation of prev_output() and unintended interactivity with the plot reloading when running DRpower::plot_prevalence()
+      
+      prev_thresh <- 0.05 # hard code 5% 
+      prev_range <- c(0,1) # hard code 0-1 (0-100 for plot)
+      
+      # get posterior from prev_output()
+      x <- seq(prev_range[1], prev_range[2], length.out = 1e3)
+      y <- prev_output()$post_full[[1]]
+      
+      # define plotting labels
+      lab1 <- sprintf("%s%% chance below threshold", round(1e2*(1 - prev_output()$prob_above_threshold), 1))
+      lab2 <- sprintf("%s%% chance above threshold", round(1e2*prev_output()$prob_above_threshold, 1))
+      
+      # find the y value where x equals the prev_thresh
+      y_thresh <- y[which.min(abs(x - prev_thresh))]
+      
+      data.frame(x = x, y = y) %>%
+        mutate(above = ifelse(x > prev_thresh, lab2, lab1),
+               above = factor(above, levels = c(lab1, lab2))) %>%
+        ggplot() + theme_bw() +
+        geom_ribbon(aes(x = 1e2*x, ymin = 0, ymax = y, fill = above)) +
+        geom_line(aes(x = 1e2*x, y = y)) +
+        geom_segment(aes(x = 1e2*prev_thresh, xend = 1e2*prev_thresh, y = 0, yend = y_thresh)) +
+        geom_errorbar(aes(xmin = prev_output()$CrI_lower, xmax = prev_output()$CrI_upper, y = 1.1*max(y)), width = 0.5) +
+        annotate(geom = "text", x = prev_output()$MAP, y = 1.2*max(y), label = "95% Credible Interval", hjust = 0) +
+        geom_point(aes(x = prev_output()$MAP, y = 1.1*max(y))) +
+        scale_fill_manual(values = c("grey", "tomato1"), name = NULL) +
+        scale_x_continuous(limits = 1e2*prev_range, expand = c(0, 0)) +
+        scale_y_continuous(limits = c(0, 1.3*max(y)), expand = c(0, 0)) +
+        xlab("Prevalence of pfhrp2/3 deletions") + ylab("Posterior probability density") +
+        theme(legend.position = "bottom")
     }
-
-    # This function re-calculates prev_output() so we need to get the right df values for the calculation and plotting 
-    DRpower::plot_prevalence(n = df$n_deletions,
-                             N = df$sample_size)
+    
     })
   
+    
+    
   # ----------------------------------
   #  Results table/plot: estimated ICC
   # ----------------------------------
@@ -1384,8 +1518,7 @@ function(input, output, session) {
         study_data <- analysis_rv$df_deletions_uploaded
       }
       
-      params <- list(analysis_nclusters = input$analysis_nclust,
-                     analysis_study_data = study_data,
+      params <- list(analysis_study_data = study_data,
                      analysis_prevoutput = prev_output(),
                      analysis_iccoutput = icc_output()
                      )

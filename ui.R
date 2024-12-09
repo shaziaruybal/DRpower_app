@@ -135,7 +135,14 @@ dashboardPage(#theme = "flatly",
                  h4("Acknowledgments", style = "color: #605ca3"),
                  p("This tool was developed by Shazia Ruybal-Pesántez and Bob Verity, Malaria Modelling Group, Imperial College London, in collaboration with the Global Malaria Programme, World Health Organisation (WHO)."),
                  br(), 
-                 p(em("Most recent update 15 November 2023.")),
+                 h4("How to reference", style = "color: #605ca3"),
+                 p("Ruybal-Pesántez S and Verity R (2023). DRpower and pfhrp2/3 planner app: Study design and analysis for pfhrp2/3 deletion prevalence studies. R package version 1.0.2 and R Shiny app version 1.0.1."),
+                 br(), 
+                 h5(em("Data privacy disclaimer"), style = "color: #605ca3"),
+                 p(em("This web application does not store any data within the application itself. Data is temporarily stored on our the Shiny server during your active session and/or when you save your results for export into the downloadable report. Please note that any refresh or reload of the page will result in the loss of data, as it is not stored beyond the duration of your session.")),
+                 br(), 
+                 br(),
+                 p(em("Most recent update 12 June 2024.")),
                  br()
           )
         )
@@ -442,8 +449,12 @@ dashboardPage(#theme = "flatly",
                    br(), br(),
                    "In these calculations the sample size number represents the number of ", em("confirmed malaria cases, "), "which may be lower than the number of ", em("suspected "), "cases (see schematic below).",
                    img(src = "img/sample_sizes_diagram.png", height = "100%", width = "100%"),
+                   br(), br(),
+                   strong("6. How do I analyse my data if I have both ", em("hrp2 "), "and ", em("hrp3 "), "gene deletion counts?"),
+                   br(), br(),
+                   "You will need to analyse results for each gene separately. DRpower does not explicitly account for joint analysis of multiple loci and so we assume you are powering for just one set of deletion counts.",
                    br(), br(), br(),
-                   strong("5. What if I want to perform even more bespoke and/or advanced analyses?"),
+                   strong("7. What if I want to perform even more bespoke and/or advanced analyses?"),
                    br(), br(),
                    "We recommend the DRpower R package for more advanced users. For more information on the statical methods used in the back-end of this app or if you want to do more advanced analyses, please visit the ",
                    a("DRpower R package website.", target = "_blank", href='https://mrc-ide.github.io/DRpower/')
@@ -464,7 +475,7 @@ dashboardPage(#theme = "flatly",
     }"
     )),
     fluidRow(
-      column(12, class = "footer", HTML("<span style='font-size:12px;background-color: black;'><p>Developed by Shazia Ruybal-Pesántez and Bob Verity</span>")))
+      column(12, class = "footer", HTML("<span style='font-size:12px;background-color: black;'><p>DRpower pfhrp2/3 planner app version 1.0.1. Developed by Shazia Ruybal-Pesántez and Bob Verity.</span>")))
       # this option has hyperlinks to github if needed
       # column(12, class = "footer", HTML("<span style='font-size:12px;background-color: black;'><p>Developed by <a href='https://www.github.com/shaziaruybal' style='color:#535394;'>Shazia Ruybal-Pesántez</a> and <a href='https://www.github.com/bobverity' style='color:#535394;'>Bob Verity</a></span>")))
   )
