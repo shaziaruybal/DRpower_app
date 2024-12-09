@@ -1468,6 +1468,7 @@ function(input, output, session) {
           },
           br(), br(),
           h4("Prevalence estimates:"),
+          p(em("MAP = maximum a posterior estimate of prevalence; CrI= credible interval")),
           renderTable(prev_output() %>% mutate(prob_above_threshold = prob_above_threshold*100) %>% 
                         select(-post_full), 
                       digits = 2),
