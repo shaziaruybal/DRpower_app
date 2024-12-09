@@ -54,7 +54,7 @@ function(input, output, session) {
     # require the user inputs to render the text
     req(input$ss_icc, input$ss_prev)
 
-    "Columns give the assumed true prevalence of pfhrp2/3 deletions in the province. 10% is highlighted as the suggested default. Rows give the number of health facilities (i.e., clusters) within the province. Scroll the table to view all suggested values. Note that if a particular cell is blank, the target sample size is >2000."
+    "Columns give the assumed true prevalence of pfhrp2/3 deletions in the province. 10% is highlighted as the suggested default. Rows give the number of health facilities (i.e., clusters) within the province. Scroll the table to view all suggested values for sample size per health facility. Note that if a particular cell is blank, the target sample size is >2000."
 
   })
 
