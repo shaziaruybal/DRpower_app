@@ -1,0 +1,31 @@
+/* # The CSS code below creates a custom callout box with the same styling as the shiny.blueprint::Callout box but without funcitonality JS/HTML issues*/
+        .custom-callout {
+          border: 1px solid #f0f0f0;
+          background-color: rgb(218, 224, 231);
+          padding: 15px;
+          margin-bottom: 10px;
+        }
+        .callout-title{
+          font-size: 17px;
+          font-weight: 600;
+          margin-bottom: 10px;
+        }
+        
+        /* Add spacing between inline links */
+        .inline-link {
+          display: inline;
+          margin-right: 0px; 
+        }
+        
+        /* Change the color of the tooltip boxes */
+        .tooltip > .tooltip-inner {
+                width: 400px;
+                color: white;
+                background-color: #666666;
+        }
+        
+        /* Change the width and color of the landing page line */
+        hr {
+          opacity: 1; 
+          border-top: 2.5px solid #605ca3;
+        }
