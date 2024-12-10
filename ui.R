@@ -10,7 +10,7 @@ library(shinyWidgets)
 library(shinyBS)
 library(shinyjs)
 
-# This is a custom function that calls upon the goToTab JS code (lines 79-88) to navigate to a tab by its 'tabname'
+# This is a custom function that calls upon the goToTab JS code (see 'script.js') to navigate to a tab by its 'tabname'
 shinyLink <- function(to, label) {
   tags$a(
     class = c("shiny__link", "inline-link"), 
@@ -54,53 +54,13 @@ dashboardPage(#theme = "flatly",
   ),
   dashboardBody(
     useShinyjs(),
-    # TODO: move this CSS code into a .css file to clean up UI code 
-    tags$style(
-      HTML("
-        /* # The CSS code below creates a custom callout box with the same styling as the shiny.blueprint::Callout box but without funcitonality JS/HTML issues*/
-        .custom-callout {
-          border: 1px solid #f0f0f0;
-          background-color: rgb(218, 224, 231);
-          padding: 15px;
-          margin-bottom: 10px;
-        }
-        .callout-title{
-          font-size: 17px;
-          font-weight: 600;
-          margin-bottom: 10px;
-        }
-        
-        /* Add spacing between inline links */
-        .inline-link {
-          display: inline;
-          margin-right: 0px; 
-        }
-        
-        /* Change the color of the tooltip boxes */
-        .tooltip > .tooltip-inner {
-                width: 400px;
-                color: white;
-                background-color: #666666;
-        }
-        
-        /* Change the width and color of the landing page line */
-        hr {
-          opacity: 1; 
-          border-top: 2.5px solid #605ca3;
-        }
-      ")
-    ),
-    # The JavaScript code below runs the function that triggers a click "event" switching to the resepctive tabName when the link is clicked
-    tags$script('
-      function goToTab(tabName) {
-        var tab = document.querySelector("a[data-value=" + tabName + "]");
-        if (tab) {
-          tab.click()
-          // var tabUrl = tab.getAttribute("href");
-          // window.open(tab, "_blank");
-        }
-      }
-    '),
+    
+    # Custom CSS
+    tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")),
+    
+    # Custom javascript (note not using atm)
+    tags$head(tags$script(src = "script.js")), 
+    
     tabItems(
       # ----------------------------------
       # TESTING
@@ -177,9 +137,9 @@ dashboardPage(#theme = "flatly",
                                  placement = "right",
                                  options = list(container = "body", 
                                                 html = T)),
-                       # helpText(em("A high ICC value implies a high variation in the prevalence of deletions between clusters. A value of 0.05 is suggested by default based on an "),
-                       #          em(a("analysis of historical studies.", target = "_blank", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html"))),
-                       # br(),
+                       helpText(em("A high ICC value implies a high variation in the prevalence of deletions between clusters. A value of 0.05 is suggested by default based on an "),
+                                em(a("analysis of historical studies.", target = "_blank", href = "https://mrc-ide.github.io/DRpower/articles/historical_analysis.html"))),
+                       br(),
                        selectInput(
                          inputId = "ss_prev",
                          label = strong("Select the prevalence threshold (%): "),
@@ -192,8 +152,8 @@ dashboardPage(#theme = "flatly",
                                  placement = "right",
                                  options = list(container = "body", 
                                                 html = T)),
-                       # helpText(em("The prevalence value that we are comparing against in our hypothesis test (5% by default, see ", em(shinyLink(to = "faq", label = "here")), ").")),
-                       # br(),
+                       helpText(em("The prevalence value that we are comparing against in our hypothesis test (5% by default, see", em(shinyLink(to = "faq", label = "the FAQs")), ").")),
+                       br(),
                    ),
                    box(width = 12,
                        tagAppendAttributes(textOutput("text_ss"), style="white-space:pre-wrap;"),
