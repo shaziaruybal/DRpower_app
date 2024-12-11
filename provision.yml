@@ -11,6 +11,7 @@ packages:
   - shinyBS
   - shinyvalidate
   - tidyverse
+  - markdown
 package_sources:
   github:
   - mrc-ide/drpower
