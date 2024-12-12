@@ -339,7 +339,7 @@ dashboardPage(#theme = "flatly",
     # Tab 5 - FAQ
     tabItem(
       tabName = "faq",
-      includeMarkdown("faq.rmd")
+      includeMarkdown("faq.Rmd")
     )
     ),
     tags$style(HTML("
